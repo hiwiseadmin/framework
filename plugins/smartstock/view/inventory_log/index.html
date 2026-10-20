@@ -1,0 +1,53 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}库存流水{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-journal-text" caption="库存流水" buttongroup="" /}
+    <div class="plugin-smartstock">
+        <div class="container-fluid p-0">
+            <div class="card">
+                <div class="card-body">
+                    <form class="row g-2 mb-3" id="search-form">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control form-control-sm" id="search-keyword" placeholder="商品名称/SKU编码">
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select form-select-sm" id="search-warehouse">
+                                <option value="">全部仓库</option>
+                                {foreach $warehouses as $w}
+                                <option value="{$w.id}">{$w.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select form-select-sm" id="search-change-type">
+                                <option value="">全部变动类型</option>
+                                <option value="in">入库</option>
+                                <option value="out">出库</option>
+                                <option value="transfer_in">调拨入库</option>
+                                <option value="transfer_out">调拨出库</option>
+                                <option value="check">盘点调整</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-flex gap-2">
+                                <input type="date" class="form-control form-control-sm" id="search-start-date">
+                                <input type="date" class="form-control form-control-sm" id="search-end-date">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm" id="btn-search"><i class="bi bi-search"></i> 查询</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-reset"><i class="bi bi-arrow-clockwise"></i> 重置</button>
+                        </div>
+                    </form>
+
+                    <div id="toolbar" class="toolbar mb-2"></div>
+                    <table id="table"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

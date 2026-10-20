@@ -1,0 +1,110 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}{if condition="!empty($link.id)"}编辑友链{else /}添加友链{/if}{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-link-45deg" caption="友情链接" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <form id="friendLinkForm" method="post"
+                      action="{if condition="!empty($link.id)"}{:plugin_url('wisecms/friendLink/edit')}?id={$link.id}{else /}{:plugin_url('wisecms/friendLink/create')}{/if}">
+                    {:csrf_field()}
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="cms-f-name">链接名称 <span class="text-danger">*</span></label>
+                            <input id="cms-f-name" type="text" name="name" class="form-control" required maxlength="100"
+                                   value="{$link.name|default=''}" placeholder="网站名 / 合作媒体名">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="cms-f-url">链接地址 <span class="text-danger">*</span></label>
+                            <input id="cms-f-url" type="text" name="url" class="form-control" required maxlength="500"
+                                   value="{$link.url|default=''}" placeholder="https://example.com">
+                            <div class="form-text">仅允许 http / https 协议</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="cms-f-group_name">分组名称</label>
+                            <input id="cms-f-group_name" type="text" name="group_name" class="form-control" maxlength="50" list="groupList"
+                                   value="{$link.group_name|default=''}" placeholder="留空=默认组">
+                            <datalist id="groupList">
+                                {foreach $groups as $g}
+                                <option value="{$g}"></option>
+                                {/foreach}
+                            </datalist>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label" for="cms-f-is_image">是否图片型</label>
+                            <select id="cms-f-is_image" name="is_image" class="form-select">
+                                <option value="0" {if condition="empty($link.is_image)"}selected{/if}>文字链接</option>
+                                <option value="1" {if condition="!empty($link.is_image)"}selected{/if}>图片链接</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-logo">Logo 地址</label>
+                            <input id="cms-f-logo" type="text" name="logo" class="form-control" maxlength="500"
+                                   value="{$link.logo|default=''}" placeholder="https://example.com/logo.png（图片型必填）">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label" for="cms-f-target">打开方式</label>
+                            <select id="cms-f-target" name="target" class="form-select">
+                                <option value="_blank" {if condition="!isset($link.target) || $link.target == '_blank'"}selected{/if}>新窗口 _blank</option>
+                                <option value="_self" {if condition="isset($link.target) && $link.target == '_self'"}selected{/if}>当前窗口 _self</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label" for="cms-f-nofollow">nofollow</label>
+                            <select id="cms-f-nofollow" name="nofollow" class="form-select">
+                                <option value="0" {if condition="empty($link.nofollow)"}selected{/if}>否</option>
+                                <option value="1" {if condition="!empty($link.nofollow)"}selected{/if}>是</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label" for="cms-f-sort">排序</label>
+                            <input id="cms-f-sort" type="number" name="sort" class="form-control" value="{$link.sort|default=0}">
+                            <div class="form-text">越大越靠前</div>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label" for="cms-f-status">状态</label>
+                            <select id="cms-f-status" name="status" class="form-select">
+                                <option value="1" {if condition="!isset($link.status) || $link.status == 1"}selected{/if}>显示</option>
+                                <option value="0" {if condition="isset($link.status) && $link.status == 0"}selected{/if}>隐藏</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label" for="cms-f-start_time">生效时间</label>
+                            <input id="cms-f-start_time" type="text" name="start_time" class="form-control"
+                                   value="{$link.start_time_text|default=''}" placeholder="Y-m-d H:i（空=不限）">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label" for="cms-f-end_time">失效时间</label>
+                            <input id="cms-f-end_time" type="text" name="end_time" class="form-control"
+                                   value="{$link.end_time_text|default=''}" placeholder="Y-m-d H:i（空=不限）">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label" for="cms-f-description">描述 / 备注</label>
+                            <textarea id="cms-f-description" name="description" class="form-control" rows="2" maxlength="255">{$link.description|default=''}</textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                    <!-- 返回与提交均由 js/friend_link.js 的 create()/edit() 处理（模板零内联脚本） -->
+                    <button type="button" id="btn-friend-link-back" class="btn btn-outline-secondary btn-sm">返回</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/friend_link.js（由 wsconfig.js 自动加载） -->
+{/block}

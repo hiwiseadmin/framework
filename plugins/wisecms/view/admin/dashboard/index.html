@@ -1,0 +1,115 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}数据看板{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-speedometer2" caption="数据看板" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <!-- ① 统计卡片（P2-01：每张卡都是链接，点击下钻到带筛选/排序的列表）
+             data-wise-nav：交给主框架「打开/切换到菜单」协议处理（见 modules/wise-navmenu.js）——
+             命中菜单则切到 CMS 一级菜单 + 高亮侧边栏 + 开/复用标签（`?status=` 等筛选态保留），
+             而不是在看板 iframe 里跳走把看板整页替换掉。href 仍是真实地址，Ctrl/中键照常。 -->
+        <div class="row g-3 mb-3">
+            {foreach $cards as $c}
+            <div class="col-6 col-xl-3" data-card-key="{$c.key}">
+                <a href="{$c.url}" data-wise-nav class="card {$c.cls} text-decoration-none h-100" title="{$c.title}">
+                    <div class="card-body py-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <div class="text-uppercase small text-body-secondary">{$c.label}</div>
+                                <div class="fs-3 fw-semibold js-card-value cms-kpi-value">{$c.value}</div>
+                            </div>
+                            <i class="{$c.icon} fs-2 cms-kpi-icon"></i>
+                        </div>
+                        <!-- 「点击查看」常态隐藏，hover 才出现：4 张卡各写一遍是纯噪音 -->
+                        <div class="small text-body-secondary mt-1 cms-kpi-link">点击查看 <i class="bi bi-arrow-right-short"></i></div>
+                    </div>
+                </a>
+            </div>
+            {/foreach}
+        </div>
+
+        <div class="row g-3 mb-3">
+            <!-- ② 待办清单（只列有真实筛选入口的项，每项可点击） -->
+            <div class="col-12 col-xl-4">
+                <div class="card h-100">
+                    <div class="card-header py-2 d-flex align-items-center justify-content-between">
+                        <h6 class="card-title mb-0 small"><i class="bi bi-list-check me-1"></i>待办</h6>
+                        {if $totalTodos > 0}
+                        <span class="badge bg-danger">{$totalTodos}</span>
+                        {else /}
+                        <span class="badge bg-success">已清空</span>
+                        {/if}
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            {foreach $todos as $t}
+                            <li class="list-group-item d-flex align-items-center justify-content-between py-2"
+                                data-todo-key="{$t.key}">
+                                <!-- data-wise-nav：同统计卡片，交由主框架切换/打开对应菜单标签 -->
+                                <a href="{$t.url}" data-wise-nav class="text-decoration-none small">
+                                    <i class="{$t.icon} me-1 text-muted"></i>{$t.label}
+                                </a>
+                                {if $t.count > 0}
+                                <span class="badge bg-warning text-dark js-todo-count">{$t.count}</span>
+                                {else /}
+                                <span class="badge bg-body-secondary text-secondary border js-todo-count">0</span>
+                                {/if}
+                            </li>
+                            {/foreach}
+                        </ul>
+                    </div>
+                    <div class="card-footer small text-muted py-2">
+                        数字均按<b>当前站点</b>统计；点击任一项进入对应列表。
+                    </div>
+                </div>
+            </div>
+
+            <!-- ③ 发布趋势（区间 7/30/90 天可切换，局部刷新不整页重载） -->
+            <div class="col-12 col-xl-8">
+                <div class="card h-100">
+                    <div class="card-header py-2 d-flex align-items-center justify-content-between">
+                        <h6 class="card-title mb-0 small"><i class="bi bi-bar-chart me-1"></i>发布趋势</h6>
+                        <div class="btn-group btn-group-sm" role="group" id="trend-range">
+                            {foreach $trendDays as $d}
+                            <button type="button" class="btn btn-outline-secondary{if $d == $days} active{/if}"
+                                    data-days="{$d}">{$d} 天</button>
+                            {/foreach}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="trendBox" data-trend='{$trendJson}' data-days="{$days}"></div>
+                        <div class="text-muted small mt-2">
+                            「发布趋势」统计的是每天<b>已发布</b>内容的数量；区间切换只重取本卡片数据。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ④ 热门内容 Top 10（行由 js/dashboard.js 渲染，切站后局部重载口径一致） -->
+        <div class="card">
+            <div class="card-header py-2">
+                <h6 class="card-title mb-0 small"><i class="bi bi-fire me-1"></i>热门内容 Top 10</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover mb-0">
+                        <thead><tr>
+                            <th style="width:70px">ID</th>
+                            <th>标题</th>
+                            <th style="width:110px" class="text-end">浏览量</th>
+                            <th style="width:150px" class="text-center">发布时间</th>
+                        </tr></thead>
+                        <tbody id="topContentsBox" data-rows='{$topJson}'></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/dashboard.js（由 wise-bootstrap 自动加载） -->
+{/block}

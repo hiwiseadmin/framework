@@ -1,0 +1,63 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}盘点详情{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-eye" caption="盘点详情 - {$order.order_no}" buttongroup="" /}
+    <div class="plugin-smartstock">
+        <div class="container-fluid p-3">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3"><strong>盘点单号：</strong>{$order.order_no|default=''}</div>
+                        <div class="col-md-3"><strong>仓库：</strong>{$order.warehouse_name|default=''}</div>
+                        <div class="col-md-3"><strong>盘点日期：</strong>{$order.order_date|default=''}</div>
+                        <div class="col-md-3"><strong>状态：</strong>{$order.status_text|default=''}</div>
+                        <div class="col-12"><strong>备注：</strong>{$order.remark|default='-'}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="mb-3"><i class="bi bi-list-ul me-2"></i>盘点明细</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th width="40">#</th>
+                                    <th>商品</th>
+                                    <th>SKU</th>
+                                    <th>规格</th>
+                                    <th>库位</th>
+                                    <th width="110">系统库存</th>
+                                    <th width="110">实盘数量</th>
+                                    <th width="110" class="text-end">差异</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {foreach $items as $k => $item}
+                                <tr>
+                                    <td>{$k+1}</td>
+                                    <td>{$item.product_name|default='-'}</td>
+                                    <td>{$item.sku|default=''}</td>
+                                    <td>{$item.spec_name|default=''}</td>
+                                    <td>{$item.location_code|default=''}</td>
+                                    <td>{$item.system_quantity|default=0}</td>
+                                    <td>{$item.actual_quantity|default=0}</td>
+                                    <td class="text-end">{$item.diff_quantity|default=0}</td>
+                                </tr>
+                                {/foreach}
+                            </tbody>
+                        </table>
+                    </div>
+                    {if empty($items)}
+                    <div class="text-center text-muted py-4">暂无盘点明细</div>
+                    {/if}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

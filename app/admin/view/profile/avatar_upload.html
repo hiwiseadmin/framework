@@ -1,0 +1,147 @@
+    <!-- 头像选择模态框 -->
+    <div class="modal fade" id="avatarSelectModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">选择头像</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- 选项卡导航 -->
+                    <ul class="nav nav-tabs mb-4" id="avatarTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="preset-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#preset" type="button" role="tab">
+                                <i class="bi bi-grid-3x3-gap me-1"></i>预设头像
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="upload-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#upload" type="button" role="tab">
+                                <i class="bi bi-upload me-1"></i>上传头像
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <!-- 选项卡内容 -->
+                    <div class="tab-content" id="avatarTabContent">
+                        <!-- 预设头像选项卡 -->
+                        <div class="tab-pane fade show active" id="preset" role="tabpanel">
+                            <div class="row" id="presetAvatarsContainer">
+                                <!-- 预设头像将通过AJAX加载 -->
+                                <div class="col-12 text-center py-5">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">加载中...</span>
+                                    </div>
+                                    <p class="mt-2 text-muted">正在加载预设头像...</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 上传头像选项卡 -->
+                        <div class="tab-pane fade" id="upload" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <!-- 图片上传区域 -->
+                                    <div class="upload-area rounded p-4 text-center mb-4" id="uploadArea" style="height: 300px;">
+                                        <div class="upload-placeholder h-100 d-flex flex-column justify-content-center align-items-center pe-none">
+                                            <i class="bi bi-cloud-upload display-4 text-muted mb-3"></i>
+                                            <p class="mb-2">点击选择图片或拖拽图片到此处</p>
+                                            <p class="text-muted small">支持 JPG、PNG 格式，最大 2MB</p>
+                                            <button type="button" class="btn btn-outline-primary mt-2 pe-auto" id="selectImageBtn">选择图片</button>
+                                        </div>
+                                    </div>
+                                    <input type="file" id="imageUpload" accept="image/*" class="d-none">
+                                    <!-- 图片预览 -->
+                                    <div class="preview-container text-center d-none" id="previewContainer">
+                                        <h6 class="mb-3">预览</h6>
+                                        <div class="preview-frame border rounded p-2 mb-3 mx-auto pe-none" style="width: 150px; height: 150px;">
+                                            <img id="avatarPreview" src="" alt="头像预览" class="img-fluid rounded" style="max-height: 100%;">
+                                        </div>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" id="resetUploadBtn">
+                                            <i class="bi bi-arrow-counterclockwise me-1"></i>重新选择
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <!-- 裁切区域 -->
+                                    <div class="cropper-container mb-4 d-none" id="cropperContainer">
+                                        <h6 class="mb-3">裁切头像</h6>
+                                        <div class="border rounded p-2 mb-3" style="height: 250px; overflow: hidden;">
+                                            <img id="imageToCrop" src="" alt="待裁切图片" 
+                                                class="img-fluid" style="max-width: 100%;">
+                                        </div>
+                                        
+                                        <!-- 裁切选项 -->
+                                        <div class="cropper-options">
+                                            <div class="row g-2 mb-3">
+                                                <!-- 裁切形状 -->
+                                                <div class="col-6">
+                                                    <div class="btn-group w-100" role="group">
+                                                        <input type="radio" class="btn-check" name="cropShape" 
+                                                            id="cropCircle" value="circle" autocomplete="off" checked>
+                                                        <label class="btn btn-outline-primary btn-sm" for="cropCircle">
+                                                            <i class="bi bi-circle me-1"></i>圆形
+                                                        </label>
+                                                        
+                                                        <input type="radio" class="btn-check" name="cropShape" 
+                                                            id="cropSquare" value="square" autocomplete="off">
+                                                        <label class="btn btn-outline-primary btn-sm" for="cropSquare">
+                                                            <i class="bi bi-square me-1"></i>方形
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <!-- 旋转角度 -->
+                                                <div class="col-6">
+                                                    <div class="input-group input-group-sm">
+                                                        <button class="rotateBtn btn btn-outline-secondary" type="button" data-action="left">
+                                                            <i class="bi bi-arrow-counterclockwise"></i>
+                                                        </button>
+                                                        <input type="number" class="form-control text-center" id="rotateAngle" value="0" min="0" max="360" step="90" readonly>
+                                                        <span class="input-group-text">°</span>
+                                                        <button class="rotateBtn btn btn-outline-secondary" type="button" data-action="right">
+                                                            <i class="bi bi-arrow-clockwise"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 上传提示 -->
+                                    <div class="upload-tips" id="uploadTips">
+                                        <h6 class="mb-3">使用说明</h6>
+                                        <ul class="list-unstyled small text-muted">
+                                            <li class="mb-2">
+                                                <i class="bi bi-check-circle text-success me-1"></i>
+                                                支持 JPG、PNG 格式的图片
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="bi bi-check-circle text-success me-1"></i>
+                                                建议上传正方形图片以获得最佳效果
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="bi bi-check-circle text-success me-1"></i>
+                                                您可以通过拖拽、缩放和旋转来调整图片
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="bi bi-check-circle text-success me-1"></i>
+                                                裁切区域将自动适应头像显示区域
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="saveAvatarBtn" disabled>
+                        <i class="bi bi-check-circle me-1"></i>保存头像
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>

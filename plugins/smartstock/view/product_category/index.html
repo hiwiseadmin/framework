@@ -1,0 +1,38 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}商品分类管理{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-diagram-2" caption="商品分类管理" buttongroup="" /}
+    <div class="plugin-smartstock">
+        <div class="container-fluid p-0">
+            <div class="card">
+                <div class="card-body">
+                    <form class="row g-2 mb-3" id="search-form">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control form-control-sm" id="search-name" placeholder="搜索分类名称...">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select form-select-sm" id="search-status">
+                                <option value="">全部状态</option>
+                                <option value="1">启用</option>
+                                <option value="0">禁用</option>
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm" id="btn-search"><i class="bi bi-search"></i> 搜索</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-reset"><i class="bi bi-arrow-clockwise"></i> 重置</button>
+                        </div>
+                    </form>
+
+                    <div id="toolbar" class="toolbar mb-2"></div>
+                    <table id="table"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{include file="product_category/form" /}
+{/block}

@@ -1,0 +1,6 @@
+<?php
+// {$name} 插件 — DI 容器绑定（boot 链 Step 10）
+// 返回「别名 => 实现类」；仅当容器中尚无该键时才绑定（不覆盖已有绑定）。
+return [
+    // 'service.alias' => \plugin\{$name}\service\ExampleService::class,
+];

@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>优化版 Clipboard.js 演示文档</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="/static/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="/static/libs/bootstrap-icons/bootstrap-icons.min.css">
+    
+    <!-- 自定义样式 -->
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --success-color: #198754;
+            --danger-color: #dc3545;
+            --clipboard-bg: #f8f9fa;
+            --code-bg: #f1f3f4;
+        }
+        
+        [data-bs-theme="dark"] {
+            --clipboard-bg: #212529;
+            --code-bg: #2b3035;
+            --primary-color: #3d8bfd;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        .clipboard-demo {
+            background-color: var(--clipboard-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .clipboard-demo:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .clipboard-btn {
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .clipboard-btn.copied {
+            background-color: var(--success-color) !important;
+            border-color: var(--success-color) !important;
+        }
+        
+        .clipboard-btn.copied::after {
+            content: "✓ 已复制";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .clipboard-btn.copied .btn-text {
+            visibility: hidden;
+        }
+        
+        .code-block {
+            background-color: var(--code-bg);
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        
+        .code-block pre {
+            margin: 0;
+        }
+        
+        .copy-code-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .copy-code-btn:hover {
+            opacity: 1;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+        
+        .status-indicator.success {
+            background-color: var(--success-color);
+        }
+        
+        .status-indicator.error {
+            background-color: var(--danger-color);
+        }
+        
+        .theme-switcher {
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .theme-switcher:hover {
+            transform: rotate(30deg);
+        }
+        
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background-color: var(--clipboard-bg);
+            border-bottom-color: var(--clipboard-bg);
+        }
+        
+        .event-log {
+            max-height: 300px;
+            overflow-y: auto;
+            border-radius: 6px;
+            padding: 1rem;
+            font-size: 0.85rem;
+        }
+        
+        .event-log .event-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .event-log .event-item:last-child {
+            border-bottom: none;
+        }
+        
+        .event-log .event-time {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .feature-card {
+            height: 100%;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .input-group .form-control {
+            border-right: none;
+        }
+        
+        .input-group .btn {
+            border-left: none;
+        }
+        
+        footer {
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        [data-bs-theme="dark"] footer {
+            border-top-color: rgba(255,255,255,0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .clipboard-demo {
+                padding: 1rem;
+            }
+            
+            .code-block {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-clipboard-check me-2"></i>
+                <span>优化版 Clipboard.js</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#intro">介绍</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#installation">安装</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#usage">使用</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">功能</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#api">API</a>
+                    </li>
+                </ul>
+                
+                <div class="d-flex align-items-center">
+                    <div class="form-check form-switch me-3">
+                        <input class="form-check-input" type="checkbox" id="themeToggle">
+                        <label class="form-check-label text-white" for="themeToggle">暗色模式</label>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <a href="https://github.com" class="btn btn-outline-light btn-sm">
+                            <i class="bi bi-github"></i> GitHub
+                        </a>
+                        <a href="#download" class="btn btn-light btn-sm">
+                            <i class="bi bi-download"></i> 下载
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container my-5">
+        <!-- 页面标题 -->
+        <header class="mb-5 text-center">
+            <h1 class="display-4 fw-bold mb-3">优化版 Clipboard.js</h1>
+            <p class="lead mb-4">一个避免全选复制、兼容现代浏览器的剪贴板操作库</p>
+            <div class="d-flex justify-content-center flex-wrap gap-2 mb-4">
+                <span class="badge bg-primary">无全选复制</span>
+                <span class="badge bg-success">Bootstrap 5 集成</span>
+                <span class="badge bg-info">UMD 支持</span>
+                <span class="badge bg-warning">事件驱动</span>
+                <span class="badge bg-danger">现代 API 优先</span>
+            </div>
+            <div id="clipboardSupport" class="alert alert-info d-inline-flex align-items-center">
+                <span class="status-indicator" id="supportStatus"></span>
+                <span id="supportText">正在检测剪贴板支持...</span>
+            </div>
+        </header>
+        
+        <!-- 介绍部分 -->
+        <section id="intro" class="mb-5">
+            <h2 class="mb-4">
+                <i class="bi bi-info-circle text-primary me-2"></i>介绍
+            </h2>
+            <div class="row">
+                <div class="col-lg-8">
+                    <p class="mb-3">优化版 Clipboard.js 是一个现代化的剪贴板操作库，解决了原生 <code>clipboard.js</code> 在某些浏览器中全选复制时出现的系统提示框问题。</p>
+                    <p class="mb-3">本库使用 <strong>Range API</strong> 替代全选操作，避免触发浏览器的复制提示框，提供更流畅的用户体验。同时优先使用现代浏览器原生的 <code>Clipboard API</code>，提供更好的性能和安全性。</p>
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>注意：</strong> 由于安全限制，某些剪贴板操作需要在安全上下文（HTTPS）中才能正常工作。
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card border-primary">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-stars text-primary me-2"></i>主要优势
+                            </h5>
+                            <ul class="mb-0">
+                                <li>避免全选复制提示框</li>
+                                <li>支持现代 Clipboard API</li>
+                                <li>完整的事件系统</li>
+                                <li>Bootstrap 5 友好</li>
+                                <li>无障碍支持</li>
+                                <li>轻量级设计</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 安装部分 -->
+        <section id="installation" class="mb-5">
+            <h2 class="mb-4">
+                <i class="bi bi-download text-primary me-2"></i>安装
+            </h2>
+            
+            <ul class="nav nav-tabs mb-3" id="installTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="npm-tab" data-bs-toggle="tab" data-bs-target="#npm" type="button">NPM</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="cdn-tab" data-bs-toggle="tab" data-bs-target="#cdn" type="button">CDN</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual" type="button">手动下载</button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="installTabsContent">
+                <!-- NPM 安装 -->
+                <div class="tab-pane fade show active" id="npm" role="tabpanel">
+                    <div class="code-block">
+                        <pre><code>npm install clipboard</code></pre>
+                        <button class="copy-code-btn" data-clipboard-feedback="true" data-clipboard-text="npm install clipboard">
+                        </button>
+                    </div>
+                    
+                    <div class="code-block">
+                        <pre><code>// ES6 导入
+import Clipboard from 'clipboard';
+
+// 或 CommonJS
+const Clipboard = require('clipboard');</code></pre>
+                        <button class="btn btn-sm btn-outline-primary copy-code-btn" data-clipboard-text="// ES6 导入
+import Clipboard from 'clipboard';
+
+// 或 CommonJS
+const Clipboard = require('clipboard');">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- CDN 安装 -->
+                <div class="tab-pane fade" id="cdn" role="tabpanel">
+                    <div class="code-block">
+                        <pre><code>&lt;!-- 通过 CDN 引入 --&gt;
+&lt;script src="https://cdn.jsdelivr.net/npm/clipboard@1.0.0/dist/clipboard.min.js"&gt;&lt;/script&gt;</code></pre>
+                        <button class="btn btn-sm btn-outline-primary copy-code-btn" data-clipboard-text='<script src="https://cdn.jsdelivr.net/npm/clipboard@1.0.0/dist/clipboard.min.js"></script>'>
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </div>
+                    <p class="text-muted">引入后，库将作为全局变量 <code>Clipboard</code> 可用。</p>
+                </div>
+                
+                <!-- 手动下载 -->
+                <div class="tab-pane fade" id="manual" role="tabpanel">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        从 GitHub 仓库下载最新版本，或直接复制下面的源代码到你的项目中。
+                    </div>
+                    
+                    <div class="code-block">
+                        <pre><code>// 将完整的 UMD 版本代码保存为 clipboard.js
+// 然后通过 script 标签引入
+&lt;script src="path/to/clipboard.js"&gt;&lt;/script&gt;</code></pre>
+                        <button class="btn btn-sm btn-outline-primary copy-code-btn" data-clipboard-text='<script src="path/to/clipboard.js"></script>'>
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button id="downloadBtn" class="btn btn-primary">
+                            <i class="bi bi-download me-2"></i>下载完整源代码
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 使用示例部分 -->
+        <section id="usage" class="mb-5">
+            <h2 class="mb-4">
+                <i class="bi bi-code-slash text-primary me-2"></i>使用示例
+            </h2>
+            
+            <!-- 基本复制示例 -->
+            <div class="clipboard-demo" id="basicCopyDemo">
+                <h4 class="mb-3">
+                    <i class="bi bi-1-circle text-primary me-2"></i>基本复制
+                </h4>
+                <p class="mb-3">复制指定的文本内容，最简单直接的方式。</p>
+                
+                <div class="row align-items-center mb-4">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="basicCopyInput" value="这是一个要复制的基本文本示例" readonly>
+                            <button class="btn btn-primary clipboard-btn" id="basicCopyBtn" data-clipboard-target="#basicCopyInput">
+                                <span class="btn-text">
+                                    <i class="bi bi-clipboard me-1"></i>复制
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mt-2 mt-md-0">
+                        <div class="alert alert-secondary mb-0">
+                            <small>点击复制按钮，然后粘贴到其他位置测试效果。</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="code-block">
+                    <pre><code>// HTML
+&lt;input type="text" value="这是一个要复制的基本文本示例" readonly&gt;
+&lt;button class="clipboard-btn" data-clipboard-text="这是一个要复制的基本文本示例"&gt;
+    &lt;i class="bi bi-clipboard"&gt;&lt;/i&gt; 复制
+&lt;/button&gt;
+
+// JavaScript
+const clipboard = new Clipboard('.clipboard-btn');
+
+clipboard.on('success', function(e) {
+    console.log('复制成功:', e.text);
+    e.trigger.classList.add('copied');
+});
+
+clipboard.on('error', function(e) {
+    console.error('复制失败:', e.error);
+});</code></pre>
+                    <button class="btn btn-sm btn-outline-primary copy-code-btn" data-clipboard-feedback="true" data-clipboard-target="#basicCopyCode">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                    <div id="basicCopyCode" style="display: none;">// HTML
+&lt;input type="text" value="这是一个要复制的基本文本示例" readonly&gt;
+&lt;button class="clipboard-btn" data-clipboard-text="这是一个要复制的基本文本示例"&gt;
+    &lt;i class="bi bi-clipboard"&gt;&lt;/i&gt; 复制
+&lt;/button&gt;
+
+// JavaScript
+const clipboard = new Clipboard('.clipboard-btn');
+
+clipboard.on('success', function(e) {
+    console.log('复制成功:', e.text);
+    e.trigger.classList.add('copied');
+});
+
+clipboard.on('error', function(e) {
+    console.error('复制失败:', e.error);
+});</div>
+                </div>
+            </div>
+            
+            <!-- 复制目标元素内容 -->
+            <div class="clipboard-demo" id="targetCopyDemo">
+                <h4 class="mb-3">
+                    <i class="bi bi-2-circle text-primary me-2"></i>复制目标元素内容
+                </h4>
+                <p class="mb-3">从页面上的其他元素复制内容，通过 <code>data-clipboard-target</code> 属性指定目标元素。</p>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">目标元素内容：</label>
+                            <div class="card" id="targetElement">
+                                <div class="card-body">
+                                    <h5 class="card-title">要复制的卡片标题</h5>
+                                    <p class="card-text">这是卡片中的内容，可以通过下面的按钮复制整个卡片的内容。</p>
+                                    <p class="card-text"><small class="text-muted">包括标题、内容和这个小字部分。</small></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">操作：</label>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-primary clipboard-btn" data-clipboard-target="#targetElement">
+                                    <span class="btn-text">
+                                        <i class="bi bi-clipboard me-1"></i>复制卡片内容
+                                    </span>
+                                </button>
+                                <button class="btn btn-outline-primary clipboard-btn" data-clipboard-target="#targetElement .card-title">
+                                    <span class="btn-text">
+                                        <i class="bi bi-clipboard me-1"></i>仅复制标题
+                                    </span>
+                                </button>
+                                <button class="btn btn-outline-primary clipboard-btn" data-clipboard-target="#targetElement .card-text">
+                                    <span class="btn-text">
+                                        <i class="bi bi-clipboard me-1"></i>仅复制正文
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="code-block">
+                    <pre><code>// HTML
+&lt;div id="targetElement"&gt;
+    &lt;h5&gt;要复制的卡片标题&lt;/h5&gt;
+    &lt;p&gt;这是卡片中的内容...&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;button data-clipboard-target="#targetElement"&gt;
+    复制卡片内容
+&lt;/button&gt;
+
+&lt;button data-clipboard-target="#targetElement h5"&gt;
+    仅复制标题
+&lt;/button&gt;</code></pre>
+                    <button class="btn btn-sm btn-outline-primary copy-code-btn" data-clipboard-target="#targetCopyCode">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                    <div id="targetCopyCode" style="display: none;">// HTML
+&lt;div id="targetElement"&gt;
+    &lt;h5&gt;要复制的卡片标题&lt;/h5&gt;
+    &lt;p&gt;这是卡片中的内容...&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;button data-clipboard-target="#targetElement"&gt;
+    复制卡片内容
+&lt;/button&gt;
+
+&lt;button data-clipboard-target="#targetElement h5"&gt;
+    仅复制标题
+&lt;/button&gt;</div>
+                </div>
+            </div>
+            
+            <!-- 剪切操作示例 -->
+            <div class="clipboard-demo" id="cutDemo">
+                <h4 class="mb-3">
+                    <i class="bi bi-3-circle text-primary me-2"></i>剪切操作
+                </h4>
+                <p class="mb-3">剪切操作会复制内容并清空源元素。注意：某些浏览器可能不支持剪切操作。</p>
+                
+                <div class="row align-items-center mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">要剪切的内容：</label>
+                            <textarea class="form-control" id="cutTextarea" rows="3">这是一段可以被剪切的内容，剪切后此文本框将被清空。</textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-grid">
+                            <button class="btn btn-danger clipboard-btn" data-clipboard-target="#cutTextarea" data-clipboard-action="cut">
+                                <span class="btn-text">
+                                    <i class="bi bi-scissors me-1"></i>剪切内容
+                                </span>
+                            </button>
+                        </div>
+                        <div class="alert alert-warning mt-3 mb-0">
+                            <small><i class="bi bi-exclamation-triangle me-1"></i>剪切操作需要浏览器支持，某些浏览器可能有限制。</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="code-block">
+                    <pre><code>// HTML
+&lt;textarea id="cutTextarea"&gt;这是一段可以被剪切的内容...&lt;/textarea&gt;
+&lt;button data-clipboard-target="#cutTextarea" data-clipboard-action="cut"&gt;
+    &lt;i class="bi bi-scissors"&gt;&lt;/i&gt; 剪切内容
+&lt;/button&gt;
+
+// JavaScript
+const clipboard = new Clipboard('button', {
+    action: function(trigger) {
+        // 也可以通过函数返回操作类型
+        return 'cut';
+    }
+});</code></pre>
+                    <button class="btn btn-sm btn-outline-primary copy-code-btn" data-clipboard-target="#cutDemoCode">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                    <div id="cutDemoCode" style="display: none;">// HTML
+&lt;textarea id="cutTextarea"&gt;这是一段可以被剪切的内容...&lt;/textarea&gt;
+&lt;button data-clipboard-target="#cutTextarea" data-clipboard-action="cut"&gt;
+    &lt;i class="bi bi-scissors"&gt;&lt;/i&gt; 剪切内容
+&lt;/button&gt;
+
+// JavaScript
+const clipboard = new Clipboard('button', {
+    action: function(trigger) {
+        // 也可以通过函数返回操作类型
+        return 'cut';
+    }
+});</div>
+                </div>
+            </div>
+            
+            <!-- 事件处理示例 -->
+            <div class="clipboard-demo" id="eventsDemo">
+                <h4 class="mb-3">
+                    <i class="bi bi-4-circle text-primary me-2"></i>事件处理
+                </h4>
+                <p class="mb-3">优化版 Clipboard.js 提供完整的事件系统，可以监听复制成功或失败事件。</p>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">测试文本：</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="eventTestInput" value="测试事件处理的文本内容">
+                                <button class="btn btn-primary clipboard-btn" id="eventTestBtn" data-clipboard-target="#eventTestInput">
+                                    <span class="btn-text">
+                                        <i class="bi bi-clipboard me-1"></i>复制并触发事件
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">事件日志：</label>
+                            <div class="event-log bg-dark text-light">
+                                <div id="eventLogContent">
+                                    <div class="event-item text-muted">事件将在这里显示...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="code-block">
+                    <pre><code>// 事件处理示例
+const clipboard = new Clipboard('.clipboard-btn');
+
+// 成功事件
+clipboard.on('success', function(e) {
+    console.log('复制成功!');
+    console.log('操作类型:', e.action);
+    console.log('复制内容:', e.text);
+    console.log('触发元素:', e.trigger);
+    console.log('时间戳:', e.timestamp);
+    
+    // 添加成功样式
+    e.trigger.classList.add('copied');
+    
+    // 2秒后移除样式
+    setTimeout(() => {
+        e.trigger.classList.remove('copied');
+    }, 2000);
+    
+    // 清除选择
+    e.clearSelection && e.clearSelection();
+});
+
+// 错误事件
+clipboard.on('error', function(e) {
+    console.error('复制失败!');
+    console.error('错误信息:', e.error);
+    
+    // 显示错误提示
+    alert('复制失败，请检查浏览器权限设置或手动复制。');
+});</code></pre>
+                    <button class="btn btn-sm btn-outline-primary copy-code-btn" data-clipboard-target="#eventsDemoCode">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                    <div id="eventsDemoCode" style="display: none;">// 事件处理示例
+const clipboard = new Clipboard('.clipboard-btn');
+
+// 成功事件
+clipboard.on('success', function(e) {
+    console.log('复制成功!');
+    console.log('操作类型:', e.action);
+    console.log('复制内容:', e.text);
+    console.log('触发元素:', e.trigger);
+    console.log('时间戳:', e.timestamp);
+    
+    // 添加成功样式
+    e.trigger.classList.add('copied');
+    
+    // 2秒后移除样式
+    setTimeout(() => {
+        e.trigger.classList.remove('copied');
+    }, 2000);
+    
+    // 清除选择
+    e.clearSelection && e.clearSelection();
+});
+
+// 错误事件
+clipboard.on('error', function(e) {
+    console.error('复制失败!');
+    console.error('错误信息:', e.error);
+    
+    // 显示错误提示
+    alert('复制失败，请检查浏览器权限设置或手动复制。');
+});</div>
+                </div>
+            </div>
+            
+            <!-- 静态方法示例 -->
+            <div class="clipboard-demo" id="staticDemo">
+                <h4 class="mb-3">
+                    <i class="bi bi-5-circle text-primary me-2"></i>静态方法
+                </h4>
+                <p class="mb-3">无需实例化即可使用的静态方法，适合一次性复制操作。</p>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">静态复制：</label>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" id="staticCopyInput" value="使用静态方法复制的文本">
+                                <button class="btn btn-primary" id="staticCopyBtn">
+                                    <i class="bi bi-clipboard me-1"></i>静态复制
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">检查支持：</label>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-info" id="checkSupportBtn">
+                                    检查剪贴板支持
+                                </button>
+                                <button class="btn btn-outline-info" id="checkCopySupportBtn">
+                                    检查复制支持
+                                </button>
+                                <button class="btn btn-outline-info" id="checkCutSupportBtn">
+                                    检查剪切支持
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="code-block">
+                    <pre><code>// 静态方法示例
+
+// 1. 静态复制
+Clipboard.copy('要复制的文本')
+    .then(success => {
+        if (success) {
+            console.log('静态复制成功');
+        } else {
+            console.error('静态复制失败');
+        }
+    });
+
+// 2. 静态剪切
+const targetElement = document.getElementById('myInput');
+Clipboard.cut(targetElement)
+    .then(success => {
+        if (success) {
+            console.log('静态剪切成功');
+        }
+    });
+
+// 3. 检查支持
+const isSupported = Clipboard.isSupported();
+console.log('剪贴板操作支持:', isSupported);
+
+const canCopy = Clipboard.isSupported('copy');
+console.log('复制操作支持:', canCopy);
+
+const canCut = Clipboard.isSupported('cut');
+console.log('剪切操作支持:', canCut);
+
+// 4. 获取支持的操作列表
+const supportedActions = Clipboard.getSupportedActions();
+console.log('支持的操作:', supportedActions);</code></pre>
+                    <button class="btn btn-sm btn-outline-primary copy-code-btn" data-clipboard-target="#staticDemoCode">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                    <div id="staticDemoCode" style="display: none;">// 静态方法示例
+
+// 1. 静态复制
+Clipboard.copy('要复制的文本')
+    .then(success => {
+        if (success) {
+            console.log('静态复制成功');
+        } else {
+            console.error('静态复制失败');
+        }
+    });
+
+// 2. 静态剪切
+const targetElement = document.getElementById('myInput');
+Clipboard.cut(targetElement)
+    .then(success => {
+        if (success) {
+            console.log('静态剪切成功');
+        }
+    });
+
+// 3. 检查支持
+const isSupported = Clipboard.isSupported();
+console.log('剪贴板操作支持:', isSupported);
+
+const canCopy = Clipboard.isSupported('copy');
+console.log('复制操作支持:', canCopy);
+
+const canCut = Clipboard.isSupported('cut');
+console.log('剪切操作支持:', canCut);
+
+// 4. 获取支持的操作列表
+const supportedActions = Clipboard.getSupportedActions();
+console.log('支持的操作:', supportedActions);</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 功能特性部分 -->
+        <section id="features" class="mb-5">
+            <h2 class="mb-4">
+                <i class="bi bi-stars text-primary me-2"></i>功能特性
+            </h2>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card feature-card border-primary h-100">
+                        <div class="card-body">
+                            <div class="feature-icon bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-clipboard-x"></i>
+                            </div>
+                            <h5 class="card-title">避免全选复制</h5>
+                            <p class="card-text">使用 Range API 替代全选操作，避免在某些浏览器中出现系统复制提示框。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card feature-card border-success h-100">
+                        <div class="card-body">
+                            <div class="feature-icon bg-success bg-opacity-10 text-success">
+                                <i class="bi bi-clipboard-check"></i>
+                            </div>
+                            <h5 class="card-title">现代 API 优先</h5>
+                            <p class="card-text">优先使用现代浏览器的 Clipboard API，提供更好的性能和安全性。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card feature-card border-info h-100">
+                        <div class="card-body">
+                            <div class="feature-icon bg-info bg-opacity-10 text-info">
+                                <i class="bi bi-box"></i>
+                            </div>
+                            <h5 class="card-title">UMD 支持</h5>
+                            <p class="card-text">支持 AMD、CommonJS、ES6 模块和全局变量，兼容各种开发环境。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card feature-card border-warning h-100">
+                        <div class="card-body">
+                            <div class="feature-icon bg-warning bg-opacity-10 text-warning">
+                                <i class="bi bi-bell"></i>
+                            </div>
+                            <h5 class="card-title">事件驱动</h5>
+                            <p class="card-text">完整的事件系统，可以监听成功、错误等事件，方便进行状态反馈。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card feature-card border-danger h-100">
+                        <div class="card-body">
+                            <div class="feature-icon bg-danger bg-opacity-10 text-danger">
+                                <i class="bi bi-universal-access"></i>
+                            </div>
+                            <h5 class="card-title">无障碍支持</h5>
+                            <p class="card-text">支持键盘操作和屏幕阅读器，符合无障碍设计规范。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card feature-card border-secondary h-100">
+                        <div class="card-body">
+                            <div class="feature-icon bg-secondary bg-opacity-10 text-secondary">
+                                <i class="bi bi-bootstrap"></i>
+                            </div>
+                            <h5 class="card-title">Bootstrap 5 友好</h5>
+                            <p class="card-text">与 Bootstrap 5 完美集成，可以直接使用 Bootstrap 的按钮和组件。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- API 文档部分 -->
+        <section id="api" class="mb-5">
+            <h2 class="mb-4">
+                <i class="bi bi-journal-text text-primary me-2"></i>API 文档
+            </h2>
+            
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>方法/属性</th>
+                            <th>描述</th>
+                            <th>参数</th>
+                            <th>返回值</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>new Clipboard(trigger, options)</code></td>
+                            <td>构造函数，创建剪贴板实例</td>
+                            <td>
+                                <strong>trigger:</strong> 触发器元素或选择器<br>
+                                <strong>options:</strong> 配置对象
+                            </td>
+                            <td>剪贴板实例</td>
+                        </tr>
+                        <tr>
+                            <td><code>.copy(text)</code></td>
+                            <td>复制文本到剪贴板</td>
+                            <td><strong>text:</strong> 要复制的文本</td>
+                            <td>Promise&lt;boolean&gt;</td>
+                        </tr>
+                        <tr>
+                            <td><code>.cut(target)</code></td>
+                            <td>剪切元素内容到剪贴板</td>
+                            <td><strong>target:</strong> 要剪切的元素</td>
+                            <td>Promise&lt;boolean&gt;</td>
+                        </tr>
+                        <tr>
+                            <td><code>.on(event, callback)</code></td>
+                            <td>绑定事件监听器</td>
+                            <td>
+                                <strong>event:</strong> 事件名称<br>
+                                <strong>callback:</strong> 回调函数
+                            </td>
+                            <td>当前实例</td>
+                        </tr>
+                        <tr>
+                            <td><code>.off(event, callback)</code></td>
+                            <td>移除事件监听器</td>
+                            <td>
+                                <strong>event:</strong> 事件名称<br>
+                                <strong>callback:</strong> 回调函数（可选）
+                            </td>
+                            <td>当前实例</td>
+                        </tr>
+                        <tr>
+                            <td><code>.destroy()</code></td>
+                            <td>销毁实例，清理事件监听</td>
+                            <td>无</td>
+                            <td>无</td>
+                        </tr>
+                        <tr>
+                            <td><code>Clipboard.copy(text, options)</code></td>
+                            <td>静态方法：复制文本</td>
+                            <td>
+                                <strong>text:</strong> 要复制的文本<br>
+                                <strong>options:</strong> 配置对象（可选）
+                            </td>
+                            <td>Promise&lt;boolean&gt;</td>
+                        </tr>
+                        <tr>
+                            <td><code>Clipboard.cut(target, options)</code></td>
+                            <td>静态方法：剪切元素内容</td>
+                            <td>
+                                <strong>target:</strong> 目标元素<br>
+                                <strong>options:</strong> 配置对象（可选）
+                            </td>
+                            <td>Promise&lt;boolean&gt;</td>
+                        </tr>
+                        <tr>
+                            <td><code>Clipboard.isSupported(action)</code></td>
+                            <td>静态方法：检查浏览器支持</td>
+                            <td><strong>action:</strong> 操作类型（可选）</td>
+                            <td>boolean</td>
+                        </tr>
+                        <tr>
+                            <td><code>Clipboard.getSupportedActions()</code></td>
+                            <td>静态方法：获取支持的操作列表</td>
+                            <td>无</td>
+                            <td>Array&lt;string&gt;</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>事件对象属性：</strong> 成功和错误事件回调函数接收一个事件对象，包含以下属性：
+                <code>action</code>（操作类型）、<code>text</code>（复制内容）、<code>trigger</code>（触发元素）、
+                <code>success</code>（是否成功）、<code>timestamp</code>（时间戳）、<code>error</code>（错误对象，仅错误事件）。
+            </div>
+        </section>
+    </div>
+    
+    <!-- 页脚 -->
+    <footer class="py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>
+                        <i class="bi bi-clipboard-check text-primary me-2"></i>优化版 Clipboard.js
+                    </h5>
+                    <p class="text-muted">一个避免全选复制、兼容现代浏览器的剪贴板操作库。</p>
+                </div>
+                <div class="col-md-3">
+                    <h6>链接</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#intro" class="text-decoration-none">介绍</a></li>
+                        <li><a href="#installation" class="text-decoration-none">安装</a></li>
+                        <li><a href="#usage" class="text-decoration-none">使用</a></li>
+                        <li><a href="#api" class="text-decoration-none">API 文档</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h6>相关资源</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="https://getbootstrap.com" class="text-decoration-none" target="_blank">Bootstrap 5</a></li>
+                        <li><a href="https://icons.getbootstrap.com" class="text-decoration-none" target="_blank">Bootstrap Icons</a></li>
+                        <li><a href="https://clipboardjs.com" class="text-decoration-none" target="_blank">原版 clipboard.js</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-3">
+            <div class="text-center text-muted">
+                <small>© 2023 优化版 Clipboard.js 演示文档 | 基于 Bootstrap 5 和 Bootstrap Icons 构建</small>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- 优化版 Clipboard.js 库 -->
+    <script src="./clipboard.js"></script>
+    
+    <!-- Bootstrap 5 JS 和 Popper -->
+    <script src="/static/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- 演示页面交互逻辑 -->
+    <script>
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化主题切换
+            const themeToggle = document.getElementById('themeToggle');
+            const htmlElement = document.documentElement;
+            
+            // 检查本地存储的主题设置
+            const savedTheme = localStorage.getItem('theme_clipboard') || 'light';
+            if (savedTheme === 'dark') {
+                htmlElement.setAttribute('data-bs-theme', 'dark');
+                themeToggle.checked = true;
+            }
+            
+            // 主题切换事件
+            themeToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    htmlElement.setAttribute('data-bs-theme', 'dark');
+                    localStorage.setItem('theme_clipboard', 'dark');
+                } else {
+                    htmlElement.setAttribute('data-bs-theme', 'light');
+                    localStorage.setItem('theme_clipboard', 'light');
+                }
+            });
+            
+            // 检测剪贴板支持
+            const supportStatus = document.getElementById('supportStatus');
+            const supportText = document.getElementById('supportText');
+            
+            if (Clipboard.isSupported()) {
+                const supportedActions = Clipboard.getSupportedActions();
+                supportStatus.className = 'status-indicator success';
+                supportText.textContent = `浏览器支持剪贴板操作 (${supportedActions.join(', ')})`;
+            } else {
+                supportStatus.className = 'status-indicator error';
+                supportText.textContent = '浏览器不支持剪贴板操作';
+            }
+            
+            // 创建主要的剪贴板实例
+            const clipboard = new Clipboard('.clipboard-btn');
+            
+            // 事件处理
+            clipboard.on('success', function(e) {
+                console.log('复制成功:', e);
+                
+                // 添加复制成功样式
+                if (e.trigger) {
+                    e.trigger.classList.add('copied');
+                    
+                    // 2秒后移除样式
+                    setTimeout(() => {
+                        e.trigger.classList.remove('copied');
+                    }, 2000);
+                }
+                
+                // 记录到事件日志
+                logEvent('success', `复制成功: "${e.text.substring(0, 30)}${e.text.length > 30 ? '...' : ''}"`);
+            });
+            
+            clipboard.on('error', function(e) {
+                console.error('复制失败:', e.error);
+                
+                // 记录到事件日志
+                logEvent('error', `复制失败: ${e.error ? e.error.message : '未知错误'}`);
+            });
+            
+            // 事件日志函数
+            function logEvent(type, message) {
+                const eventLogContent = document.getElementById('eventLogContent');
+                const time = new Date().toLocaleTimeString();
+                
+                const eventItem = document.createElement('div');
+                eventItem.className = 'event-item';
+                
+                const statusClass = type === 'success' ? 'status-indicator success' : 'status-indicator error';
+                
+                eventItem.innerHTML = `
+                    <span class="${statusClass}"></span>
+                    <span class="event-message">${message}</span>
+                    <br>
+                    <small class="event-time">${time}</small>
+                `;
+                
+                // 添加到日志顶部
+                eventLogContent.insertBefore(eventItem, eventLogContent.firstChild);
+                
+                // 限制日志数量
+                const maxLogs = 10;
+                if (eventLogContent.children.length > maxLogs) {
+                    eventLogContent.removeChild(eventLogContent.lastChild);
+                }
+            }
+            
+            // 静态方法演示
+            document.getElementById('staticCopyBtn').addEventListener('click', function() {
+                const text = document.getElementById('staticCopyInput').value;
+                
+                Clipboard.copy(text)
+                    .then(success => {
+                        if (success) {
+                            alert('静态复制成功！');
+                            logEvent('success', `静态复制成功: "${text.substring(0, 30)}${text.length > 30 ? '...' : ''}"`);
+                        } else {
+                            alert('静态复制失败！');
+                            logEvent('error', '静态复制失败');
+                        }
+                    });
+            });
+            
+            // 检查支持按钮
+            document.getElementById('checkSupportBtn').addEventListener('click', function() {
+                const isSupported = Clipboard.isSupported();
+                alert(`剪贴板操作支持: ${isSupported ? '是' : '否'}`);
+            });
+            
+            document.getElementById('checkCopySupportBtn').addEventListener('click', function() {
+                const canCopy = Clipboard.isSupported('copy');
+                alert(`复制操作支持: ${canCopy ? '是' : '否'}`);
+            });
+            
+            document.getElementById('checkCutSupportBtn').addEventListener('click', function() {
+                const canCut = Clipboard.isSupported('cut');
+                alert(`剪切操作支持: ${canCut ? '是' : '否'}`);
+            });
+            
+            // 代码复制按钮（特殊处理）
+            const codeCopyButtons = document.querySelectorAll('.copy-code-btn');
+            const codeClipboard = new Clipboard('.copy-code-btn', {
+                target: function(trigger) {
+                    // 获取对应的代码块
+                    const targetId = trigger.getAttribute('data-clipboard-target');
+                    if (targetId) {
+                        return document.querySelector(targetId);
+                    }
+                    return null;
+                }
+            });
+            
+            // 下载按钮
+            document.getElementById('downloadBtn').addEventListener('click', function() {
+                // 这里可以模拟下载功能
+                alert('下载功能演示 - 在实际应用中这里会提供文件下载');
+                logEvent('success', '下载了优化版 Clipboard.js 源代码');
+            });
+            
+            // 平滑滚动
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        e.preventDefault();
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 70,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+            
+            // 页面加载完成日志
+            logEvent('success', '页面加载完成，剪贴板库已初始化');
+        });
+    </script>
+</body>
+</html>

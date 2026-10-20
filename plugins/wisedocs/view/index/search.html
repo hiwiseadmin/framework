@@ -1,0 +1,70 @@
+{extend name="index/layout"}
+
+{block name="title"}{$title|default='搜索'}{/block}
+
+{block name="content"}
+<h1 class="wd-page-title">搜索文档</h1>
+
+<form method="get" action="/plugin/wisedocs/index/search" class="wd-search-panel__form" role="search">
+    <input class="wd-input" type="search" name="keyword" value="{$keyword|default=''}"
+           placeholder="输入关键词搜索文档..." aria-label="搜索关键词">
+    <button class="wd-btn wd-btn--brand" type="submit"><i class="bi bi-search"></i> 搜索</button>
+</form>
+
+{if !empty($suggestions)}
+<div class="wd-chips">
+    <span>相关建议：</span>
+    {volist name="suggestions" id="sug"}
+    <a class="wd-tag" href="/plugin/wisedocs/index/search?keyword={$sug}">{$sug}</a>
+    {/volist}
+</div>
+{/if}
+
+{if !empty($hotSearches)}
+<div class="wd-chips">
+    <i class="bi bi-fire"></i> 热门搜索：
+    {volist name="hotSearches" id="item"}
+    <a class="wd-tag" href="/plugin/wisedocs/index/search?keyword={$item.keyword}">{$item.keyword}</a>
+    {/volist}
+</div>
+{/if}
+
+<p class="wd-meta" style="margin:28px 0 4px">
+    {if !empty($keyword)}
+    关键词「<b>{$keyword}</b>」共找到 <b>{$total|default=0}</b> 条结果
+    {else /}
+    请输入关键词开始搜索
+    {/if}
+</p>
+
+{if !empty($documents)}
+<ul class="wd-list">
+    {volist name="documents" id="doc"}
+    <li>
+        <a class="wd-list__item" href="/plugin/wisedocs/index/detail?slug={$doc.slug}">
+            <div class="wd-list__top">
+                <span class="wd-list__title">{$doc.title}</span>
+                <span class="wd-list__meta"><i class="bi bi-eye"></i> {$doc.view_count|default=0}</span>
+            </div>
+            {if !empty($doc.excerpt)}
+            <p class="wd-list__desc">{$doc.excerpt|mb_substr=0,110}</p>
+            {/if}
+        </a>
+    </li>
+    {/volist}
+</ul>
+
+{if $documents->total() > 0}
+<div class="wd-pagination">
+    {$documents->render()|raw}
+</div>
+{/if}
+{else /}
+{if !empty($keyword)}
+<div class="wd-empty">
+    <i class="bi bi-search"></i>
+    没有找到匹配的文档，试试更换关键词
+</div>
+{/if}
+{/if}
+{/block}

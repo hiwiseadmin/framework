@@ -1,0 +1,192 @@
+{extend name="public/base" /}
+
+{block name="title"}{if $isEdit}编辑权限{else}添加权限{/if}{/block}
+
+{block name="content"}
+<body>
+<div class="container">
+    <form id="wsForm" class="ws-form needs-validation" novalidate method="post" action="{$formAction}">
+        {if $isEdit}<input type="hidden" name="id" value="{$row.id}">{/if}
+        <div class="row">
+            <!-- 上级权限 -->
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label for="parentId" class="col-form-label">上级权限 <i class="bi bi-question-circle-fill" data-bs-toggle="tooltip"
+                        title="顶级权限通常作为模块容器，子权限继承父权限的访问控制"></i></label>
+                </div>
+                <div class="col">
+                    <select class="form-select" id="parentId" name="parent_id" 
+                        data-validation="required" 
+                        data-validation-message-required="请选择上级权限">
+                        <option value="0">顶级权限</option> 
+                        {volist name="permissions" id="perm"}
+                            <option value="{$perm.id}" {if ($isEdit && $row.parent_id == $perm.id) || (!$isEdit && $parentId == $perm.id)}selected{/if}>{$perm.name}</option>
+                        {/volist}
+                    </select>
+                </div>
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 权限标题 -->
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label for="name" class="col-form-label">权限标题 <i class="bi bi-question-circle-fill" data-bs-toggle="tooltip" title="用于显示的中文名称"></i></label>
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" id="name" name="name" value="{$row.name|default=''}" placeholder="如：权限列表"
+                        data-validation="required" 
+                        data-validation-message-required="请输入权限标题">
+                </div>
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 权限名称（标识） -->
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label for="ident" class="col-form-label">权限标识 <i class="bi bi-question-circle-fill" data-bs-toggle="tooltip"  data-bs-html="true"
+                        title="<b>必须唯一</b>，用于权限判断的唯一标识，建议使用 <b>模块.控制器.方法（如：admin.menu.index）</b> 格式"></i></label>
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" id="ident" name="ident" value="{$row.ident|default=''}" placeholder="如：admin.permission.index" 
+                        data-bs-toggle="tooltip" title="必须唯一，用于权限判断的唯一标识，建议使用 模块.控制器.方法 格式"
+                        data-validation="required" 
+                        data-validation-message-required="请输入权限标识">
+                </div>
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 请求方法 -->
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label for="method" class="col-form-label">请求方法 </label>
+                </div>
+                <div class="col">
+                    <div class="form-inline">
+                        <div data-role="wsselect" 
+                                data-name="method"
+                                data-allow-clear="false"
+                                data-value="{$row.method|default='*'}"
+                                data-options='[{"value":"*","label":"ALL", "secondary":"允许所有方法"},{"value":"GET","label":"GET", "secondary":"获取资源"},{"value":"POST","label":"POST", "secondary":"创建资源"},{"value":"PUT","label":"PUT", "secondary":"更新资源"},{"value":"DELETE","label":"DELETE", "secondary":"删除资源"}]'
+                                data-placeholder="请选择">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text"></span>
+                    </div>
+                </div>
+            </div>
+ 
+            <!-- 权限类型 -->
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label for="type" class="col-form-label">权限类型 </label>
+                </div>
+                <div class="col">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="type" id="route" value="route" {if !$isEdit || $row.type == 'route'}checked{/if}
+                            data-validation="required" 
+                            data-validation-message-required="请选择权限类型">
+                        <label class="form-check-label" for="route">路由 </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="type" id="api" value="api" {if $isEdit && $row.type == 'api'}checked{/if}>
+                        <label class="form-check-label" for="api">接口 </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="type" id="custom" value="custom" {if $isEdit && $row.type == 'custom'}checked{/if}>
+                        <label class="form-check-label" for="custom">通用 </label>
+                    </div>
+                </div>
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 排序号 -->
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label for="sort" class="col-form-label">排序号 <i class="bi bi-question-circle-fill" data-bs-toggle="tooltip" title="数值越小，排序越靠前"></i></label>
+                </div>
+                <div class="col">
+                    <input type="number" class="form-control" id="sort" name="sort" value="{$row.sort|default=0}" min="0"
+                        data-validation="required|min:0|max:9999"
+                        data-validation-message-required="请输入排序号"
+                        data-validation-message-min="排序号最小值为0"
+                        data-validation-message-max="排序号最大值为9999">
+                </div>
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text"></span>
+                    </div>
+                </div>
+            </div>
+                        
+            <!-- 权限状态 -->
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label class="col-form-label">权限状态 </label>
+                </div>
+                <div class="col">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="status" id="status1" value="1" {if !$isEdit || $row.status == 1}checked{/if}
+                            data-validation="required" 
+                            data-validation-message-required="请选择权限状态">
+                        <label class="form-check-label" for="status1">启用 <i class="bi bi-question-circle-fill" 
+                            data-bs-toggle="tooltip" title="启用状态下，权限将对用户可见并可执行"></i></label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="status" id="status0" value="0" {if $isEdit && $row.status == 0}checked{/if}>
+                        <label class="form-check-label" for="status0">禁用 <i class="bi bi-question-circle-fill" 
+                            data-bs-toggle="tooltip" title="禁用状态下，权限将对用户不可见，无法执行，同时也不会在角色权限设置中显示"></i></label>
+                    </div>
+                </div>
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text"></span>
+                    </div>
+                </div>
+            </div>
+                        
+            <!-- 备注 -->
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label for="description" class="col-form-label">备注</label>
+                </div>
+                <div class="col">
+                    <textarea class="form-control" id="description" name="description" rows="3" placeholder="请输入权限描述信息">{$row.description|default=''}</textarea>
+                </div>
+                <div class="col-auto tips">
+                    <div class="form-text">用于描述权限的详细信息</div>
+                </div>
+            </div>
+        </div>
+        {include file="public/submit" /}
+    </form>
+    
+    <!-- 帮助信息 -->
+    {include file="permission/prompt" /}
+</div>
+{/block}

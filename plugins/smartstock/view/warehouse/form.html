@@ -1,0 +1,57 @@
+<!-- 仓库 新增/编辑 模态框片段 -->
+<div class="modal fade" id="warehouse-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="form-title">新增仓库</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+            </div>
+            <form id="warehouse-form" class="modal-body row g-3">
+                <input type="hidden" name="id" id="form-id" value="0">
+                <div class="col-md-4">
+                    <label class="form-label">仓库编码</label>
+                    <input type="text" name="code" id="form-code" class="form-control" placeholder="如：WH001">
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label">仓库名称 <span class="text-danger">*</span></label>
+                    <input type="text" name="name" id="form-name" class="form-control" placeholder="如：主仓库"
+                           data-validation="required|maxLength:50"
+                           data-validation-message-required="请填写仓库名称"
+                           data-validation-message-maxLength="仓库名称不能超过 50 个字符">
+                    <div class="invalid-feedback"><span class="validation-text"></span></div>
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label">地址</label>
+                    <input type="text" name="address" id="form-address" class="form-control" placeholder="仓库详细地址">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">排序</label>
+                    <input type="number" name="sort_order" id="form-sort" class="form-control" value="0">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">联系人</label>
+                    <input type="text" name="contact" id="form-contact" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">联系电话</label>
+                    <input type="text" name="phone" id="form-phone" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">状态</label>
+                    <select name="status" id="form-status" class="form-select">
+                        <option value="1">启用</option>
+                        <option value="0">禁用</option>
+                    </select>
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label">备注</label>
+                    <textarea name="remark" id="form-remark" class="form-control" rows="2"></textarea>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" form="warehouse-form" class="btn btn-primary"><i class="bi bi-check-lg"></i> 保存</button>
+            </div>
+        </div>
+    </div>
+</div>

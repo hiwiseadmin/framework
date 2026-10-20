@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WsPopMenu 组件演示</title>
+    <!-- Bootstrap CSS -->
+    <link href="/statics/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="/statics/libs/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-bottom: 3rem;
+        }
+        .demo-section {
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            background-color:  var(--bs-body-bg);
+            border-radius: 0.5rem;
+            border: 1px solid var(--bs-border-color);
+        }
+        .demo-title {
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--bs-border-color);
+        }
+        .demo-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .demo-description {
+            margin-top: 1rem;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        .right-click-area {
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: default;
+            user-select: none;
+        }
+        .demo-code {
+            background-color: var(--bs-secondary-bg, #f8f9fa);
+            border-radius: 0.25rem;
+            padding: 1rem;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            margin-top: 1rem;
+            border-left: 4px solid var(--bs-primary, #0d6efd);
+        }
+        .feature-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .feature-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--bs-border-color);
+        }
+        .feature-list li:before {
+            content: "✓";
+            color: var(--bs-success, #198754);
+            margin-right: 0.75rem;
+            font-weight: bold;
+        }
+        .highlight {
+            background-color: var(--bs-warning-bg, rgba(255, 193, 7, 0.1));
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <header class="mb-5">
+            <h1 class="display-4 mb-3">WsPopMenu 组件演示</h1>
+            <p class="lead">基于 jQuery、Bootstrap 和 Bootstrap Icons 开发的弹出菜单组件</p>
+            <div class="alert alert-info">
+                <h5 class="alert-heading">组件特性：</h5>
+                <ul class="feature-list mb-0">
+                    <li>支持多种触发方式：点击、悬停、右键菜单</li>
+                    <li>灵活的定位选项（8个方向）</li>
+                    <li>支持多级嵌套菜单（无限级）</li>
+                    <li>内置 Bootstrap Icons 支持</li>
+                    <li>响应式设计，自动边界检测</li>
+                    <li>无障碍访问支持</li>
+                    <li>UMD 模块封装，支持多种环境</li>
+                    <li>丰富的配置选项和事件回调</li>
+                </ul>
+            </div>
+        </header>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- 基本用法 -->
+                <section class="demo-section">
+                    <h3 class="demo-title">基本用法</h3>
+                    <div class="demo-buttons">
+                        <button class="btn btn-primary" id="basic-click">点击触发菜单</button>
+                        <button class="btn btn-outline-secondary" id="basic-hover">悬停触发菜单</button>
+                        <button class="btn btn-success" id="basic-icons">带图标菜单</button>
+                    </div>
+                    <div class="demo-description">
+                        展示三种基本触发方式的菜单：点击触发、悬停触发和带图标的菜单。
+                    </div>
+                    <pre class="demo-code"><code>
+// 点击触发菜单
+$('#basic-click').wsPopMenu({
+    items: [
+        { text: '编辑', icon: 'bi-pencil', id: 'edit' },
+        { text: '复制', icon: 'bi-copy', id: 'copy' },
+        { text: '删除', icon: 'bi-trash', id: 'delete' }
+    ]
+});
+
+// 悬停触发菜单
+$('#basic-hover').wsPopMenu({
+    trigger: 'hover',
+    items: [
+        { text: '首页', icon: 'bi-house', id: 'home' },
+        { text: '个人资料', icon: 'bi-person', id: 'profile' }
+    ]
+});
+                    </code></pre>
+                </section>
+
+                <!-- 定位示例 -->
+                <section class="demo-section">
+                    <h3 class="demo-title">定位示例</h3>
+                    <div class="demo-buttons">
+                        <button class="btn btn-info" id="placement-top">上方 (top-start)</button>
+                        <button class="btn btn-info" id="placement-bottom">下方 (bottom-start)</button>
+                        <button class="btn btn-info" id="placement-left">左侧 (left-start)</button>
+                        <button class="btn btn-info" id="placement-right">右侧 (right-start)</button>
+                    </div>
+                    <div class="demo-description">
+                        展示不同位置的菜单，支持 <span class="highlight">top</span>、<span class="highlight">bottom</span>、<span class="highlight">left</span>、<span class="highlight">right</span> 四个主方向，每个方向还有 <span class="highlight">-start</span>、<span class="highlight">-end</span> 变体。
+                    </div>
+                    <pre class="demo-code"><code>
+// 上方定位
+$('#placement-top').wsPopMenu({
+    placement: 'top-start',
+    items: [...]
+});
+
+// 右侧定位
+$('#placement-right').wsPopMenu({
+    placement: 'right-start',
+    items: [...]
+});
+                    </code></pre>
+                </section>
+
+                <!-- 右键菜单 -->
+                <section class="demo-section">
+                    <h3 class="demo-title">右键菜单</h3>
+                    <div class="card">
+                        <div class="card-body right-click-area" id="contextmenu-area">
+                            <div class="text-center">
+                                <i class="bi bi-mouse-fill fs-1 text-muted mb-3"></i>
+                                <p class="mb-0">在此区域点击右键查看右键菜单效果</p>
+                                <small class="text-muted">支持所有桌面浏览器和移动设备的长按操作</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="demo-description">
+                        右键菜单（上下文菜单）功能，支持自定义菜单项和事件处理。
+                    </div>
+                    <pre class="demo-code"><code>
+// 右键菜单
+$('#contextmenu-area').wsPopMenu({
+    trigger: 'contextmenu',
+    items: [
+        { text: '查看源代码', icon: 'bi-code', id: 'view-source' },
+        { text: '检查元素', icon: 'bi-bug', id: 'inspect' },
+        { type: 'divider' },
+        { text: '刷新', icon: 'bi-arrow-clockwise', id: 'refresh' }
+    ],
+    onItemClick: function(id, $item) {
+        console.log('右键菜单项:', id);
+        alert('执行了操作: ' + id);
+    }
+});
+                     </code></pre>
+                </section>
+
+                <!-- 二级菜单 -->
+                <section class="demo-section">
+                    <h3 class="demo-title">二级菜单</h3>
+                    <div class="demo-buttons">
+                        <button class="btn btn-warning" id="submenu-demo">二级菜单演示</button>
+                    </div>
+                    <div class="demo-description">
+                        支持多级嵌套菜单，可以无限级嵌套（但建议不超过3级以获得最佳用户体验）。
+                    </div>
+                    <pre class="demo-code"><code>
+// 二级菜单
+$('#submenu-demo').wsPopMenu({
+    items: [
+        { 
+            text: '文件', 
+            icon: 'bi-folder', 
+            id: 'file',
+            children: [
+                { text: '新建', icon: 'bi-plus', id: 'new' },
+                { text: '打开', icon: 'bi-folder-open', id: 'open' },
+                { 
+                    text: '导出为', 
+                    id: 'export-as',
+                    children: [  // 三级菜单
+                        { text: 'PDF', id: 'pdf' },
+                        { text: 'Word', id: 'word' }
+                    ]
+                }
+            ]
+        }
+    ]
+});
+                     </code></pre>
+                </section>
+
+                <!-- 动态内容 -->
+                <section class="demo-section">
+                    <h3 class="demo-title">动态内容</h3>
+                    <div class="demo-buttons">
+                        <button class="btn btn-danger" id="dynamic-menu">动态菜单</button>
+                        <button class="btn btn-outline-danger" id="update-menu">更新菜单内容</button>
+                    </div>
+                    <div class="demo-description">
+                        演示如何动态更新菜单内容和配置选项。
+                    </div>
+                    <pre class="demo-code"><code>
+// 获取菜单实例并更新内容
+var menu = $('#dynamic-menu').data('wsPopmenu');
+menu.updateItems([
+    { text: '新菜单项 1', id: 'new1' },
+    { text: '新菜单项 2', id: 'new2' }
+]);
+
+// 更新配置选项
+menu.updateOptions({
+    placement: 'bottom-end',
+    offsetX: 10
+});
+                     </code></pre>
+                </section>
+            </div>
+
+            <div class="col-lg-4">
+                <!-- API 文档 -->
+                <section class="demo-section">
+                    <h3 class="demo-title">API 文档</h3>
+                    <h5>配置选项</h5>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>选项</th>
+                                <th>类型</th>
+                                <th>默认值</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>trigger</code></td>
+                                <td>string</td>
+                                <td>'click'</td>
+                                <td>触发方式：'click', 'hover', 'contextmenu'</td>
+                            </tr>
+                            <tr>
+                                <td><code>placement</code></td>
+                                <td>string</td>
+                                <td>'bottom-start'</td>
+                                <td>菜单位置：top, bottom, left, right 及其 -start/-end 变体</td>
+                            </tr>
+                            <tr>
+                                <td><code>items</code></td>
+                                <td>array</td>
+                                <td>[]</td>
+                                <td>菜单项数组</td>
+                            </tr>
+                            <tr>
+                                <td><code>offsetX</code></td>
+                                <td>number</td>
+                                <td>0</td>
+                                <td>水平偏移量（像素）</td>
+                            </tr>
+                            <tr>
+                                <td><code>offsetY</code></td>
+                                <td>number</td>
+                                <td>0</td>
+                                <td>垂直偏移量（像素）</td>
+                            </tr>
+                            <tr>
+                                <td><code>autoClose</code></td>
+                                <td>boolean</td>
+                                <td>true</td>
+                                <td>点击外部是否自动关闭</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <h5 class="mt-4">菜单项格式</h5>
+                    <pre class="demo-code p-3"><code>{
+  text: '菜单文本',      // 必填
+  icon: 'bi-icon-class', // 可选，Bootstrap Icons 类名
+  id: 'item-id',         // 可选，用于标识
+  disabled: false,       // 可选，是否禁用
+  children: []           // 可选，子菜单项数组
+}
+
+// 特殊项
+{ type: 'divider' }      // 分隔线
+{ type: 'header', text: '标题' } // 分组标题</code></pre>
+                    
+                    <h5 class="mt-4">方法</h5>
+                    <ul class="list-unstyled">
+                        <li><code>.show()</code> - 显示菜单</li>
+                        <li><code>.hide()</code> - 隐藏菜单</li>
+                        <li><code>.toggle()</code> - 切换菜单显示状态</li>
+                        <li><code>.updateItems(items)</code> - 更新菜单内容</li>
+                        <li><code>.updateOptions(options)</code> - 更新配置</li>
+                        <li><code>.destroy()</code> - 销毁菜单</li>
+                    </ul>
+                    
+                    <h5 class="mt-4">事件回调</h5>
+                    <ul class="list-unstyled">
+                        <li><code>onShow()</code> - 菜单显示时触发</li>
+                        <li><code>onHide()</code> - 菜单隐藏时触发</li>
+                        <li><code>onItemClick(id, $item)</code> - 点击菜单项时触发</li>
+                    </ul>
+                </section>
+
+                <!-- 使用说明 -->
+                <section class="demo-section">
+                    <h3 class="demo-title">使用说明</h3>
+                    <div class="alert alert-success">
+                        <h6>1. 引入依赖</h6>
+                        <pre class="mb-0"><code>&lt;!-- jQuery --&gt;
+&lt;script src="jquery.min.js"&gt;&lt;/script&gt;
+&lt;!-- Bootstrap Icons (可选) --&gt;
+&lt;link href="bootstrap-icons.css" rel="stylesheet"&gt;</code></pre>
+                    </div>
+                    
+                    <div class="alert alert-success mt-3">
+                        <h6>2. 引入 WsPopMenu</h6>
+                        <pre class="mb-0"><code>&lt;script src="popmenu.js"&gt;&lt;/script&gt;</code></pre>
+                    </div>
+                    
+                    <div class="alert alert-success mt-3">
+                        <h6>3. 初始化</h6>
+                        <pre class="mb-0"><code>// jQuery 插件方式
+$('#element').wsPopMenu(options);
+
+// 构造函数方式
+var menu = new WsPopMenu(options);
+menu.attachTo($('#element'));</code></pre>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="/statics/js/jquery/jquery-3.6.0.min.js"></script>
+    <!-- 引入 WsPopMenu 组件 -->
+    <!-- 组件为原生 ESM，可直接加载源码：改完组件刷新即可，无需任何构建。
+         样式必须单独 link —— 组件刻意不 import CSS，否则浏览器会因 MIME 类型
+         是 text/css 而拒绝加载整个模块。 -->
+    <link rel="stylesheet" href="ws-popmenu.css">
+    <script type="module" src="ws-popmenu.js"></script>
+    <script src="/statics/js/theme.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // 1. 基本点击菜单
+            $('#basic-click').wsPopMenu({
+                items: [
+                    { text: '编辑', icon: 'bi-pencil', id: 'edit1', type: 'header' },
+                    { text: '编辑', icon: 'bi-pencil', id: 'edit', shortcut: 'Ctrl+E' },
+                    { text: '复制', icon: 'bi-copy', id: 'copy'},
+                    { text: '删除', icon: 'bi-trash', id: 'delete', disabled: true }
+                ],
+                onItemClick: function(id, $item) {
+                    console.log('点击了菜单项:', id);
+                    alert('执行了操作: ' + id);
+                }
+            });
+            
+            // 2. 悬停触发菜单
+            $('#basic-hover').wsPopMenu({
+                trigger: 'hover',
+                items: [
+                    { text: '首页', icon: 'bi-house', id: 'home' },
+                    { text: '个人资料', icon: 'bi-person', id: 'profile' },
+                    { type: 'divider' },
+                    { text: '设置', icon: 'bi-gear', id: 'settings' },
+                    { text: '退出', icon: 'bi-box-arrow-right', id: 'logout' }
+                ],
+                onItemClick: function(id, $item) {
+                    console.log('点击了菜单项:', id);
+                    alert('执行了操作: ' + id);
+                }
+            });
+            
+            // 3. 带图标菜单
+            $('#basic-icons').wsPopMenu({
+                items: [
+                    { text: '新建文件', icon: 'bi-file-earmark-plus', id: 'new-file' },
+                    { text: '新建文件夹', icon: 'bi-folder-plus', id: 'new-folder' },
+                    { type: 'divider' },
+                    { text: '导入', icon: 'bi-upload', id: 'import' },
+                    { text: '导出', icon: 'bi-download', id: 'export' },
+                    { type: 'divider' },
+                    { text: '首选项', icon: 'bi-sliders', id: 'preferences' }
+                ],
+                onItemClick: function(id, $item) {
+                    console.log('点击了菜单项:', id);
+                    alert('执行了操作: ' + id);
+                }
+            });
+            
+            // 4. 定位示例 - 上方
+            $('#placement-top').wsPopMenu({
+                placement: 'top-start',
+                items: [
+                    { text: '选项 1', icon: 'bi-1-circle', id: 'option1' },
+                    { text: '选项 2', icon: 'bi-2-circle', id: 'option2' },
+                    { text: '选项 3', icon: 'bi-3-circle', id: 'option3' }
+                ],
+                onItemClick: function(id, $item) {
+                    console.log('点击了菜单项:', id);
+                    alert('执行了操作: ' + id);
+                }
+            });
+            
+            // 5. 定位示例 - 下方
+            $('#placement-bottom').wsPopMenu({
+                placement: 'bottom-start',
+                items: [
+                    { text: '选项 A', icon: 'bi-a-circle', id: 'optionA' },
+                    { text: '选项 B', icon: 'bi-b-circle', id: 'optionB' },
+                    { text: '选项 C', icon: 'bi-c-circle', id: 'optionC' }
+                ],
+                onItemClick: function(id, $item) {
+                    console.log('点击了菜单项:', id);
+                    alert('执行了操作: ' + id);
+                }
+            });
+            
+            // 6. 定位示例 - 左侧
+            $('#placement-left').wsPopMenu({
+                placement: 'left-start',
+                items: [
+                    { text: '左菜单 1', icon: 'bi-arrow-left', id: 'left1' },
+                    { text: '左菜单 2', icon: 'bi-arrow-left-right', id: 'left2' }
+                ],
+                onItemClick: function(id, $item) {
+                    console.log('点击了菜单项:', id);
+                    alert('执行了操作: ' + id);
+                }
+            });
+            
+            // 7. 定位示例 - 右侧
+            $('#placement-right').wsPopMenu({
+                placement: 'right-start',
+                items: [
+                    { text: '右菜单 1', icon: 'bi-arrow-right', id: 'right1' },
+                    { text: '右菜单 2', icon: 'bi-arrow-up-right', id: 'right2' }
+                ],
+                onItemClick: function(id, $item) {
+                    console.log('点击了菜单项:', id);
+                    alert('执行了操作: ' + id);
+                }
+            });
+            
+            // 8. 右键菜单
+            $('#contextmenu-area').wsPopMenu({
+                trigger: 'contextmenu',
+                items: [
+                    { text: '查看源代码', icon: 'bi-code', id: 'view-source' },
+                    { text: '检查元素', icon: 'bi-bug', id: 'inspect' },
+                    { type: 'divider' },
+                    { text: '刷新', icon: 'bi-arrow-clockwise', id: 'refresh' },
+                    { text: '返回', icon: 'bi-arrow-left', id: 'back' },
+                    { type: 'divider' },
+                    { text: '打印', icon: 'bi-printer', id: 'print' },
+                    { text: '保存', icon: 'bi-save', id: 'save' }
+                ],
+                onItemClick: function(id, $item) {
+                    console.log('右键菜单项:', id);
+                    alert('执行了操作: ' + id);
+                }
+            });
+            
+            // 9. 二级菜单
+            $('#submenu-demo').wsPopMenu({
+                items: [
+                    { 
+                        text: '文件', 
+                        icon: 'bi-folder', 
+                        id: 'file',
+                        children: [
+                            { text: '新建', icon: 'bi-plus', id: 'new' },
+                            { text: '打开', icon: 'bi-folder-open', id: 'open' },
+                            { text: '保存', icon: 'bi-save', id: 'save' },
+                            { text: '另存为', icon: 'bi-save-fill', id: 'save-as' },
+                            { type: 'divider' },
+                            { 
+                                text: '导出为', 
+                                icon: 'bi-download', 
+                                id: 'export-as',
+                                children: [
+                                    { text: 'PDF 文档', icon: 'bi-file-pdf', id: 'pdf' },
+                                    { text: 'Word 文档', icon: 'bi-file-word', id: 'word' },
+                                    { text: '图像文件', icon: 'bi-file-image', id: 'image' },
+                                    { 
+                                        text: '其他格式', 
+                                        id: 'other-formats',
+                                        children: [
+                                            { text: 'HTML', id: 'html' },
+                                            { text: '纯文本', id: 'text' },
+                                            { text: 'Markdown', id: 'markdown' }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    { 
+                        text: '编辑', 
+                        icon: 'bi-pencil', 
+                        id: 'edit',
+                        children: [
+                            { text: '撤销', icon: 'bi-arrow-counterclockwise', id: 'undo' },
+                            { text: '重做', icon: 'bi-arrow-clockwise', id: 'redo' },
+                            { type: 'divider' },
+                            { text: '剪切', icon: 'bi-scissors', id: 'cut' },
+                            { text: '复制', icon: 'bi-copy', id: 'copy' },
+                            { text: '粘贴', icon: 'bi-clipboard', id: 'paste' },
+                            { text: '选择性粘贴', icon: 'bi-clipboard-check', id: 'paste-special' }
+                        ]
+                    },
+                    { 
+                        text: '视图', 
+                        icon: 'bi-eye', 
+                        id: 'view',
+                        children: [
+                            { text: '缩放', icon: 'bi-zoom-in', id: 'zoom' },
+                            { text: '全屏', icon: 'bi-arrows-fullscreen', id: 'fullscreen' },
+                            { type: 'divider' },
+                            { 
+                                text: '主题', 
+                                icon: 'bi-palette', 
+                                id: 'theme',
+                                children: [
+                                    { text: '浅色主题', icon: 'bi-sun', id: 'light' },
+                                    { text: '深色主题', icon: 'bi-moon', id: 'dark' },
+                                    { text: '自动主题', icon: 'bi-circle-half', id: 'auto' }
+                                ]
+                            }
+                        ]
+                    },
+                    { type: 'divider' },
+                    { text: '帮助', icon: 'bi-question-circle', id: 'help' },
+                    { text: '关于', icon: 'bi-info-circle', id: 'about' }
+                ],
+                onItemClick: function(id, $item) {
+                    console.log('点击了菜单项:', id);
+                    if(id === 'light'){
+                        $('html').attr('data-bs-theme', 'light');
+                    }else if(id === 'dark'){
+                        $('html').attr('data-bs-theme', 'dark');
+                    }else if(id === 'auto'){
+                        $('html').attr('data-bs-theme', '');
+                    }
+                    alert('执行了操作: ' + id);
+                }
+            });
+            
+            // 10. 动态菜单
+            var dynamicMenu = $('#dynamic-menu').wsPopMenu({
+                items: [
+                    { text: '原始菜单项 1', id: 'original1' },
+                    { text: '原始菜单项 2', id: 'original2' }
+                ],
+                onItemClick: function(id, $item) {
+                    console.log('点击了菜单项:', id);
+                    alert('执行了操作: ' + id);
+                }
+            }).data('wsPopmenu');
+            
+            // 11. 更新菜单内容
+            $('#update-menu').on('click', function() {
+                dynamicMenu.updateItems([
+                    { text: '更新的菜单项 1', icon: 'bi-star', id: 'updated1' },
+                    { text: '更新的菜单项 2', icon: 'bi-heart', id: 'updated2' },
+                    { type: 'divider' },
+                    { text: '新添加的项', icon: 'bi-plus-circle', id: 'newItem' }
+                ]);
+                
+                // 同时更新配置
+                dynamicMenu.updateOptions({
+                    placement: 'bottom-end',
+                    offsetX: 10,
+                    offsetY: 5
+                });
+                
+                alert('菜单内容已更新！');
+            });
+            
+            // 全局事件监听
+            $(document).on('click', function(e) {
+                // 清理所有打开的菜单（除了当前点击的元素）
+                $('.popmenu.show').each(function() {
+                    var $menu = $(this);
+                    if (!$menu.is(e.target) && $menu.has(e.target).length === 0) {
+                        $menu.removeClass('show');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

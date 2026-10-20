@@ -1,0 +1,79 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}系统工具{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-tools" caption="系统工具" buttongroup="" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <div class="alert alert-light border py-2 mb-3 small">
+                    <i class="bi bi-info-circle me-1"></i>
+                    本页是<b>插件级维护</b>入口：只操作 wisecms 自身的缓存，<b>不修改任何业务数据</b>。
+                </div>
+
+                <h6 class="mb-2"><i class="bi bi-arrow-repeat me-1"></i>缓存维护</h6>
+                <p class="text-muted small mb-3">
+                    「刷新 CMS 缓存」只清空 <b>wisecms 插件</b>自己的缓存家族（见下方清单），
+                    <b>不影响数据库数据</b>，也不触及框架与其它插件的缓存。
+                    刷新后首次访问前台会重新生成缓存，可能有短暂变慢。
+                    <br>
+                    <span class="text-danger">作用范围：全站（所有站点）</span>，不随站点选择器变化。
+                </p>
+
+                <button type="button" id="btn-flush-cache" class="btn btn-sm btn-warning">
+                    <i class="bi bi-arrow-repeat me-1"></i>刷新 CMS 缓存
+                </button>
+
+                <hr class="my-4">
+
+                <h6 class="mb-2"><i class="bi bi-list-ul me-1"></i>将清理的缓存家族</h6>
+                <p class="text-muted small mb-2">
+                    当前缓存驱动：<code>{$cacheDriver}</code>；共 <b>{:count($cacheFamilies)}</b> 个家族。
+                    清单由 <code>CacheService</code> 的 <code>KEY_*</code> 常量自动推导（新增键无需手工维护）。
+                </p>
+                <div>
+                    {volist name="cacheFamilies" id="family"}
+                    <span class="badge bg-body-secondary text-body-secondary border me-1 mb-1">{$family}</span>
+                    {/volist}
+                </div>
+
+                <hr class="my-4">
+
+                <h6 class="mb-2"><i class="bi bi-shield-exclamation me-1"></i>孤儿数据清理</h6>
+                <p class="text-muted small mb-2">
+                    清理「外键指向<b>已不存在的内容</b>」的历史遗留关联行 —— 内容被彻底删除时若未走级联清理，
+                    关联表会留下永远查不到的悬空行。<b>清理是物理删除，不可恢复</b>，
+                    请先<b>扫描</b>看清影响面，再确认执行。
+                    <br>
+                    被删除的每一行其外键都指向不存在的内容，<b>不会影响任何可见数据</b>。
+                    <br>
+                    <span class="text-danger">作用范围：全站（所有站点）</span>，不随站点选择器变化。
+                </p>
+
+                <p class="text-muted small mb-2">将扫描的数据表（含各模型的动态自定义字段副表）：</p>
+                <div class="mb-3">
+                    {volist name="orphanLabels" id="label"}
+                    <span class="badge bg-body-secondary text-body-secondary border me-1 mb-1">{$label}</span>
+                    {/volist}
+                </div>
+
+                <div class="mb-3">
+                    <button type="button" id="btn-scan-orphans" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-search me-1"></i>扫描孤儿数据
+                    </button>
+                    <button type="button" id="btn-purge-orphans" class="btn btn-sm btn-danger" disabled>
+                        <i class="bi bi-eraser me-1"></i>清理孤儿数据
+                    </button>
+                    <span class="text-muted small ms-2" id="orphan-summary">尚未扫描</span>
+                </div>
+
+                <div id="orphan-result"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/system.js（由 wsconfig.js 自动加载） -->
+{/block}

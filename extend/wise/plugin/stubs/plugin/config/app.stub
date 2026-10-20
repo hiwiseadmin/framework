@@ -1,0 +1,26 @@
+<?php
+/**
+ * {$name} 插件 — 主配置（boot 链 Step 2 加载）
+ *
+ * ⚠️ 本文件**必须命名为 app.php**：
+ *    只有 app.php 的内容会被「平铺」到插件配置域根，即
+ *        config('{$name}.xxx')       ← 平铺写法（推荐）
+ *        config('{$name}.app.xxx')   ← 子键写法（等价）
+ *    命名为其他名字（如 setting.php）时只会产生 config('{$name}.setting.xxx')，不会平铺。
+ */
+
+return [
+    'info' => [
+        'name'        => '{$name}',
+        'title'       => '{$name}',
+        'description' => '{$description}',
+        'author'      => '{$author}',
+        'version'     => '{$version}',
+    ],
+
+    // 插件运行设置
+    'setting' => [
+        'enable'    => true,
+        'auto_load' => true,
+    ],
+];

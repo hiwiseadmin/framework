@@ -1,0 +1,34 @@
+{extend name="public/base" /}
+
+{block name="title"}任务中心{/block}
+
+{block name="content"}
+<body>
+<div class="app-main container-fluid">
+    {include file="public/index_header" /}
+
+    <div class="card mb-3">
+        <div class="card-body py-2" id="async-task-health">
+            <span class="text-muted small">正在加载队列健康…</span>
+        </div>
+    </div>
+
+    <div id="async-task-filter" class="d-flex flex-wrap gap-2 align-items-center mb-2">
+        <select id="filter-status" class="form-select form-select-sm" style="width: 140px;">
+            <option value="">全部状态</option>
+            <option value="pending">等待中</option>
+            <option value="running">执行中</option>
+            <option value="success">成功</option>
+            <option value="failed">失败</option>
+            <option value="canceled">已取消</option>
+            <option value="stale">已卡死</option>
+        </select>
+        <input id="filter-keyword" class="form-control form-control-sm" style="width: 240px;"
+               type="text" placeholder="任务号 / 回调标识 / 名称" />
+    </div>
+
+    <div id="toolbar" class="toolbar"></div>
+
+    <table id="table"></table>
+</div>
+{/block}

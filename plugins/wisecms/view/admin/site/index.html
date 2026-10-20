@@ -1,0 +1,29 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}多站点管理{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-globe2" caption="多站点管理" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <div class="alert alert-light border py-2 mb-3 small">
+                    <i class="bi bi-info-circle me-1"></i>
+                    「<b>当前站点</b>」是后台编辑上下文（顶部选择器切换，标在本列表行内）；
+                    未切换时默认取排序最前的<b>启用</b>站点。
+                    <br>
+                    删除站点有<b>两道门</b>：站点下仍有内容 / 栏目 / 单页（<b>含回收站</b>）时会被拒绝
+                    —— 列表的「站点数据」列即为该判断；只有全为 0 时才会级联清理附属数据（别名 / URL 规则 / 友链 / 内链 / 重定向 / 标签）。
+                </div>
+
+                <div id="toolbar" class="toolbar"></div>
+                <table id="table"></table>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/site.js（由 wsconfig.js 自动加载） -->
+{/block}

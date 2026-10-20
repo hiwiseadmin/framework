@@ -1,0 +1,92 @@
+<?php
+declare(strict_types=1);
+
+namespace {$namespace}\controller;
+{$class_imports}
+use app\common\controller\traits\CrudSchemaTrait;
+use app\common\controller\traits\CrudTrait;
+use {$namespace}\model\{$class} as {$class}Model;
+use think\Model;
+use wise\form\schema\Form;
+{$field_imports}
+
+/**
+ * {$title} 控制器
+ *
+ * 由 `php think wise:crud` 于 {$create_time} 生成。
+ *
+ * 设计原则（与 FastAdmin 生成完整控制器方法的方式相反）：
+ *   这里只做**声明** —— 表单 Schema 写在 defineForm()，其余 CRUD 能力全部来自
+ *   CrudTrait（查询构建 + 标准 RESTful），列表/表单页面由框架级共享模板
+ *   在请求时渲染。**改字段只需改本文件，不需要重新生成页面。**
+ *
+ * 三段职责：
+ *   1. defineForm()   —— 唯一声明源：表单字段、校验规则、类型转换都由它派生
+ *   2. index/add/edit —— 渲染入口（复用 CrudSchemaTrait 的共享模板渲染）
+ *   3. getModel()     —— CrudTrait 的模型依赖
+ *
+ * 自定义 HTML 的逃生通道：直接覆盖 index()/add()/edit() 并 fetch 自己的模板即可，
+ * 本类不会阻止你这么做（与原有手写控制器完全兼容）。
+ *
+ * @see \docs\wiseadmin-crud-field-mapping.md 字段类型推导规范
+ */
+class {$class} extends BaseController
+{
+    use CrudTrait;
+    use CrudSchemaTrait;
+
+{$plugin_declaration}
+
+    /**
+     * CrudTrait 的模型依赖
+     */
+    protected function getModel(): Model
+    {
+        return new {$class}Model();
+    }
+
+    /**
+     * 表单 Schema 声明（**唯一需要维护的地方**）
+     *
+     * 每行上方的注释由生成器写入，格式：
+     *   // 字段名: 列类型 · 命中层(命中规则) · 备选类型
+     * 命中层为 P1~P3 的属于启发式推断，建议人工核对；P0 为显式声明。
+     */
+    protected function defineForm(Form $form): void
+    {
+{$form_lines}
+    }
+
+    /**
+     * 列表页
+     */
+    public function index()
+    {
+        return $this->renderCrudIndex('{$title}');
+    }
+
+    /**
+     * 新增页
+     */
+    public function add()
+    {
+        return $this->renderCrudForm(null, '新增{$title}', (string) url('save'));
+    }
+
+    /**
+     * 编辑页
+     */
+    public function edit()
+    {
+        $id  = $this->request->param('id/d', 0);
+        $row = $this->getModel()->find($id);
+
+        if (!$row) {
+            return $this->error('记录不存在');
+        }
+
+        return $this->renderCrudForm($row, '编辑{$title}', (string) url('update'));
+    }
+
+{$action_wrappers}
+}

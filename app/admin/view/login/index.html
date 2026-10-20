@@ -1,0 +1,139 @@
+{extend name="public/base" /}
+
+{block name="title"}登录{/block}
+
+{block name="css"}
+<style>
+.login-box {
+    /* margin-top: 100px; */
+}
+.login-logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.login-logo span {
+    font-size: 28px;
+    font-weight: bold;
+}
+.loading-overlay {
+    visibility: hidden;
+}
+.captcha-img {
+    cursor: pointer;
+    height: 38px;
+    border-radius: 0 4px 4px 0;
+}
+.captcha-wrapper {
+    display: flex;
+    align-items: stretch;
+}
+.captcha-wrapper .form-control {
+    border-radius: 4px 0 0 4px;
+}
+</style>
+{/block}
+
+{block name="content"}
+<body>
+<div class="hold-transition login-page">
+    <div class="login-box">
+        <div class="login-logo">
+            <span><i class="bi bi-bar-chart-line"></i> {$wssite['name']|default='网站管理系统'}</span>
+        </div>
+        
+        <div class="card p-1 bg-body-tertiary">
+            <div class="card-body login-card-body bg-body-tertiary">
+                <p class="login-box-msg">请登录以开始您的会话</p>
+                
+                <form id="loginForm" class="">
+                    <input type="hidden" id="referer" value="{$referer|default=''}">
+                    {if $captcha_enabled}
+                    <input type="hidden" id="captcha-key" name="captcha_key" value="">
+                    {/if}
+                    
+                    <div class="input-group mb-1">
+                        <div class="input-group-text">
+                            <span class="bi bi-person"></span>
+                        </div>
+                        <input type="text" name="username" id="loginUsername" class="form-control rounded-end" placeholder="用户名" autocomplete="username" 
+                            data-validation="required|minLength:2|maxLength:30" 
+                            data-validation-message-required="请输入用户名"
+                            data-validation-message-minLength="用户名至少需要2个字符"
+                            data-validation-message-maxLength="用户名不能超过30个字符">
+                        <div class="invalid-feedback" style="display: block; visibility: hidden;">
+                            <i class="bi bi-exclamation-circle me-2"></i>
+                            <span class="validation-text"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group mb-1">
+                        <div class="input-group-text">
+                            <span class="bi bi-lock"></span>
+                        </div>
+                        <input type="password" name="password" id="loginPassword" class="form-control" placeholder="密码" autocomplete="current-password"
+                            data-validation="required|minLength:6|maxLength:30" 
+                            data-validation-message-required="请输入密码"
+                            data-validation-message-minLength="密码至少需要6个字符"
+                            data-validation-message-maxLength="密码不能超过30个字符">
+                        <button class="btn btn-outline-secondary" type="button" id="togglePassword" tabindex="-1" aria-label="显示密码" title="显示/隐藏密码">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <div class="invalid-feedback" style="display: block; visibility: hidden;">
+                            <i class="bi bi-exclamation-circle me-2"></i>
+                            <span class="validation-text"></span>
+                        </div>
+                    </div>
+                    
+                    {if $captcha_enabled}
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="input-group mb-1 captcha-wrapper">
+                                <input type="text" name="captcha_code" class="form-control" placeholder="验证码"
+                                    data-validation="required|minLength:4|maxLength:4" 
+                                    data-validation-message-required="请输入验证码"
+                                    data-validation-message-minLength="验证码为4位字符"
+                                    data-validation-message-maxLength="验证码为4位字符">
+                                <span class="input-group-append">
+                                    <img src="" alt="验证码" class="captcha-img" id="captchaImg" title="点击刷新验证码">
+                                </span>
+                                <div class="invalid-feedback" style="display: block; visibility: hidden;">
+                                    <i class="bi bi-exclamation-circle me-2"></i>
+                                    <span class="validation-text"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {/if}
+                    
+                    {if $keep_login_enabled}
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="keeplogin" value="1" id="flexCheckDefault" {if cookie('keeplogin')}checked{/if} />
+                            <label class="form-check-label" for="flexCheckDefault"
+                                data-bs-toggle="tooltip" data-bs-placement="right"
+                                data-bs-title="{$keep_login_tip}">保持登录 <i class="bi bi-info-circle"></i></label>
+                            </div>
+                        </div>
+                    </div>
+                    {/if}
+                    
+                    <div class="row">
+                        <div class="social-auth-links text-center mb-3 d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-block">登录</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="js"}
+<script type="text/javascript" nonce="{$csp_nonce|default=''}">
+    var dologin_url = "{:$dologin_url}";
+    var captcha_image_url = "{:$captcha_image_url}";
+    var captcha_enabled = {:$captcha_enabled ? 'true' : 'false'};
+</script>
+{/block}

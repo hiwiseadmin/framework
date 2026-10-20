@@ -1,0 +1,78 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}库存查询{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-boxes" caption="库存查询" buttongroup="" /}
+    <div class="plugin-smartstock">
+        <div class="container-fluid p-0">
+            <div class="card">
+                <div class="card-body">
+                    <form class="row g-2 mb-3" id="search-form">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control form-control-sm" id="search-keyword" placeholder="商品名称/SKU编码">
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select form-select-sm" id="search-warehouse">
+                                <option value="">全部仓库</option>
+                                {foreach $warehouses as $w}
+                                <option value="{$w.id}">{$w.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm" id="btn-search"><i class="bi bi-search"></i> 搜索</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-reset"><i class="bi bi-arrow-clockwise"></i> 重置</button>
+                        </div>
+                    </form>
+
+                    <div id="toolbar" class="toolbar mb-2"></div>
+                    <table id="table"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 调整库存 模态框 -->
+<div class="modal fade" id="adjust-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="form-title">调整库存</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+            </div>
+            <form id="adjust-form" class="modal-body row g-3">
+                <div class="col-md-12">
+                    <label class="form-label">商品 <span class="text-danger">*</span></label>
+                    <select id="form-product" name="product_id" class="form-select">
+                        <option value="">请选择商品</option>
+                    </select>
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label">仓库 <span class="text-danger">*</span></label>
+                    <select id="form-warehouse" name="warehouse_id" class="form-select">
+                        <option value="">请选择仓库</option>
+                        {foreach $warehouses as $w}
+                        <option value="{$w.id}">{$w.name}</option>
+                        {/foreach}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">调整后库存数量 <span class="text-danger">*</span></label>
+                    <input type="number" id="form-quantity" name="new_quantity" class="form-control" min="0">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">调整原因</label>
+                    <input type="text" id="form-reason" name="reason" class="form-control" placeholder="可选">
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" form="adjust-form" class="btn btn-primary"><i class="bi bi-check-lg"></i> 保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

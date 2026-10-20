@@ -1,0 +1,40 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}评论管理{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-chat-left-text" caption="评论管理" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <!-- data-comment-check：供 js/comment.js 决定默认筛选（1 = 先审后发 → 默认看「待审核」）。
+             审核模式取值见 CommentService::CHECK_*。 -->
+        <div id="cmsCommentPage" data-comment-check="{:config('wisecms.comment_check', 1)}">
+            <div class="card">
+                <div class="card-body">
+                    <!-- 筛选条：状态切换就地刷新，不再整页跳转 -->
+                    <div class="row g-2 align-items-center mb-3">
+                        <div class="col-auto">
+                            <select class="form-select form-select-sm" id="filter-status" style="width:130px">
+                                <option value="">全部状态</option>
+                                <option value="0">待审核</option>
+                                <option value="1">已通过</option>
+                                <option value="2">已拒绝</option>
+                            </select>
+                        </div>
+                        <div class="col-auto ms-auto">
+                            <span class="text-muted small">审核通过 / 拒绝为单条操作；删除会连带其下所有回复</span>
+                        </div>
+                    </div>
+
+                    <!-- 表格：仅挂载点。无批量接口 → 不开勾选 -->
+                    <div id="toolbar" class="toolbar"></div>
+                    <table id="table"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/comment.js（由 wsconfig.js 自动加载） -->
+{/block}

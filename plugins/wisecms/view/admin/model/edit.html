@@ -1,0 +1,50 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}编辑模型{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-pencil-square" caption="编辑模型" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <form id="modelForm" method="post" action="{:plugin_url('wisecms/model/edit')}">
+                    {:csrf_field()}
+                    <input id="cms-f-id" type="hidden" name="id" value="{$model.id}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-id">模型标识</label>
+                            <input type="text" class="form-control" value="{$model.name}" disabled>
+                            <div class="form-text">模型标识创建后不可修改</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-title">模型名称 <span class="text-danger">*</span></label>
+                            <input id="cms-f-title" type="text" name="title" class="form-control" required maxlength="50" value="{$model.title}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-title">数据表名</label>
+                            <input type="text" class="form-control" value="{$model.table_name}" disabled>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-status">状态</label>
+                            <select id="cms-f-status" name="status" class="form-select">
+                                <option value="1" {if $model.status == 1}selected{/if}>启用</option>
+                                <option value="0" {if $model.status == 0}selected{/if}>禁用</option>
+                            </select>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label" for="cms-f-description">模型描述</label>
+                            <textarea id="cms-f-description" name="description" class="form-control" rows="3" maxlength="200">{$model.description}</textarea>
+                        </div>
+                    </div>
+                    <div class="cms-form-actions">
+                        <a href="{:plugin_url('wisecms/model/index')}" class="btn btn-outline-secondary btn-sm cms-form-actions-secondary">返回</a>
+                        <a href="{:plugin_url('wisecms/modelField/index')}?model_id={$model.id}" class="btn btn-outline-secondary btn-sm">管理字段</a>
+                        <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

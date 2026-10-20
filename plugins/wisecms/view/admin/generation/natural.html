@@ -1,0 +1,62 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}自然语言生成{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-magic" caption="自然语言生成" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <div class="alert alert-light border py-2 mb-3 small">
+                    <i class="bi bi-info-circle me-1"></i>
+                    生成后内容<b>按全局审核规则入库为草稿</b>（不受「直接发布」勾选绕过审核）；
+                    若未安装 <code>wise-agent</code> 插件则无法真正生成，会给出提示。
+                </div>
+
+                <form id="naturalForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-task_name">任务名称</label>
+                            <input id="cms-f-task_name" type="text" name="task_name" class="form-control" placeholder="留空自动生成">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-topic">主题 <span class="text-danger">*</span></label>
+                            <input id="cms-f-topic" type="text" name="topic" class="form-control" required placeholder="如：夏季防晒指南">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-style">写作风格</label>
+                            <input id="cms-f-style" type="text" name="style" class="form-control" value="专业">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-catid">所属栏目</label>
+                            <select id="cms-f-catid" name="catid" class="form-select">
+                                <option value="0">不指定</option>
+                                {foreach $categoryOptions as $opt}
+                                <option value="{$opt.id}">{$opt.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label" for="cms-f-requirements">写作要求</label>
+                            <textarea id="cms-f-requirements" name="requirements" class="form-control" rows="3" placeholder="结构完整，800字以上，含 h2/h3 标题"></textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" name="auto_publish" value="1" class="form-check-input" id="autoPublish">
+                                <label class="form-check-label" for="autoPublish">生成后直接发布（仍受全局审核规则约束）</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">开始生成</button>
+                    <a href="{:plugin_url('wisecms/generation/index')}" class="btn btn-outline-secondary btn-sm">返回</a>
+                </form>
+                <div id="resultBox" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/generation.js（由 wsconfig.js 自动加载） -->
+{/block}

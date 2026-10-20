@@ -1,0 +1,77 @@
+{
+    "name": "wiseeditor",
+    "title": "WiseEditor",
+    "version": "1.0.0",
+    "description": "基于 TipTap + Milkdown 的编辑器插件，提供富文本编辑和 Markdown 编辑能力。支持多编辑器兼容，插件可扩展。",
+    "author": "WiseAdmin Team",
+    "dependencies": {},
+    "service_provider": "plugin\\wiseeditor\\BootServiceProvider",
+    "develop": true,
+    "menus": [],
+    "permissions": [
+        {
+            "ident": "wiseeditor:upload",
+            "name": "编辑器上传文件",
+            "type": "custom",
+            "description": "允许在编辑器中使用图片/文件上传功能"
+        },
+        {
+            "ident": "wiseeditor:source",
+            "name": "查看源码",
+            "type": "custom",
+            "description": "允许切换到 HTML 源码编辑模式"
+        },
+        {
+            "ident": "wiseeditor:fullscreen",
+            "name": "全屏编辑",
+            "type": "custom",
+            "description": "允许使用全屏编辑模式"
+        },
+        {
+            "ident": "wiseeditor:embed",
+            "name": "嵌入多媒体",
+            "type": "custom",
+            "description": "允许在编辑器中嵌入视频等外部内容"
+        },
+        {
+            "ident": "wiseeditor:code",
+            "name": "代码块编辑",
+            "type": "custom",
+            "description": "允许插入和编辑代码块"
+        }
+    ],
+    "config": {
+        "default_editor": {
+            "type": "select",
+            "title": "默认编辑器",
+            "value": "richtext",
+            "options": {
+                "richtext": "TipTap 富文本编辑器",
+                "markdown": "Milkdown Markdown 编辑器",
+                "simple": "简易编辑器"
+            }
+        },
+        "upload_max_size": {
+            "type": "number",
+            "title": "上传文件大小限制(MB)",
+            "value": 5
+        },
+        "image_compress": {
+            "type": "boolean",
+            "title": "启用图片压缩",
+            "value": true
+        },
+        "tiptap_default_height": {
+            "type": "number",
+            "title": "TipTap 编辑器默认高度(px)",
+            "value": 400
+        },
+        "milkdown_default_height": {
+            "type": "number",
+            "title": "Milkdown 编辑器默认高度(px)",
+            "value": 500
+        }
+    },
+    "slots": {},
+    "vendor": {}
+}

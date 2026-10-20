@@ -1,0 +1,303 @@
+{
+    "name": "wisedocs",
+    "title": "WiseDocs",
+    "version": "1.0.0",
+    "description": "多空间文档中心：支持文章 / 代码 / 组件（沙箱在线运行）/ API 文档，含分类、标签、搜索、反馈与统计。",
+    "author": "WiseAdmin",
+    "dependencies": {},
+    "packages": {
+        "wiseadmin/wise-member": {
+            "constraint": "*",
+            "required": false
+        }
+    },
+    "service_provider": "plugin\\wisedocs\\BootServiceProvider",
+    "develop": false,
+    "menu": {
+        "title": "文档中心",
+        "icon": "bi bi-journal-text",
+        "sort": 40
+    },
+    "icon": {
+        "type": "bi",
+        "value": "bi bi-journal-text",
+        "color": "#4361ee"
+    },
+    "menus": [
+        {
+            "name": "文档中心",
+            "icon": "bi bi-journal-text",
+            "path": "",
+            "sort": 40,
+            "type": "dir",
+            "status": 1,
+            "children": [
+                {
+                    "name": "概览",
+                    "icon": "bi bi-speedometer2",
+                    "path": "/plugin/wisedocs/dashboard",
+                    "component": "",
+                    "sort": 10,
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "文档管理",
+                    "icon": "bi bi-file-earmark-text",
+                    "path": "/plugin/wisedocs/document",
+                    "component": "",
+                    "sort": 20,
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "分类管理",
+                    "icon": "bi bi-diagram-2",
+                    "path": "/plugin/wisedocs/category",
+                    "component": "",
+                    "sort": 30,
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "标签管理",
+                    "icon": "bi bi-tags",
+                    "path": "/plugin/wisedocs/tag",
+                    "component": "",
+                    "sort": 40,
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "反馈管理",
+                    "icon": "bi bi-chat-left-text",
+                    "path": "/plugin/wisedocs/feedback",
+                    "component": "",
+                    "sort": 50,
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "数据统计",
+                    "icon": "bi bi-bar-chart",
+                    "path": "/plugin/wisedocs/stats",
+                    "component": "",
+                    "sort": 60,
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "空间管理",
+                    "icon": "bi bi-diagram-3",
+                    "path": "/plugin/wisedocs/space",
+                    "component": "",
+                    "sort": 70,
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "插件设置",
+                    "icon": "bi bi-gear",
+                    "path": "/admin/plugin/configIndex/name/wisedocs",
+                    "component": "",
+                    "sort": 90,
+                    "type": "menu",
+                    "status": 1
+                }
+            ]
+        }
+    ],
+    "permissions": [
+        {
+            "name": "文档中心概览",
+            "ident": "wisedocs.dashboard.index",
+            "method": "*",
+            "type": "custom",
+            "description": "查看 WiseDocs 概览页"
+        },
+        {
+            "name": "文档管理（全部）",
+            "ident": "wisedocs.document.*",
+            "method": "*",
+            "type": "custom",
+            "description": "文档管理控制器的全部操作"
+        },
+        {
+            "name": "文档列表",
+            "ident": "wisedocs.document.index",
+            "method": "GET",
+            "type": "custom",
+            "description": "查看文档列表"
+        },
+        {
+            "name": "文档新增/编辑页面",
+            "ident": "wisedocs.document.form",
+            "method": "GET",
+            "type": "custom",
+            "description": "打开文档新增/编辑独立页面"
+        },
+        {
+            "name": "文档新增/编辑",
+            "ident": "wisedocs.document.save",
+            "method": "POST",
+            "type": "custom",
+            "description": "新增或编辑文档"
+        },
+        {
+            "name": "文档删除",
+            "ident": "wisedocs.document.delete",
+            "method": "POST",
+            "type": "custom",
+            "description": "删除文档"
+        },
+        {
+            "name": "分类管理（全部）",
+            "ident": "wisedocs.category.*",
+            "method": "*",
+            "type": "custom",
+            "description": "分类管理控制器的全部操作"
+        },
+        {
+            "name": "分类列表",
+            "ident": "wisedocs.category.index",
+            "method": "GET",
+            "type": "custom",
+            "description": "查看分类"
+        },
+        {
+            "name": "分类新增/编辑",
+            "ident": "wisedocs.category.save",
+            "method": "POST",
+            "type": "custom",
+            "description": "新增或编辑分类"
+        },
+        {
+            "name": "分类删除",
+            "ident": "wisedocs.category.delete",
+            "method": "POST",
+            "type": "custom",
+            "description": "删除分类"
+        },
+        {
+            "name": "标签管理（全部）",
+            "ident": "wisedocs.tag.*",
+            "method": "*",
+            "type": "custom",
+            "description": "标签管理控制器的全部操作"
+        },
+        {
+            "name": "标签列表",
+            "ident": "wisedocs.tag.index",
+            "method": "GET",
+            "type": "custom",
+            "description": "查看标签"
+        },
+        {
+            "name": "标签新增/编辑",
+            "ident": "wisedocs.tag.save",
+            "method": "POST",
+            "type": "custom",
+            "description": "新增或编辑标签"
+        },
+        {
+            "name": "标签删除",
+            "ident": "wisedocs.tag.delete",
+            "method": "POST",
+            "type": "custom",
+            "description": "删除标签"
+        },
+        {
+            "name": "标签合并",
+            "ident": "wisedocs.tag.merge",
+            "method": "POST",
+            "type": "custom",
+            "description": "合并标签"
+        },
+        {
+            "name": "反馈管理（全部）",
+            "ident": "wisedocs.feedback.*",
+            "method": "*",
+            "type": "custom",
+            "description": "反馈管理控制器的全部操作"
+        },
+        {
+            "name": "反馈处理",
+            "ident": "wisedocs.feedback.process",
+            "method": "POST",
+            "type": "custom",
+            "description": "处理或忽略反馈"
+        },
+        {
+            "name": "反馈删除",
+            "ident": "wisedocs.feedback.delete",
+            "method": "POST",
+            "type": "custom",
+            "description": "删除反馈"
+        },
+        {
+            "name": "数据统计（全部）",
+            "ident": "wisedocs.stats.*",
+            "method": "*",
+            "type": "custom",
+            "description": "统计控制器的全部操作"
+        },
+        {
+            "name": "统计导出",
+            "ident": "wisedocs.stats.export",
+            "method": "GET",
+            "type": "custom",
+            "description": "导出统计数据"
+        },
+        {
+            "name": "空间管理（全部）",
+            "ident": "wisedocs.space.*",
+            "method": "*",
+            "type": "custom",
+            "description": "空间管理控制器的全部操作"
+        },
+        {
+            "name": "空间新增/编辑",
+            "ident": "wisedocs.space.save",
+            "method": "POST",
+            "type": "custom",
+            "description": "新增或编辑空间"
+        },
+        {
+            "name": "设置管理（全部）",
+            "ident": "wisedocs.settings.*",
+            "method": "*",
+            "type": "custom",
+            "description": "设置控制器的全部操作"
+        },
+        {
+            "name": "保存设置",
+            "ident": "wisedocs.settings.save",
+            "method": "POST",
+            "type": "custom",
+            "description": "保存插件设置"
+        }
+    ],
+    "config": {
+        "cache_time": {
+            "type": "number",
+            "title": "缓存时间(秒)",
+            "value": 3600
+        },
+        "search_engine": {
+            "type": "select",
+            "title": "搜索引擘",
+            "value": "like",
+            "options": {
+                "like": "LIKE 模糊匹配（兼容性最好）",
+                "fulltext": "MySQL FULLTEXT（需全文索引；中文依赖 ngram 分词器）"
+            },
+            "group": "search",
+            "sort": 1
+        }
+    },
+    "config_groups": {
+        "search": "搜索设置"
+    },
+    "slots": {},
+    "vendor": {}
+}

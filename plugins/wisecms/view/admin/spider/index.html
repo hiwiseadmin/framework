@@ -1,0 +1,30 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}内容采集{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-cloud-download" caption="内容采集" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <div class="alert alert-light border py-2 mb-3 small">
+                    <i class="bi bi-info-circle me-1"></i>
+                    「执行采集」为<b>同步长任务</b>（单次最多抓取 20 个链接，可能耗时数分钟），
+                    结果以<b>草稿</b>入库到目标栏目，<b>不会</b>覆盖或删除既有内容。
+                    <div class="text-muted mt-1">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        采集任务列表<b>不按站点隔离</b>（任务表无站点归属），请留意目标栏目所属站点。
+                    </div>
+                </div>
+
+                <div id="toolbar" class="toolbar"></div>
+                <table id="table"></table>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/spider.js（由 wsconfig.js 自动加载） -->
+{/block}

@@ -1,0 +1,59 @@
+<div class="modal fade position-fixed" id="loginSuccessModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
+    <div class="modal-dialog">
+        <div class="modal-content small">
+            <div class="modal-header border-bottom border-secondary">
+                <h5 class="modal-title d-flex align-items-center">
+                    <span class="bg-success rounded-circle me-2 text-center" style="width: 24px; height: 24px;">
+                        <i class="bi bi-check d-inline-flex"></i>
+                    </span>
+                    登录成功
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div>
+                    {if !empty($current_login_log)}{if ($current_login_log.security_level == 1)}<span class="text-success float-end me-2"><i class="bi bi-shield-fill-check"></i> 已信任设备</span>
+                    {elseif $current_login_log.security_level == 2}<span class="text-warning float-end me-2"><i class="bi bi-shield-fill-x"></i> 未认证设备</span>
+                    {elseif $current_login_log.security_level == 3}<span class="text-danger float-end me-2"><i class="bi bi-exclamation-triangle-fill"></i> 风险设备</span>{/if}{/if}
+                    <h6 class="text-muted mb-2">当前登录信息:</h6>
+                    <table class="table table-bordered m-0">
+                        <tbody>
+                            <tr>
+                                <th class="" width="100">IP</th>
+                                <td>{$current_login_log.login_ip|default='未知'}</td>
+                            </tr>
+                            <tr>
+                                <th class="">归属地</th>
+                                <td>{$current_login_log.location|default='未知'}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                {if $last_login_log}
+                <div class="mt-4">
+                    {if ($last_login_log.security_level == 1)}<span class="text-success float-end me-2"><i class="bi bi-shield-fill-check"></i> 已信任设备</span>
+                    {elseif $last_login_log.security_level == 2}<span class="text-warning float-end me-2"><i class="bi bi-shield-fill-x"></i> 未认证设备</span>
+                    {elseif $last_login_log.security_level == 3}<span class="text-danger float-end me-2"><i class="bi bi-exclamation-triangle-fill"></i> 风险设备</span>{/if}
+                    <h6 class="text-muted mb-2">上次登录信息:</h6>
+                    <table class="table table-bordered m-0">
+                        <tbody>
+                            <tr>
+                                <th class="" width="100">IP</th>
+                                <td>{$last_login_log.login_ip|default='未知'}</td>
+                            </tr>
+                            <tr>
+                                <th class="">归属地</th>
+                                <td>{$last_login_log.location|default='未知'}</td>
+                            </tr>
+                            <tr>
+                                <th class="">登录时间</th>
+                                <td>{$last_login_log.login_time|default='未知'}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                {/if}
+            </div>
+        </div>
+    </div>
+</div>

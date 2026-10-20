@@ -1,0 +1,124 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}入库管理{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-box-arrow-in-down" caption="入库管理" buttongroup="" /}
+    <div class="plugin-smartstock">
+        <div class="container-fluid p-0">
+            <div class="card">
+                <div class="card-body">
+                    <form class="row g-2 mb-3" id="search-form">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control form-control-sm" id="search-order-no" placeholder="入库单号">
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select form-select-sm" id="search-type">
+                                <option value="">全部类型</option>
+                                {foreach $types as $k => $v}
+                                <option value="{$k}">{$v}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select form-select-sm" id="search-warehouse">
+                                <option value="">全部仓库</option>
+                                {foreach $warehouses as $w}
+                                <option value="{$w.id}">{$w.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select form-select-sm" id="search-status">
+                                <option value="">全部状态</option>
+                                <option value="0">草稿</option>
+                                <option value="1">已确认</option>
+                                <option value="2">已完成</option>
+                                <option value="3">已取消</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm" id="btn-search"><i class="bi bi-search"></i> 搜索</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-reset"><i class="bi bi-arrow-clockwise"></i> 重置</button>
+                        </div>
+                    </form>
+
+                    <div id="toolbar" class="toolbar mb-2"></div>
+                    <table id="table"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 新增/编辑 模态框 -->
+<div class="modal fade" id="stockin-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="form-title">新增入库单</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+            </div>
+            <form id="stockin-form" class="modal-body">
+                <input type="hidden" name="id" id="form-id" value="0">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label">仓库 <span class="text-danger">*</span></label>
+                        <select id="form-warehouse" name="warehouse_id" class="form-select">
+                            <option value="">请选择仓库</option>
+                            {foreach $warehouses as $w}
+                            <option value="{$w.id}">{$w.name}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">入库类型 <span class="text-danger">*</span></label>
+                        <select id="form-type" name="type" class="form-select">
+                            <option value="">请选择类型</option>
+                            {foreach $types as $k => $v}
+                            <option value="{$k}">{$v}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">入库日期</label>
+                        <input type="date" id="form-date" name="order_date" class="form-control">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">备注</label>
+                        <input type="text" id="form-remark" name="remark" class="form-control" placeholder="备注">
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="mb-0"><i class="bi bi-list-ul me-2"></i>入库明细</h6>
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="btn-add-item">
+                        <i class="bi bi-plus-lg"></i> 添加明细
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm">
+                        <thead>
+                            <tr>
+                                <th width="40">#</th>
+                                <th>商品</th>
+                                <th width="100">数量</th>
+                                <th width="110">单价</th>
+                                <th width="100" class="text-end">金额</th>
+                                <th>备注</th>
+                                <th width="60">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="items-tbody"></tbody>
+                    </table>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" form="stockin-form" class="btn btn-primary"><i class="bi bi-check-lg"></i> 保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

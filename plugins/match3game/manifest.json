@@ -1,0 +1,189 @@
+{
+    "name": "match3game",
+    "title": "消消乐小游戏",
+    "version": "2.2.0",
+    "description": "三消 + 肉鸽 + 社交小游戏插件 — Level Schema v1 / 三层校验 / 随机关卡 / 肉鸽局与遗物 / 异步对战与赛季",
+    "author": "WiseAdmin Team",
+    "develop": true,
+    "service_provider": "plugin\\match3game\\BootServiceProvider",
+    "dependencies": {},
+    "packages": {
+        "wiseadmin/wise-member": "*"
+    },
+    "menu": {
+        "title": "消消乐",
+        "icon": "bi bi-grid-3x3-gap",
+        "sort": 40
+    },
+    "icon": {
+        "type": "bi",
+        "value": "bi bi-grid-3x3-gap",
+        "color": "#fd7e14"
+    },
+    "menus": [
+        {
+            "name": "运营概览",
+            "icon": "bi bi-speedometer2",
+            "path": "/plugin/match3game/dashboard",
+            "sort": 10,
+            "type": "menu",
+            "status": 1
+        },
+        {
+            "name": "关卡管理",
+            "icon": "bi bi-map",
+            "path": "",
+            "sort": 20,
+            "type": "dir",
+            "status": 1,
+            "children": [
+                {
+                    "name": "章节/地图",
+                    "path": "/plugin/match3game/chapter",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "关卡列表",
+                    "path": "/plugin/match3game/level",
+                    "type": "menu",
+                    "status": 1
+                }
+            ]
+        },
+        {
+            "name": "内容配置",
+            "icon": "bi bi-box-seam",
+            "path": "",
+            "sort": 30,
+            "type": "dir",
+            "status": 1,
+            "children": [
+                {
+                    "name": "元素字典",
+                    "path": "/plugin/match3game/element",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "道具配置",
+                    "path": "/plugin/match3game/prop",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "遗物配置",
+                    "path": "/plugin/match3game/relic",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "事件配置",
+                    "path": "/plugin/match3game/event",
+                    "type": "menu",
+                    "status": 1
+                }
+            ]
+        },
+        {
+            "name": "社交运营",
+            "icon": "bi bi-people",
+            "path": "",
+            "sort": 35,
+            "type": "dir",
+            "status": 1,
+            "children": [
+                {
+                    "name": "赛季管理",
+                    "path": "/plugin/match3game/season",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "群擂台",
+                    "path": "/plugin/match3game/group_battle",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "作弊复核",
+                    "path": "/plugin/match3game/cheat",
+                    "type": "menu",
+                    "status": 1
+                }
+            ]
+        },
+        {
+            "name": "玩家",
+            "icon": "bi bi-people",
+            "path": "",
+            "sort": 40,
+            "type": "dir",
+            "status": 1,
+            "children": [
+                {
+                    "name": "玩家查询",
+                    "path": "/plugin/match3game/player",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "道具发放",
+                    "path": "/plugin/match3game/reward",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "对局日志",
+                    "path": "/plugin/match3game/battle_log",
+                    "type": "menu",
+                    "status": 1
+                }
+            ]
+        },
+        {
+            "name": "系统",
+            "icon": "bi bi-gear",
+            "path": "",
+            "sort": 50,
+            "type": "dir",
+            "status": 1,
+            "children": [
+                {
+                    "name": "玩法参数",
+                    "path": "/plugin/match3game/settings",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "测试工具",
+                    "path": "/plugin/match3game/playtest",
+                    "type": "menu",
+                    "status": 1
+                }
+            ]
+        }
+    ],
+    "permissions": [],
+    "config": [],
+    "slots": {},
+    "vendor": {},
+    "member": {
+        "features_require": {
+            "wallet": true
+        },
+        "scene_preset": {
+            "code": "game",
+            "name": "游戏站会员",
+            "theme": "default",
+            "features": {
+                "checkin": true,
+                "wallet": true,
+                "growth": true,
+                "level": true,
+                "task": false,
+                "invite": false
+            }
+        }
+    }
+}

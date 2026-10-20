@@ -1,0 +1,216 @@
+{
+  "version": "1.0.0",
+  "description": "Patch 引擎跨语言测试向量 —— TS 与 PHP 两份实现必须全部通过且结果完全一致",
+  "howToUse": "PHP 侧读取本文件，对每个 case 执行 applyOps(doc, ops) 后与 expected 做 stableStringify 比对",
+  "cases": [
+    {
+      "name": "replace_基础_修改合成规则",
+      "doc": {
+        "schema": "match3/level@1",
+        "rules": { "mode": "moves", "moves": 25, "specials": { "match4": "stripe", "match5Line": "rainbow" } }
+      },
+      "ops": [{ "op": "replace", "path": "/rules/specials/match4", "value": "bomb" }],
+      "expected": {
+        "schema": "match3/level@1",
+        "rules": { "mode": "moves", "moves": 25, "specials": { "match4": "bomb", "match5Line": "rainbow" } }
+      },
+      "expectSkipped": 0,
+      "expectError": null
+    },
+    {
+      "name": "add_accumulate_步数加5",
+      "doc": { "rules": { "moves": 25 } },
+      "ops": [{ "op": "add", "path": "/rules/moves", "value": 5, "mode": "accumulate" }],
+      "expected": { "rules": { "moves": 30 } },
+      "expectSkipped": 0,
+      "expectError": null
+    },
+    {
+      "name": "add_accumulate_两次累加",
+      "doc": { "rules": { "moves": 25 } },
+      "ops": [
+        { "op": "add", "path": "/rules/moves", "value": 5, "mode": "accumulate" },
+        { "op": "add", "path": "/rules/moves", "value": 3, "mode": "accumulate" }
+      ],
+      "expected": { "rules": { "moves": 33 } },
+      "expectSkipped": 0,
+      "expectError": null
+    },
+    {
+      "name": "add_默认override_不累加",
+      "doc": { "rules": { "moves": 25 } },
+      "ops": [{ "op": "add", "path": "/rules/moves", "value": 5 }],
+      "expected": { "rules": { "moves": 5 } },
+      "expectSkipped": 0,
+      "expectError": null
+    },
+    {
+      "name": "mul_分数倍率",
+      "doc": { "rules": { "scoreMul": 1 } },
+      "ops": [{ "op": "mul", "path": "/rules/scoreMul", "value": 1.2 }],
+      "expected": { "rules": { "scoreMul": 1.2 } },
+      "expectSkipped": 0,
+      "expectError": null
+    },
+    {
+      "name": "selector_命中_关闭巧克力蔓延",
+      "doc": {
+        "behaviours": [
+          { "id": "choc", "type": "spread", "interval": 2 },
+          { "id": "vine", "type": "grow", "interval": 3 }
+        ]
+      },
+      "ops": [{ "op": "replace", "path": "/behaviours/[id=choc]/interval", "value": 0 }],
+      "expected": {
+        "behaviours": [
+          { "id": "choc", "type": "spread", "interval": 0 },
+          { "id": "vine", "type": "grow", "interval": 3 }
+        ]
+      },
+      "expectSkipped": 0,
+      "expectError": null
+    },
+    {
+      "name": "selector_未命中_安全跳过",
+      "doc": {
+        "behaviours": [{ "id": "choc", "type": "spread", "interval": 2 }]
+      },
+      "ops": [{ "op": "replace", "path": "/behaviours/[id=nope]/interval", "value": 0 }],
+      "expected": {
+        "behaviours": [{ "id": "choc", "type": "spread", "interval": 2 }]
+      },
+      "expectSkipped": 1,
+      "expectError": null
+    },
+    {
+      "name": "remove_按选择器删除字段",
+      "doc": {
+        "behaviours": [
+          { "id": "choc", "type": "spread", "interval": 2 },
+          { "id": "vine", "type": "grow", "interval": 3 }
+        ]
+      },
+      "ops": [{ "op": "remove", "path": "/behaviours/[id=choc]/interval" }],
+      "expected": {
+        "behaviours": [
+          { "id": "choc", "type": "spread" },
+          { "id": "vine", "type": "grow", "interval": 3 }
+        ]
+      },
+      "expectSkipped": 0,
+      "expectError": null
+    },
+    {
+      "name": "双刃剑_步数减5且分数翻倍",
+      "doc": { "rules": { "moves": 25, "scoreMul": 1 } },
+      "ops": [
+        { "op": "add", "path": "/rules/moves", "value": -5, "mode": "accumulate" },
+        { "op": "mul", "path": "/rules/scoreMul", "value": 2 }
+      ],
+      "expected": { "rules": { "moves": 20, "scoreMul": 2 } },
+      "expectSkipped": 0,
+      "expectError": null
+    },
+    {
+      "name": "数组下标_替换地形行",
+      "doc": {
+        "regions": [{ "id": "main", "layers": { "terrain": ["ooo", "ooo", "ooo"] } }]
+      },
+      "ops": [{ "op": "replace", "path": "/regions/0/layers/terrain/1", "value": "o.o" }],
+      "expected": {
+        "regions": [{ "id": "main", "layers": { "terrain": ["ooo", "o.o", "ooo"] } }]
+      },
+      "expectSkipped": 0,
+      "expectError": null
+    },
+    {
+      "name": "冲突_两个replace同路径后者生效",
+      "doc": { "rules": { "moves": 25 } },
+      "ops": [
+        { "op": "replace", "path": "/rules/moves", "value": 30 },
+        { "op": "replace", "path": "/rules/moves", "value": 20 }
+      ],
+      "expected": { "rules": { "moves": 20 } },
+      "expectSkipped": 0,
+      "expectError": null
+    },
+    {
+      "name": "异常_replace目标不存在应报错",
+      "doc": { "rules": { "moves": 25 } },
+      "ops": [{ "op": "replace", "path": "/rules/nope", "value": 1 }],
+      "expected": null,
+      "expectSkipped": 0,
+      "expectError": "PatchError"
+    },
+    {
+      "name": "异常_mul目标非数字应报错",
+      "doc": { "rules": { "mode": "moves" } },
+      "ops": [{ "op": "mul", "path": "/rules/mode", "value": 2 }],
+      "expected": null,
+      "expectSkipped": 0,
+      "expectError": "PatchError"
+    },
+    {
+      "name": "mul_字段不存在_以1为基准不报错",
+      "doc": { "rules": { "moves": 25 } },
+      "ops": [{ "op": "mul", "path": "/rules/scoreMul", "value": 1.2 }],
+      "expected": { "rules": { "moves": 25, "scoreMul": 1.2 } },
+      "expectSkipped": 0,
+      "expectError": null
+    },
+    {
+      "name": "mul_连续两次_以1为基准累乘",
+      "doc": { "rules": { "moves": 25 } },
+      "ops": [
+        { "op": "mul", "path": "/rules/scoreMul", "value": 1.2 },
+        { "op": "mul", "path": "/rules/scoreMul", "value": 2 }
+      ],
+      "expected": { "rules": { "moves": 25, "scoreMul": 2.4 } },
+      "expectSkipped": 0,
+      "expectError": null
+    },
+    {
+      "name": "自动创建中间节点_add新建路径",
+      "doc": { "rules": { "moves": 25 } },
+      "ops": [{ "op": "add", "path": "/rules/scoreBonus/ice", "value": 50, "mode": "accumulate" }],
+      "expected": { "rules": { "moves": 25, "scoreBonus": { "ice": 50 } } },
+      "expectSkipped": 0,
+      "expectError": null
+    }
+  ],
+  "relicCases": [
+    {
+      "name": "真实遗物组合_时间沙漏加聚宝盆",
+      "doc": {
+        "schema": "match3/level@1",
+        "rules": { "mode": "moves", "moves": 25, "scoreMul": 1, "minMatch": 3 }
+      },
+      "relics": [
+        { "id": "r_more_moves", "name": "时间沙漏", "rarity": "common", "patch": [{ "op": "add", "path": "/rules/moves", "value": 5, "mode": "accumulate" }] },
+        { "id": "r_score_mul", "name": "聚宝盆", "rarity": "rare", "patch": [{ "op": "mul", "path": "/rules/scoreMul", "value": 1.2 }] }
+      ],
+      "expected": {
+        "schema": "match3/level@1",
+        "rules": { "mode": "moves", "moves": 30, "scoreMul": 1.2, "minMatch": 3 }
+      }
+    },
+    {
+      "name": "真实遗物组合_净化符加破釜沉舟",
+      "doc": {
+        "rules": { "moves": 25, "scoreMul": 1 },
+        "behaviours": [{ "id": "choc", "type": "spread", "interval": 2 }]
+      },
+      "relics": [
+        { "id": "r_no_choco", "name": "净化符", "rarity": "rare", "patch": [{ "op": "replace", "path": "/behaviours/[id=choc]/interval", "value": 0 }] },
+        { "id": "r_risk_moves", "name": "破釜沉舟", "rarity": "epic", "patch": [
+          { "op": "add", "path": "/rules/moves", "value": -5, "mode": "accumulate" },
+          { "op": "mul", "path": "/rules/scoreMul", "value": 2 }
+        ] }
+      ],
+      "expected": {
+        "rules": { "moves": 20, "scoreMul": 2 },
+        "behaviours": [{ "id": "choc", "type": "spread", "interval": 0 }]
+      }
+    }
+  ]
+}

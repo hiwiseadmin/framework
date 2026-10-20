@@ -1,0 +1,62 @@
+{extend name="index/layout" /}
+
+{block name="title"}{$cms.site_name}{/block}
+
+{block name="main"}
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="cms-card p-3">
+            <h5 class="border-bottom pb-2 mb-3">最新内容</h5>
+
+            {empty name="latest.data"}
+            <p class="text-muted py-4 text-center mb-0">暂无内容，请先在后台发布。</p>
+            {else /}
+            {foreach $latest.data as $item}
+            <div class="d-flex gap-3 py-3 border-bottom">
+                {if condition="!empty($item['thumb'])"}
+                <img class="cms-thumb" src="{$item.thumb}" alt="{$item.title}">
+                {/if}
+                <div class="flex-grow-1">
+                    <a class="cms-title fw-bold d-block mb-1"
+                       href="{$item.url|default=''}">{$item.title}</a>
+                    <div class="cms-desc mb-2">{$item.description|default=''|mb_substr=0,80}</div>
+                    <div class="cms-meta">
+                        <span>{$item.category.name|default='未分类'}</span>
+                        <span class="mx-2">·</span>
+                        <span>{:substr($item.create_time, 0, 10)}</span>
+                        <span class="mx-2">·</span>
+                        <span>{$item.view_count} 次浏览</span>
+                    </div>
+                </div>
+            </div>
+            {/foreach}
+            {/empty}
+
+            {include file="index/pager" /}
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="cms-card p-3 mb-4">
+            <h6 class="border-bottom pb-2">热门内容</h6>
+            <ul class="list-unstyled mb-0">
+                {cms:arclist flag="hot" limit="8" id="item"}
+                <li class="py-1">
+                    <a class="cms-title small d-block text-truncate"
+                       href="{$item.url|default=''}">{$item.title}</a>
+                </li>
+                {/cms:arclist}
+            </ul>
+        </div>
+
+        <div class="cms-card p-3">
+            <h6 class="border-bottom pb-2">标签云</h6>
+            <div>
+                {cms:tags limit="20" id="tag"}
+                <a class="cms-tag" href="{$tag.url|default=''}">{$tag.name}</a>
+                {/cms:tags}
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

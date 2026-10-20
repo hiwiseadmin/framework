@@ -1,0 +1,144 @@
+{extend name="index/layout"}
+
+{block name="title"}{$document.title}{/block}
+
+{block name="css"}
+{if !empty($document.content_format) && $document.content_format == 'markdown' && empty($document.content_html)}
+<link rel="stylesheet" href="/statics/libs/ws-markdown/ws-markdown.css">
+{/if}
+<link rel="stylesheet" href="/statics/js/highlight/styles/github.css">
+<style>
+.hljs { background: transparent; padding: 0; }
+html.dark .hljs { color: #c9d1d9; }
+html.dark .hljs-keyword, html.dark .hljs-selector-tag, html.dark .hljs-tag { color: #ff7b72; }
+html.dark .hljs-string, html.dark .hljs-attr, html.dark .hljs-template-variable { color: #a5d6ff; }
+html.dark .hljs-title, html.dark .hljs-section { color: #d2a8ff; }
+html.dark .hljs-comment, html.dark .hljs-quote { color: #8b949e; }
+html.dark .hljs-number, html.dark .hljs-literal { color: #79c0ff; }
+html.dark .hljs-built_in, html.dark .hljs-type { color: #ffa657; }
+</style>
+{/block}
+
+{block name="sidebar"}
+<div class="wd-sidebar-group">
+    <p class="wd-sidebar-group__title">API 导航</p>
+    <ul class="wd-sidebar-list">
+        {volist name="grouped" id="items" key="method"}
+        <li class="wd-sidebar-item has-children" data-open="true">
+            <div class="wd-sidebar-item__row">
+                <span class="wd-sidebar-link" style="cursor:default">
+                    <span class="wd-badge wd-badge--brand">{$method}</span>
+                    <span class="wd-badge wd-badge--muted">{$items|count}</span>
+                </span>
+                <button class="wd-sidebar-toggle" type="button" aria-expanded="true"
+                        aria-label="折叠 {$method}"><i class="bi bi-chevron-right"></i></button>
+            </div>
+            <ul class="wd-sidebar-sub">
+                {volist name="items" id="doc"}
+                <li class="wd-sidebar-item">
+                    <div class="wd-sidebar-item__row">
+                        <a class="wd-sidebar-link{if $doc.id == $document.id} active{/if}"
+                           href="/plugin/wisedocs/api/detail?slug={$doc.slug}" title="{$doc.title}">{$doc.title}</a>
+                    </div>
+                </li>
+                {/volist}
+            </ul>
+        </li>
+        {/volist}
+    </ul>
+</div>
+{/block}
+
+{block name="content"}
+<nav class="wd-breadcrumb" aria-label="面包屑">
+    <a href="/plugin/wisedocs/api/index">API 文档</a>
+    {if !empty($category)}
+    <span class="wd-breadcrumb__sep">/</span>
+    <span>{$category.name}</span>
+    {/if}
+    <span class="wd-breadcrumb__sep">/</span>
+    <span>{$document.title}</span>
+</nav>
+
+<h1 class="wd-page-title">{$document.title}</h1>
+
+<div class="wd-meta">
+    <span class="wd-badge wd-badge--brand">{$document.api_method|default='GET'}</span>
+    <code>{$document.api_endpoint|default='-'}</code>
+    <a class="wd-btn wd-btn--ghost" style="margin-left:auto"
+       href="/plugin/wisedocs/api/json?slug={$document.slug}">
+        <i class="bi bi-braces"></i> 查看 JSON
+    </a>
+</div>
+
+<div class="wd-divider"></div>
+
+<article class="wd-doc" id="docs-content">
+    {if !empty($document.excerpt)}
+    <p>{$document.excerpt}</p>
+    {/if}
+
+    {if !empty($document.content_html)}
+    {$document.content_html|raw}
+    {elseif !empty($document.content_format) && $document.content_format == 'markdown'}
+    <!-- 旧数据降级：由框架 ws-markdown 渲染；块内先输出原文作为降级 -->
+    <div class="wd-md" id="docs-md"><pre class="wd-md-fallback">{$document.content|htmlspecialchars}</pre></div>
+    {else /}
+    {$document.content|raw}
+    {/if}
+
+    {if !empty($extra['request'])}
+    <h2>请求参数</h2>
+    <table>
+        <thead>
+        <tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+        {volist name="extra.request" id="param"}
+        <tr>
+            <td><code>{$param.name|default=''}</code></td>
+            <td>{$param.type|default='string'}</td>
+            <td>{if !empty($param.required)}是{else /}否{/if}</td>
+            <td>{$param.description|default=''}</td>
+        </tr>
+        {/volist}
+        </tbody>
+    </table>
+    {/if}
+
+    {if !empty($extra['response'])}
+    <h2>响应字段</h2>
+    <table>
+        <thead>
+        <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+        {volist name="extra.response" id="field"}
+        <tr>
+            <td><code>{$field.name|default=''}</code></td>
+            <td>{$field.type|default='string'}</td>
+            <td>{$field.description|default=''}</td>
+        </tr>
+        {/volist}
+        </tbody>
+    </table>
+    {/if}
+</article>
+{/block}
+
+{block name="outline"}
+<aside class="wd-outline" id="docs-right" aria-label="本页目录">
+    <p class="wd-outline__title">本页目录</p>
+    <ul class="wd-outline__list" id="docs-toc-list"></ul>
+    <p class="wd-search__hint" id="docs-toc-empty" style="display:none">本页暂无目录</p>
+    <div class="wd-outline__foot">
+        <button type="button" class="wd-backtop js-backtop">
+            <i class="bi bi-arrow-up-circle"></i> 回到顶部
+        </button>
+    </div>
+</aside>
+{/block}
+
+{block name="js"}
+<script src="/statics/js/highlight/js/highlight.min.js"></script>
+{/block}

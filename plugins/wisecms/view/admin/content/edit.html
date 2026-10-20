@@ -1,0 +1,266 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}编辑内容{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-pencil-square" caption="编辑内容" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <form id="contentForm" method="post" action="{:plugin_url('wisecms/content/edit')}">
+            {:csrf_field()}
+            <input id="cms-f-id" type="hidden" name="id" value="{$content.id}">
+
+            <div class="row">
+                <!-- 左：六 Tab 分区 -->
+                <div class="col-lg-9">
+                    <div class="card">
+                        <div class="card-header p-0">
+                            <ul class="nav nav-tabs" id="contentTabs" role="tablist">
+                                <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tab-basic">基本信息</a></li>
+                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-body">正文</a></li>
+                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-fields">自定义字段</a></li>
+                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-publish">发布设置</a></li>
+                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-seo">SEO</a></li>
+                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-quality">质量</a></li>
+                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-versions">版本</a></li>
+                            </ul>
+                        </div>
+                        <div class="card-body">
+                            <div class="tab-content">
+                                <!-- ① 基本信息 -->
+                                <div class="tab-pane fade show active" id="tab-basic">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="cms-f-title">标题 <span class="text-danger">*</span></label>
+                                        <input id="cms-f-title" type="text" name="title" class="form-control" required maxlength="200" value="{$content.title}">
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label" for="cms-f-catid">所属栏目 <span class="text-danger">*</span></label>
+                                            <select id="cms-f-catid" name="catid" class="form-select" required>
+                                                <option value="">请选择栏目</option>
+                                                {foreach $categoryOptions as $opt}
+                                                <option value="{$opt.id}" {if $content.catid == $opt.id}selected{/if}>{$opt.name}</option>
+                                                {/foreach}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label" for="cms-f-username">作者</label>
+                                            <input id="cms-f-username" type="text" name="username" class="form-control" value="{$content.username}">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label" for="cms-f-source_type">来源</label>
+                                            <input id="cms-f-source_type" type="text" name="source_type" class="form-control" value="{$content.source_type}">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label" for="cms-f-tags">标签</label>
+                                            <input id="cms-f-tags" type="text" name="tags" class="form-control" placeholder="逗号分隔, 如: 科技,AI" value="{$tagsText}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ② 正文 -->
+                                <div class="tab-pane fade" id="tab-body">
+                                    <div class="mb-0">
+                                        <label class="form-label d-flex align-items-center justify-content-between">
+                                            <span>正文内容</span>
+                                            <span class="small text-muted" id="body-word-count">字数 0</span>
+                                        </label>
+                                        <!-- UIUX-P1-06：正文接 wiseeditor（未启用则 PHP 侧回退 textarea）。
+                                             字段名固定 content，值承载元素 id = editor_content_input；
+                                             编辑器静态资源由 PHP 拼在本片段内（模板内不出现 script 标签，见 assignBodyEditor） -->
+                                        {$bodyEditorHtml|raw}
+                                        <div class="mt-2">
+                                            <button type="button" id="btn-insert-internal-link"
+                                                    class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-link-45deg me-1"></i>插入内联链接
+                                            </button>
+                                            <span class="text-muted small ms-2">
+                                                选本站已发布内容，在光标处插入内链
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ③ 自定义字段 -->
+                                <div class="tab-pane fade" id="tab-fields">
+                                    {if !empty($customForm.base)}
+                                    {foreach $customForm.base as $field}
+                                    <div class="mb-3">
+                                        <label class="form-label">{$field.name}{if $field.is_required}<span class="text-danger">*</span>{/if}</label>
+                                        {$field.form|raw}
+                                        {if !empty($field.tips)}<div class="form-text">{$field.tips}</div>{/if}
+                                    </div>
+                                    {/foreach}
+                                    {foreach $customForm.senior as $field}
+                                    <div class="mb-3">
+                                        <label class="form-label">{$field.name}</label>
+                                        {$field.form|raw}
+                                        {if !empty($field.tips)}<div class="form-text">{$field.tips}</div>{/if}
+                                    </div>
+                                    {/foreach}
+                                    {else /}
+                                    <div class="text-muted text-center py-4">该内容没有自定义字段（未绑定含字段的内容模型）</div>
+                                    {/if}
+                                </div>
+
+                                <!-- ④ 发布设置 -->
+                                <div class="tab-pane fade" id="tab-publish">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label" for="cms-f-publish_time">定时发布</label>
+                                            <input id="cms-f-publish_time" type="datetime-local" name="publish_time" class="form-control"
+                                                   value="{:substr(str_replace(' ', 'T', (string) ($content['publish_time'] ?? '')), 0, 16)}">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label" for="cms-f-status">状态</label>
+                                            <select id="cms-f-status" name="status" class="form-select">
+                                                <option value="0" {if $content.status == 0}selected{/if}>草稿</option>
+                                                <option value="1" {if $content.status == 1}selected{/if}>待审核</option>
+                                                <option value="2" {if $content.status == 2}selected{/if}>已发布</option>
+                                                <option value="3" {if $content.status == 3}selected{/if}>已归档</option>
+                                            </select>
+                                            <div class="form-text">右侧「保存草稿 / 发布」是快捷方式，会自动设置此处状态后提交</div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label" for="cms-f-thumb">缩略图</label>
+                                            <input id="cms-f-thumb" type="text" name="thumb" class="form-control" value="{$content.thumb}">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label" for="cms-f-listorder">排序</label>
+                                            <input id="cms-f-listorder" type="number" name="listorder" class="form-control" value="{$content.listorder|default=0}">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="form-check">
+                                                <input id="cms-f-is_top" type="checkbox" name="is_top" value="1" class="form-check-input" {if $content.is_top == 1}checked{/if}>
+                                                <label class="form-check-label" for="cms-f-is_top">置顶</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input id="cms-f-is_recommend" type="checkbox" name="is_recommend" value="1" class="form-check-input" {if $content.is_recommend == 1}checked{/if}>
+                                                <label class="form-check-label" for="cms-f-is_recommend">推荐</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ⑤ SEO -->
+                                <div class="tab-pane fade" id="tab-seo">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="cms-f-slug">URL别名 (Slug)</label>
+                                        <input id="cms-f-slug" type="text" name="slug" class="form-control" value="{$content.slug}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label" for="cms-f-keywords">关键词</label>
+                                        <input id="cms-f-keywords" type="text" name="keywords" class="form-control" value="{$content.keywords}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label" for="cms-f-description">描述 (Description)</label>
+                                        <textarea id="cms-f-description" name="description" class="form-control" rows="3" maxlength="500">{$content.description}</textarea>
+                                    </div>
+                                    <div class="mb-0">
+                                        <label class="form-label" for="cms-f-canonical_url">Canonical URL</label>
+                                        <input id="cms-f-canonical_url" type="url" name="canonical_url" class="form-control" value="{$content.canonical_url}">
+                                    </div>
+
+                                    <!-- P1-05：SEO 实时评分面板（点击检测 → 得分 + 检查项明细） -->
+                                    <div class="border-top pt-3 mt-3">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <label class="form-label mb-0 me-2">SEO 实时评分</label>
+                                            <button type="button" id="btn-seo-audit" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-graph-up me-1"></i>检测
+                                            </button>
+                                        </div>
+                                        <div id="seo-score-panel">
+                                            <div class="text-muted small">
+                                                点击「检测」实时评估当前内容的 SEO 得分与检查项；
+                                                检测结果会写入审查记录并同步列表页的 SEO 列。
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ⑦ 质量评分（UIUX-P2-02：QualityScorer 的入口补齐） -->
+                                <div class="tab-pane fade" id="tab-quality">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <label class="form-label mb-0 me-2">内容质量评分</label>
+                                        <button type="button" id="btn-quality-audit" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-speedometer2 me-1"></i>检测
+                                        </button>
+                                    </div>
+                                    <div id="quality-score-panel">
+                                        <div class="text-muted small">
+                                            按「内容完整度 / SEO优化度 / 可读性 / 原创性」四个维度综合评分（满分 100 分）；
+                                            检测结果会写入质量记录并同步列表页的「质量」列。
+                                            <br>需要全站批量重评时可执行 <code>php think wisecms:quality:rescore</code>。
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ⑥ 版本 -->
+                                <div class="tab-pane fade" id="tab-versions">
+                                    <div class="text-center py-4">
+                                        <div class="text-muted mb-3">查看该内容的版本历史、对比与回滚</div>
+                                        <a href="{:plugin_url('wisecms/content/versions')}?id={$content.id}" class="btn btn-outline-info btn-sm">
+                                            <i class="bi bi-clock-history me-1"></i>打开版本历史
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右：粘性锚点导航 + 操作条 -->
+                <div class="col-lg-3">
+                    <div class="card sticky-top" style="top:1rem">
+                        <div class="card-header"><h6 class="card-title mb-0">分区导航</h6></div>
+                        <div class="card-body">
+                            <ul class="nav flex-column cms-anchor-nav">
+                                <li><button type="button" class="nav-link cms-anchor" data-tab="tab-basic">基本信息</button></li>
+                                <li><button type="button" class="nav-link cms-anchor" data-tab="tab-body">正文</button></li>
+                                <li><button type="button" class="nav-link cms-anchor" data-tab="tab-fields">自定义字段</button></li>
+                                <li><button type="button" class="nav-link cms-anchor" data-tab="tab-publish">发布设置</button></li>
+                                <li><button type="button" class="nav-link cms-anchor" data-tab="tab-seo">SEO</button></li>
+                                <li><button type="button" class="nav-link cms-anchor" data-tab="tab-quality">质量</button></li>
+                                <li><button type="button" class="nav-link cms-anchor" data-tab="tab-versions">版本</button></li>
+                            </ul>
+
+                            <hr class="my-2">
+
+                            <!-- 操作条契约（UIUX-P1-07）：主操作只有一个且用 primary；
+                                 secondary/danger 只用于次要动作与破坏性动作。 -->
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-sm btn-primary" data-submit-status="2">
+                                    <i class="bi bi-send me-1"></i>发布
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-submit-status="0">
+                                    <i class="bi bi-save me-1"></i>保存草稿
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-preview">
+                                    <i class="bi bi-eye me-1"></i>预览
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-workflow">
+                                    <i class="bi bi-diagram-2 me-1"></i>流程
+                                </button>
+                            </div>
+
+                            <div id="autosave-status" class="small text-muted mt-2"></div>
+
+                            <hr class="my-2">
+
+                            <a href="{:plugin_url('wisecms/content/versions')}?id={$content.id}" class="btn btn-sm btn-link w-100 text-decoration-none">
+                                <i class="bi bi-clock-history me-1"></i>版本历史
+                            </a>
+                            <a href="{:plugin_url('wisecms/content/index')}" class="btn btn-sm btn-link w-100 text-decoration-none cms-back">
+                                <i class="bi bi-arrow-left me-1"></i>返回列表
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/content.js（由 wsconfig.js 自动加载） -->
+{/block}

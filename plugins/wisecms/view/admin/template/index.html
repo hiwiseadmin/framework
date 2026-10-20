@@ -1,0 +1,68 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}内容模板{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-file-earmark-richtext" caption="内容模板" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <!-- ⚠️ 模板表没有 site_id：本页**不跟随后台站点选择器**，必须显式说明，
+                     否则用户切换站点后发现列表没变会误判为 bug（与「广告管理」同一口径） -->
+                <div class="alert alert-light border py-2 mb-3 small">
+                    <i class="bi bi-info-circle me-1"></i>
+                    内容模板为 <b>全站共享</b>，不受顶部「当前站点」影响。
+                    模板的 <b>预设内容</b> / <b>SEO 默认值</b> 由生成引擎的「模板」模式消费
+                    （<code>applyTemplate()</code>）；<code>schema</code> / <code>icon</code>
+                    两列当前<b>无任何消费方</b>，故表单刻意不暴露（配了不生效即"假配置"）。
+                </div>
+
+                <!-- 筛选条：条件变化后局部刷新表格 -->
+                <div class="row g-2 align-items-center mb-3">
+                    <div class="col-auto">
+                        <select class="form-select form-select-sm" id="filter-type" style="width:130px">
+                            <option value="">全部类型</option>
+                            {foreach $typeOptions as $opt}
+                            <option value="{$opt.value}">{$opt.label}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <select class="form-select form-select-sm" id="filter-status" style="width:130px">
+                            <option value="">全部状态</option>
+                            <option value="1">启用</option>
+                            <option value="0">禁用</option>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <input type="text" class="form-control form-control-sm" id="filter-keyword"
+                               placeholder="搜索名称 / 标识" style="width:200px" autocomplete="off">
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-sm btn-primary" id="btn-search-template">
+                            <i class="bi bi-search"></i> 搜索
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-reset-template">重置</button>
+                    </div>
+                </div>
+
+                <!-- 表格：仅挂载点；列/分页/空态/加载态由 cmsTable() 渲染 -->
+                <div id="toolbar" class="toolbar"></div>
+                <table id="table"></table>
+
+                {if $totalCount == 0}
+                <div class="alert alert-warning py-2 mt-3 mb-0 small">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    模板表当前为空。可点上方工具栏的「安装默认模板」一键装入 4 个内置模板
+                    （新闻稿 / 教程 / FAQ / 关于我们）。
+                </div>
+                {/if}
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/template.js（由 wise-bootstrap 自动加载） -->
+{/block}

@@ -1,0 +1,38 @@
+<!-- 商品规格 新增/编辑 模态框片段 -->
+<div class="modal fade" id="spec-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="form-title">新增规格</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+            </div>
+            <form id="spec-form" class="modal-body row g-3">
+                <input type="hidden" name="id" id="form-id" value="0">
+                <div class="col-md-12">
+                    <label class="form-label">规格名称 <span class="text-danger">*</span></label>
+                    <input type="text" name="name" id="form-name" class="form-control" placeholder="如：颜色"
+                           data-validation="required|maxLength:50"
+                           data-validation-message-required="请填写规格名称"
+                           data-validation-message-maxLength="规格名称不能超过 50 个字符">
+                    <div class="invalid-feedback"><span class="validation-text"></span></div>
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label">规格选项</label>
+                    <input type="text" name="options_raw" id="form-options-raw" class="form-control" placeholder="多个选项用英文逗号分隔，如：红,蓝,白">
+                    <div class="form-text">保存后将自动拆分为独立选项。</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">状态</label>
+                    <select name="status" id="form-status" class="form-select">
+                        <option value="1">启用</option>
+                        <option value="0">禁用</option>
+                    </select>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" form="spec-form" class="btn btn-primary"><i class="bi bi-check-lg"></i> 保存</button>
+            </div>
+        </div>
+    </div>
+</div>

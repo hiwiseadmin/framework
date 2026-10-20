@@ -1,0 +1,15 @@
+<?php
+/**
+ * {$name} 插件 — 后台路由
+ *
+ * ⚠️ 框架在 boot 链 Step 9 已自动包裹 `plugin/{$name}` 前缀
+ *    （见 WiseBootServiceProvider::registerRoute），此处**不要**再写
+ *    Route::group('plugin/...')，否则会变成
+ *    /plugin/{$name}/plugin/{$name}/... 的双重前缀。
+ *
+ * 本文件注册的路由最终 URL 形如：/plugin/{$name}/index
+ */
+
+use think\facade\Route;
+
+Route::get('index', 'plugin\\{$name}\\controller\\Index@index');

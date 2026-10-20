@@ -1,0 +1,282 @@
+{
+    "name": "smartstock",
+    "title": "智库存",
+    "version": "1.0.0",
+    "description": "通用电商商品库存管理系统",
+    "author": "WiseAdmin",
+    "dependencies": {},
+    "packages": {
+        "wiseadmin/wise-member": {
+            "constraint": "*",
+            "required": false
+        }
+    },
+    "service_provider": "plugin\\smartstock\\BootServiceProvider",
+    "develop": false,
+    "menu": {
+        "title": "智库存",
+        "icon": "bi bi-box-seam",
+        "sort": 30
+    },
+    "icon": {
+        "type": "bi",
+        "value": "bi bi-box-seam",
+        "color": "#0d6efd"
+    },
+    "menus": [
+        {
+            "name": "库存概览",
+            "icon": "bi bi-speedometer2",
+            "path": "/plugin/smartstock/dashboard",
+            "sort": 10,
+            "type": "menu",
+            "status": 1
+        },
+        {
+            "name": "基础数据",
+            "icon": "bi bi-database",
+            "path": "",
+            "sort": 20,
+            "type": "dir",
+            "status": 1,
+            "children": [
+                {
+                    "name": "商品管理",
+                    "path": "/plugin/smartstock/product",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "商品分类",
+                    "path": "/plugin/smartstock/product_category",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "仓库管理",
+                    "path": "/plugin/smartstock/warehouse",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "计量单位",
+                    "path": "/plugin/smartstock/unit",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "规格模板",
+                    "path": "/plugin/smartstock/spec",
+                    "type": "menu",
+                    "status": 1
+                }
+            ]
+        },
+        {
+            "name": "库存管理",
+            "icon": "bi bi-box-seam",
+            "path": "",
+            "sort": 30,
+            "type": "dir",
+            "status": 1,
+            "children": [
+                {
+                    "name": "库存查询",
+                    "path": "/plugin/smartstock/stock",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "库存流水",
+                    "path": "/plugin/smartstock/inventory_log",
+                    "type": "menu",
+                    "status": 1
+                }
+            ]
+        },
+        {
+            "name": "业务操作",
+            "icon": "bi bi-arrow-left-right",
+            "path": "",
+            "sort": 40,
+            "type": "dir",
+            "status": 1,
+            "children": [
+                {
+                    "name": "入库管理",
+                    "path": "/plugin/smartstock/stock_in",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "出库管理",
+                    "path": "/plugin/smartstock/stock_out",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "调拨管理",
+                    "path": "/plugin/smartstock/transfer",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "盘点管理",
+                    "path": "/plugin/smartstock/check",
+                    "type": "menu",
+                    "status": 1
+                }
+            ]
+        },
+        {
+            "name": "预警中心",
+            "icon": "bi bi-exclamation-triangle",
+            "path": "",
+            "sort": 50,
+            "type": "dir",
+            "status": 1,
+            "children": [
+                {
+                    "name": "预警规则",
+                    "path": "/plugin/smartstock/alert/ruleIndex",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "预警日志",
+                    "path": "/plugin/smartstock/alert/logIndex",
+                    "type": "menu",
+                    "status": 1
+                }
+            ]
+        },
+        {
+            "name": "数据报表",
+            "icon": "bi bi-bar-chart",
+            "path": "",
+            "sort": 60,
+            "type": "dir",
+            "status": 1,
+            "children": [
+                {
+                    "name": "出入库统计",
+                    "path": "/plugin/smartstock/report/inOut",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "周转率分析",
+                    "path": "/plugin/smartstock/report/turnover",
+                    "type": "menu",
+                    "status": 1
+                }
+            ]
+        },
+        {
+            "name": "系统配置",
+            "icon": "bi bi-gear",
+            "path": "/admin/plugin/configIndex/name/smartstock",
+            "sort": 70,
+            "type": "menu",
+            "status": 1
+        }
+    ],
+    "permissions": [],
+    "config": {
+        "alert_min_quantity": {
+            "type": "number",
+            "title": "默认低库存预警阈值",
+            "value": 10,
+            "group": "alert",
+            "sort": 1
+        },
+        "alert_max_quantity": {
+            "type": "number",
+            "title": "默认超库存预警阈值",
+            "value": 1000,
+            "group": "alert",
+            "sort": 2
+        },
+        "alert_expiry_days": {
+            "type": "number",
+            "title": "默认保质期预警天数",
+            "value": 30,
+            "group": "alert",
+            "sort": 3
+        },
+        "alert_check_interval": {
+            "type": "number",
+            "title": "预警检测间隔（秒）",
+            "value": 3600,
+            "group": "alert",
+            "sort": 4
+        },
+        "page_size": {
+            "type": "number",
+            "title": "每页条数",
+            "value": 20,
+            "group": "base",
+            "sort": 1
+        },
+        "stock_out_strategy": {
+            "type": "select",
+            "title": "出库策略",
+            "value": "fifo",
+            "options": {
+                "fifo": "先进先出",
+                "lifo": "后进先出",
+                "manual": "手动指定"
+            },
+            "group": "stock",
+            "sort": 1
+        },
+        "stock_in_prefix": {
+            "type": "string",
+            "title": "入库单号前缀",
+            "value": "IN",
+            "group": "order",
+            "sort": 1
+        },
+        "stock_out_prefix": {
+            "type": "string",
+            "title": "出库单号前缀",
+            "value": "OUT",
+            "group": "order",
+            "sort": 2
+        },
+        "transfer_prefix": {
+            "type": "string",
+            "title": "调拨单号前缀",
+            "value": "TF",
+            "group": "order",
+            "sort": 3
+        },
+        "check_prefix": {
+            "type": "string",
+            "title": "盘点单号前缀",
+            "value": "CK",
+            "group": "order",
+            "sort": 4
+        }
+    },
+    "config_groups": {
+        "base": {
+            "title": "基础设置",
+            "sort": 10
+        },
+        "stock": {
+            "title": "库存设置",
+            "sort": 20
+        },
+        "alert": {
+            "title": "库存预警",
+            "sort": 30
+        },
+        "order": {
+            "title": "订单设置",
+            "sort": 40
+        }
+    },
+    "slots": {},
+    "vendor": {}
+}

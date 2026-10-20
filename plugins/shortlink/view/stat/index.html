@@ -1,0 +1,94 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="title"}访问统计 - ShortLink{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-bar-chart-line" caption="访问统计" buttongroup="<div class='d-flex align-items-center gap-2'><select class='form-select form-select-sm' id='stat-link-id' style='width: 260px;'><option value='0'>全部短链接</option>{foreach $links as $link}<option value='{$link.id}'>{$link.title|default=$link.code}</option>{/foreach}</select></div>" /}
+    <div class="plugin-shortlink">
+        <div class="container-fluid p-0">
+            <!-- 统计卡片 -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="text-muted small">总访问量</div>
+                            <div class="fs-3 fw-bold" id="stat-total">0</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="text-muted small">独立访客</div>
+                            <div class="fs-3 fw-bold" id="stat-unique">0</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="text-muted small">今日访问</div>
+                            <div class="fs-3 fw-bold" id="stat-today">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-transparent border-0">
+                            <h6 class="mb-0"><i class="bi bi-graph-up me-2"></i>近 7 天趋势</h6>
+                        </div>
+                        <div class="card-body"><div id="trend-chart" style="height: 320px;"></div></div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-transparent border-0">
+                            <h6 class="mb-0"><i class="bi bi-device-ssd me-2"></i>设备分布</h6>
+                        </div>
+                        <div class="card-body" id="stat-device">暂无数据</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 访问日志表格 -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h6 class="mb-0"><i class="bi bi-list-ul me-2"></i>访问日志</h6>
+                </div>
+                <div class="card-body">
+                    <table id="log-table"
+                           data-toggle="table"
+                           data-url="{:url('/plugin/shortlink/stat/getList')}"
+                           data-side-pagination="server"
+                           data-pagination="true"
+                           data-page-list="[10, 25, 50]"
+                           data-page-size="20">
+                        <thead>
+                            <tr>
+                                <th data-field="id" data-width="60">ID</th>
+                                <th data-field="title" data-width="160">标题</th>
+                                <th data-field="short_url" data-width="220">短链接</th>
+                                <th data-field="total_visits" data-width="100" data-align="center">总访问</th>
+                                <th data-field="unique_visits" data-width="100" data-align="center">独立访客</th>
+                                <th data-field="today_visits" data-width="100" data-align="center">今日访问</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<script type="module">
+import api from '/statics/plugins/shortlink/js/common/api.js';
+import module from '/statics/plugins/shortlink/js/stat/index.js';
+
+        $(function() {
+            module.index();
+        });
+</script>
+{/block}

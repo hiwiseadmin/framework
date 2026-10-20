@@ -1,0 +1,469 @@
+/**
+ * ws-upload.css
+ * WiseAdmin 文件上传组件样式
+ *
+ * 所有类名统一使用 `ws-upload-` 前缀：本组件旧版使用 `.upload-container` /
+ * `.upload-dropzone` / `.file-icon` 等无前缀通用名，与
+ * app/admin/view/attachment 页面的同名样式存在真实冲突（已实测）。
+ *
+ * 状态类统一用 `is-` 前缀（is-dragover / is-uploading / is-success / is-error），
+ * 以区别于 `.ws-upload-error` 这类表示"错误文本"的语义类。
+ */
+
+.ws-upload-container {
+    position: relative;
+}
+
+.ws-upload-dropzone {
+    border: 2px dashed var(--bs-border-color);
+    border-radius: 0.375rem;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    background: var(--bs-secondary-bg);
+    color: var(--bs-body-color);
+    cursor: pointer;
+}
+
+.ws-upload-dropzone:hover {
+    border-color: var(--bs-primary);
+    background: var(--bs-tertiary-bg);
+}
+
+.ws-upload-dropzone.is-dragover {
+    border-color: var(--bs-primary);
+    background: var(--bs-primary-bg-subtle);
+    color: var(--bs-body-color);
+}
+
+.ws-upload-dropzone:focus-visible {
+    outline: 2px solid rgba(var(--bs-primary-rgb, 13, 110, 253), 0.4);
+    outline-offset: 2px;
+}
+
+.ws-upload-dropzone.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.ws-upload-dropzone.disabled:hover {
+    border-color: var(--bs-border-color);
+    background: var(--bs-secondary-bg);
+}
+
+.ws-upload-preview {
+    margin-top: 1rem;
+}
+
+.ws-upload-file-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.375rem;
+    margin-bottom: 0.5rem;
+    background: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    transition: all 0.3s ease;
+}
+
+.ws-upload-file-item:hover {
+    box-shadow: 0 0.125rem 0.25rem var(--bs-border-color-translucent);
+}
+
+.ws-upload-file-item.is-uploading {
+    border-left: 4px solid var(--bs-primary);
+}
+
+.ws-upload-file-item.is-success {
+    border-left: 4px solid var(--bs-success);
+}
+
+.ws-upload-file-item.is-error {
+    border-left: 4px solid var(--bs-danger);
+}
+
+.ws-upload-file-icon {
+    font-size: 1.5rem;
+    margin-right: 0.75rem;
+    width: 40px;
+    text-align: center;
+}
+
+.ws-upload-file-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.ws-upload-file-name {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+    word-break: break-all;
+}
+
+.ws-upload-file-size {
+    font-size: 0.875rem;
+    color: var(--bs-secondary-color);
+}
+
+.ws-upload-file-progress {
+    width: 100%;
+    margin: 0.5rem 0;
+}
+
+.ws-upload-file-actions {
+    margin-left: 1rem;
+}
+
+.ws-upload-status {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.ws-upload-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.ws-upload-grid-item {
+    position: relative;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.375rem;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--bs-body-bg);
+}
+
+.ws-upload-grid-item img,
+.ws-upload-grid-item video {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+}
+
+.ws-upload-grid-item .ws-upload-file-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 120px;
+    font-size: 2rem;
+    color: var(--bs-secondary-color);
+}
+
+.ws-upload-grid-item-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.ws-upload-grid-item:hover .ws-upload-grid-item-overlay {
+    opacity: 1;
+}
+
+.ws-upload-actions {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--bs-border-color);
+}
+
+.ws-upload-statistics {
+    font-size: 0.875rem;
+    color: var(--bs-secondary-color);
+    margin-top: 0.5rem;
+}
+
+.ws-upload-error {
+    color: var(--bs-danger);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.ws-upload-success {
+    color: var(--bs-success);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.ws-upload-loading {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid var(--bs-secondary-bg-subtle, #f3f3f3);
+    border-top: 2px solid var(--bs-primary);
+    border-radius: 50%;
+    animation: ws-upload-spin 1s linear infinite;
+    margin-right: 0.5rem;
+}
+
+@keyframes ws-upload-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.ws-upload-tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.ws-upload-tooltip .ws-upload-tooltip-text {
+    visibility: hidden;
+    width: 200px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 4px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.ws-upload-tooltip:hover .ws-upload-tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+.ws-upload-image-preview-modal .modal-body {
+    text-align: center;
+}
+
+.ws-upload-image-preview-modal img {
+    max-width: 100%;
+    max-height: 70vh;
+}
+
+/* ========== 方案D：compact 紧凑表格行（listLayout: 'compact'）==========
+   每文件收敛为一行：图标 + 文件名/大小同行，进度条贴行底 2px 细线，
+   不再为"进度条/状态"各起一行，从根源上压缩上传时列表占位高度。 */
+.ws-upload-compact .ws-upload-file-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0.35rem 0.5rem;
+    min-height: 34px;
+    margin-bottom: 0.25rem;
+    gap: 0.5rem;
+    overflow: hidden;
+}
+
+.ws-upload-compact .ws-upload-file-icon {
+    width: 20px;
+    margin-right: 0;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.ws-upload-compact .ws-upload-file-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    flex-wrap: wrap;
+    padding-right: 0.25rem;
+}
+
+.ws-upload-compact .ws-upload-file-name {
+    margin: 0;
+    font-size: 0.8125rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 55%;
+    order: 1;
+}
+
+.ws-upload-compact .ws-upload-file-size {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--bs-secondary-color);
+    white-space: nowrap;
+    order: 2;
+}
+
+.ws-upload-compact .ws-upload-status {
+    margin: 0;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    order: 3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 40%;
+}
+
+/* 进度条贴行底细线，不额外占行高 */
+.ws-upload-compact .ws-upload-file-progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    margin: 0;
+    border-radius: 0;
+    background-color: var(--bs-secondary-bg-subtle, #e9ecef);
+}
+.ws-upload-compact .ws-upload-file-progress .progress-bar {
+    height: 100%;
+}
+
+/* 行内操作按钮收紧 */
+.ws-upload-compact .ws-upload-file-actions {
+    margin-left: 0;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+.ws-upload-compact .ws-upload-file-actions .btn {
+    padding: 0.05rem 0.35rem;
+    font-size: 0.75rem;
+    line-height: 1.2;
+}
+.ws-upload-compact .ws-upload-file-actions .btn i {
+    margin-right: 0;
+}
+
+/* 行内追加的图片“预览”按钮也压扁 */
+.ws-upload-compact .ws-upload-file-info .preview-btn {
+    padding: 0.05rem 0.4rem;
+    font-size: 0.75rem;
+    margin-top: 0 !important;
+    order: 4;
+}
+
+/* ========== 方案E：mini-queue 迷你上传队列（listLayout: 'mini-queue'）==========
+   上传中的文件收进视口右下角的浮动迷你条（汇总 + 展开面板），
+   主列表在“上传中”阶段几乎不占位，仅在上传完成后逐条回显。 */
+.ws-upload-mini {
+    /* 上传中行默认收起：详情由迷你队列呈现 */
+}
+.ws-upload-mini .ws-upload-file-item.ws-upload-mini-hide {
+    display: none !important;
+}
+
+/* 迷你队列本体：fixed 右下 */
+.ws-upload-mini-queue {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 2000;
+    width: 300px;
+    max-width: calc(100vw - 2rem);
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1rem var(--bs-border-color-translucent, rgba(0, 0, 0, 0.15));
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    overflow: hidden;
+}
+.ws-upload-mini-queue.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* 头部（点击展开/收起） */
+.ws-upload-mini-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    border: none;
+    background: none;
+    color: inherit;
+    padding: 0.55rem 0.75rem;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+.ws-upload-mini-head .ws-upload-mini-head-text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.ws-upload-mini-head-count {
+    min-width: 1.25rem;
+    text-align: center;
+    background-color: var(--bs-primary);
+    color: #fff;
+    border-radius: 10rem;
+    font-size: 0.7rem;
+    padding: 0.05rem 0.35rem;
+}
+.ws-upload-mini-caret {
+    transition: transform 0.2s ease;
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+.ws-upload-mini-queue.open .ws-upload-mini-caret {
+    transform: rotate(180deg);
+}
+
+/* 聚合细进度条 */
+.ws-upload-mini-bar {
+    height: 3px;
+    background-color: var(--bs-secondary-bg-subtle, #e9ecef);
+}
+.ws-upload-mini-progress {
+    height: 100%;
+    width: 0;
+    background-color: var(--bs-primary);
+    transition: width 0.2s ease;
+}
+
+/* 展开面板：逐文件列表 */
+.ws-upload-mini-list {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+}
+.ws-upload-mini-queue.open .ws-upload-mini-list {
+    max-height: 40vh;
+    overflow-y: auto;
+    border-top: 1px solid var(--bs-border-color);
+}
+.ws-upload-mini-file {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+    border-bottom: 1px solid var(--bs-border-color-subtle, rgba(0,0,0,0.05));
+}
+.ws-upload-mini-file:last-child {
+    border-bottom: none;
+}
+.ws-upload-mini-file-icon {
+    flex-shrink: 0;
+}
+.ws-upload-mini-file-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--bs-body-color);
+}
+.ws-upload-mini-file-pct {
+    flex-shrink: 0;
+    color: var(--bs-secondary-color);
+    font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,94 @@
+{extend name="public/base" /}
+
+{block name="title"}数据面板{/block}
+
+{block name="css"}
+<link rel="stylesheet" href="/statics/libs/gridstack/gridstack.min.css?v=13.2.0">
+<link rel="stylesheet" href="/statics/css/dashboard.css">
+{/block}
+
+{block name="style"}
+<style>
+.ui-resizable-se {
+    display:none !important
+}
+.grid-stack-item:hover .ui-resizable-se {
+    display:block !important;
+}
+</style>
+{/block}
+
+{block name="content"}
+<body>
+    <div class="container-fluid" id="dashboard-app">
+        <!-- 工具条 -->
+        <div class="container-fluid p-3">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3 class="mb-0"><i id="index_header_icon" class="[icon]"></i><span id="index_header_title" class="ms-2">[caption]</span></h3>
+                    <span class="text-muted small" id="dashboard-hint">拖拽/缩放卡片，点击右上角按钮管理</span>
+                </div>
+                <div class="col-sm-6 text-end">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id="dashboard-add-btn" title="添加面板">
+                        <i class="bi bi-plus-lg me-1"></i>添加面板
+                    </button>
+                    <button type="button" class="btn btn-outline-danger btn-sm" id="dashboard-reset-btn" title="恢复默认布局">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i>恢复默认
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slot: 仪表盘顶部挂件 -->
+        <div data-slot="dashboard.widgets.top" data-slot-hide-empty="true"></div>
+
+        <!-- 面板编排区（GridStack） -->
+        <div class="grid-stack" id="panel-grid"></div>
+
+        <!-- 空态 -->
+        <div id="dashboard-empty" class="dashboard-empty d-none">
+            <i class="bi bi-layout-three-columns"></i>
+            <p>还没有面板，点击右上角“添加面板”开始搭建</p>
+        </div>
+
+        <!-- Slot: 仪表盘底部挂件 -->
+        <div data-slot="dashboard.widgets.bottom" data-slot-hide-empty="true"></div>
+    </div>
+
+    <!-- 添加/恢复面板弹窗 -->
+    <div class="modal fade" id="dashboard-add-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header py-2">
+                    <h6 class="modal-title"><i class="bi bi-plus-square me-1"></i>添加面板</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body dashboard-catalog"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 面板配置弹窗（props 表单） -->
+    <div class="modal fade" id="dashboard-config-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header py-2">
+                    <h6 class="modal-title"><i class="bi bi-gear me-1"></i>面板配置</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="dashboard-config-form" class="needs-validation"></form>
+                </div>
+                <div class="modal-footer py-2">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="dashboard-config-save">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}
+
+{block name="js"}
+<script type="text/javascript" src="/statics/libs/gridstack/gridstack-all.min.js?v=13.2.0"></script>
+<script type="text/javascript" nonce="{$csp_nonce}">var $dashboardData = {:$dashboardData}</script>
+{/block}

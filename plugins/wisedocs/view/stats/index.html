@@ -1,0 +1,194 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}数据统计{/block}
+
+{block name="css"}
+<link rel="stylesheet" href="/statics/plugins/wisedocs/css/admin.css">
+{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-bar-chart" caption="数据统计" buttongroup="" /}
+
+    <div class="container-fluid p-0">
+        <div class="card mb-3">
+            <div class="card-body">
+                <form class="row g-2 align-items-end" method="get" action="/plugin/wisedocs/stats/index" id="stats-form">
+                    <div class="col-12">
+                        <label class="form-label small text-muted mb-1 d-block">快捷区间</label>
+                        <div class="btn-group" role="group" aria-label="快捷日期区间">
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-range="today">今天</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-range="7d">近 7 天</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-range="30d">近 30 天</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-range="custom">自定义</button>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small text-muted mb-1" for="stats-start">开始日期</label>
+                        <input type="date" name="start_date" id="stats-start" class="form-control form-control-sm" value="{$startDate}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small text-muted mb-1" for="stats-end">结束日期</label>
+                        <input type="date" name="end_date" id="stats-end" class="form-control form-control-sm" value="{$endDate}">
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-funnel"></i> 查询</button>
+                        <a class="btn btn-sm btn-outline-secondary"
+                           href="/plugin/wisedocs/stats/export?start_date={$startDate}&end_date={$endDate}">
+                            <i class="bi bi-download"></i> 导出 CSV
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-6 col-lg-3">
+                <div class="card"><div class="card-body">
+                    <div class="text-muted small">总浏览量</div>
+                    <div class="fs-3 fw-bold">{$overallStats.total_views}</div>
+                </div></div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card"><div class="card-body">
+                    <div class="text-muted small">文档数量</div>
+                    <div class="fs-3 fw-bold">{$overallStats.document_count}</div>
+                </div></div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card"><div class="card-body">
+                    <div class="text-muted small">有帮助 / 无帮助</div>
+                    <div class="fs-3 fw-bold">
+                        <span class="text-success">{$overallStats.total_helpful}</span>
+                        <span class="text-muted fs-6">/</span>
+                        <span class="text-danger">{$overallStats.total_unhelpful}</span>
+                    </div>
+                </div></div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card"><div class="card-body">
+                    <div class="text-muted small">有帮助率</div>
+                    <div class="fs-3 fw-bold">{$overallStats.helpful_rate}%</div>
+                </div></div>
+            </div>
+        </div>
+
+        <div class="card mb-3" id="trend-card" data-start-date="{$startDate}" data-end-date="{$endDate}">
+            <div class="card-header fw-bold d-flex align-items-center">
+                <span>浏览趋势</span>
+                <span class="text-muted small ms-2 fw-normal" id="trend-range"></span>
+            </div>
+            <div class="card-body">
+                <div style="height: 280px; position: relative;">
+                    <canvas id="trend-chart"></canvas>
+                </div>
+                <div class="table-responsive mt-3">
+                    <table class="table table-sm table-striped mb-0">
+                        <thead class="docs-thead">
+                        <tr>
+                            <th>日期</th>
+                            <th style="width:90px;">浏览</th>
+                            <th style="width:90px;">有帮助</th>
+                            <th style="width:90px;">无帮助</th>
+                        </tr>
+                        </thead>
+                        <tbody id="trend-tbody">
+                        <tr><td colspan="4" class="text-center text-muted py-4">加载中…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header fw-bold">热门文档 Top 10</div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead class="docs-thead">
+                        <tr>
+                            <th style="width:70px;">排名</th>
+                            <th>文档</th>
+                            <th style="width:160px;">分类</th>
+                            <th style="width:90px;">浏览</th>
+                            <th style="width:90px;">有帮助</th>
+                            <th style="width:90px;">无帮助</th>
+                            <th style="width:110px;">反馈率</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {volist name="hotDocuments" id="doc"}
+                        <tr>
+                            <td>{$key + 1}</td>
+                            <td>
+                                <a href="/plugin/wisedocs/stats/document?id={$doc.id}" class="text-decoration-none">
+                                    {$doc.title}
+                                </a>
+                            </td>
+                            <td>{$doc.category_name|default='-'}</td>
+                            <td>{$doc.views}</td>
+                            <td class="text-success">{$doc.helpful}</td>
+                            <td class="text-danger">{$doc.unhelpful}</td>
+                            <td>
+                                {if $doc.views > 0}
+                                {:round(($doc.helpful + $doc.unhelpful) / $doc.views * 100, 2)}%
+                                {else /}0%{/if}
+                            </td>
+                        </tr>
+                        {/volist}
+                        {if empty($hotDocuments)}
+                        <tr><td colspan="7" class="text-center text-muted py-4">暂无数据</td></tr>
+                        {/if}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header fw-bold">分类统计</div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead class="docs-thead">
+                        <tr>
+                            <th>分类</th>
+                            <th style="width:100px;">文档数</th>
+                            <th style="width:100px;">浏览</th>
+                            <th style="width:100px;">有帮助</th>
+                            <th style="width:100px;">无帮助</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {volist name="categoryStats" id="cat"}
+                        <tr>
+                            <td>
+                                {if $cat.id > 0}
+                                <a href="/plugin/wisedocs/document/index?category_id={$cat.id}" class="text-decoration-none">
+                                    {$cat.name|default='未分类'}
+                                </a>
+                                {else /}
+                                {$cat.name|default='未分类'}
+                                {/if}
+                            </td>
+                            <td>{$cat.document_count}</td>
+                            <td>{$cat.total_views}</td>
+                            <td class="text-success">{$cat.total_helpful}</td>
+                            <td class="text-danger">{$cat.total_unhelpful}</td>
+                        </tr>
+                        {/volist}
+                        {if empty($categoryStats)}
+                        <tr><td colspan="5" class="text-center text-muted py-4">暂无数据</td></tr>
+                        {/if}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="js"}
+<script src="/statics/js/chartjs/4.4.0/chart.umd.js"></script>
+{/block}

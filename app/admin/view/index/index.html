@@ -1,0 +1,465 @@
+{extend name="public/base" /}
+
+{block name="title"}首页{/block}
+
+{block name="bodyclass"}layout-fixed fixed-header fixed-footer sidebar-expand-lg sidebar-open bg-body-tertiary sidebar-mini{/block}
+
+{block name="content"}
+    <div class="app-wrapper">
+        <div class="app-header border-0">
+            <nav class="navbar navbar-expand bg-body">
+                <div class="container-fluid d-flex">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
+                            <i class="bi bi-list"></i>
+                        </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" role="button" data-lte-widget="refresh" ><i class="bi bi-arrow-counterclockwise"></i></a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav overflow-hidden" id="top-nav-menu" style="flex: 1;">
+                        <!-- ===== 控制台区块（system 顶级菜单） ===== -->
+                        {volist name="consoleMenus" id="menu"}
+                        <li class="nav-item text-nowrap">
+                            <a href="#" class="nav-link top-menu-item text-nowrap {eq name='$key' value='0'} active{/eq}" data-menu="{$menu.path}" data-id="{$menu.id}">{$menu.name}</a>
+                        </li>
+                        {/volist}
+                        <!-- ===== 插件扩展（固定 Tab，收纳单顶级插件） ===== -->
+                        {notempty name="extendRoot"}
+                        <li class="nav-item text-nowrap">
+                            <a href="#" class="nav-link top-menu-item text-nowrap" data-menu="{$extendRoot.path}" data-id="{$extendRoot.id}">{$extendRoot.name}</a>
+                        </li>
+                        {/notempty}
+                        <!-- ===== 常用插件区（pinned 多顶级插件） ===== -->
+                        <!-- 与「临时插件 Tab」保持同一形态：图标 + 名称。
+                             图标口径与启动台一致（manifest 顶层 icon 优先，见 MenuLauncherService::withStructuredIcon()）：
+                             模板直出 bi 兜底，image / emoji 由 index.js 的 applyNavIcon() 按 iconType 补渲染。 -->
+                        {volist name="pinnedPlugins" id="menu"}
+                        <li class="nav-item text-nowrap">
+                            <a href="#" class="nav-link top-menu-item text-nowrap" data-menu="{$menu.path}" data-id="{$menu.id}" data-pinned-ident="{$menu.plugin|default=''}"><i class="{$menu.iconBi|default='bi bi-plugin'}" data-pinned-nav-icon></i>&nbsp;<span>{$menu.name}</span></a>
+                        </li>
+                        {/volist}
+                        <!-- 临时插件 Tab（未固定的多顶级插件，启动台左侧，始终只保留一个） -->
+                        <li class="nav-item text-nowrap d-none" id="temp-plugin-nav">
+                            <a href="#" class="nav-link top-menu-item text-nowrap" id="temp-plugin-nav-link" data-id="temp-plugin">
+                                <i class="bi bi-plugin" id="temp-plugin-nav-icon"></i>&nbsp;<span id="temp-plugin-nav-name"></span>
+                            </a>
+                        </li>
+                        <!-- 应用启动台按钮（九宫格） -->
+                        <li class="nav-item text-nowrap nav-launcher-toggle" data-bs-toggle="tooltip" title="应用启动台 (Shift + O)">
+                            <a href="#" class="nav-link" id="launcher-open-btn" role="button"><i class="bi bi-grid-3x3-gap-fill"></i></a>
+                        </li>
+                        <!-- 更多菜单下拉按钮 -->
+                        <li class="nav-item dropdown nav-more-toggle d-none" id="nav-more-toggle">
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </a>
+                            <ul class="dropdown-menu nav-more-dropdown bg-body-secondary" id="nav-more-dropdown"></ul>
+                        </li>
+                    </ul>
+        
+                    <ul class="navbar-nav ms-auto">
+                        <!-- 临时锁屏 -->
+                        <li class="nav-item d-none d-md-block" data-lte-widget="lockscreen" data-bs-toggle="tooltip" title="临时锁屏 Shift + L" data-bs-placement="bottom">
+                            <a class="nav-link" href="#" role="button"><i class="bi bi-lock"></i></a>
+                        </li>
+                        <!-- 全局搜索（主快捷键 / ，备选 Ctrl+K / Cmd+K） -->
+                        <li class="nav-item d-none d-md-block" id="global-search-btn" data-bs-toggle="tooltip" title="全局搜索（按 / ，或 Ctrl+K）" data-bs-placement="bottom">
+                            <a class="nav-link" id="global-search-trigger" href="#" role="button"><i class="bi bi-search"></i></a>
+                        </li>
+                        <!-- 清理缓存 -->
+                        <li class="nav-item dropdown d-none d-md-block" data-bs-toggle="tooltip" title="清理缓存" data-bs-placement="bottom">
+                            <button class="btn btn-link nav-link py-2 px-0 px-lg-2 dropdown-toggle d-flex align-items-center"
+                                type="button" aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static">
+                                <span><i class="bi bi-trash3"></i></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end bg-body-secondary">
+                                <li>
+                                    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-cache-value="all">
+                                        <i class="bi bi-trash3 me-2"></i>一键清理
+                                    </button>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-cache-value="template">
+                                        <i class="bi bi-window me-2"></i>模板缓存
+                                    </button>
+                                </li>
+                                <li>
+                                    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-cache-value="plugin">
+                                        <i class="bi bi-plugin me-2"></i>插件缓存
+                                    </button>
+                                </li>
+                                <li>
+                                    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-cache-value="module">
+                                        <i class="bi bi-browser-edge me-2"></i>组件缓存
+                                    </button>
+                                </li>
+                            </ul>
+                        </li>
+                        <!-- 外观设置（明暗模式 / 颜色主题 / 侧边栏，由 Wise.theme 驱动） -->
+                        <li class="nav-item dropdown d-none d-md-block" data-bs-toggle="tooltip" title="外观设置 Shift+T" data-bs-placement="bottom">
+                            <button class="btn btn-link nav-link py-2 px-0 px-lg-2 dropdown-toggle d-flex align-items-center" id="ws-theme-toggle"
+                                type="button" aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static"
+                                data-bs-auto-close="outside" aria-label="外观设置">
+                                <i class="bi bi-palette" id="ws-theme-icon"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end p-3" id="ws-theme-menu">
+                                <h6 class="dropdown-header text-uppercase small text-secondary fw-semibold px-0 pt-0">明暗模式</h6>
+                                <div class="ws-theme-modes mb-2" role="group" aria-label="明暗模式">
+                                    <button type="button" class="btn" data-ws-theme-mode="auto" aria-pressed="false"><i class="bi bi-circle-half me-1"></i>自动</button>
+                                    <button type="button" class="btn" data-ws-theme-mode="light" aria-pressed="false"><i class="bi bi-sun-fill me-1"></i>亮色</button>
+                                    <button type="button" class="btn" data-ws-theme-mode="dark" aria-pressed="false"><i class="bi bi-moon-fill me-1"></i>暗色</button>
+                                </div>
+                                <h6 class="dropdown-header text-uppercase small text-secondary fw-semibold px-0 mt-3">颜色主题</h6>
+                                <div class="ws-theme-schemes mb-2" role="group" aria-label="颜色主题">
+                                    <button type="button" class="ws-scheme-swatch" data-ws-scheme="blue" aria-label="蓝色" title="蓝色" aria-pressed="false"><span class="ws-scheme-check bi bi-check-lg"></span></button>
+                                    <button type="button" class="ws-scheme-swatch" data-ws-scheme="green" aria-label="绿色" title="绿色" aria-pressed="false"><span class="ws-scheme-check bi bi-check-lg"></span></button>
+                                    <button type="button" class="ws-scheme-swatch" data-ws-scheme="red" aria-label="红色" title="红色" aria-pressed="false"><span class="ws-scheme-check bi bi-check-lg"></span></button>
+                                    <button type="button" class="ws-scheme-swatch" data-ws-scheme="purple" aria-label="紫色" title="紫色" aria-pressed="false"><span class="ws-scheme-check bi bi-check-lg"></span></button>
+                                </div>
+                                <h6 class="dropdown-header text-uppercase small text-secondary fw-semibold px-0 mt-3">侧边栏</h6>
+                                <div class="ws-theme-sidebars mb-1" role="group" aria-label="侧边栏模式">
+                                    <button type="button" class="btn btn-sm text-start w-100" data-ws-theme-sidebar="auto" aria-pressed="false"><i class="bi bi-arrow-left-right me-2"></i>跟随主题</button>
+                                    <button type="button" class="btn btn-sm text-start w-100" data-ws-theme-sidebar="dark" aria-pressed="false"><i class="bi bi-moon-stars-fill me-2"></i>始终深色</button>
+                                    <button type="button" class="btn btn-sm text-start w-100" data-ws-theme-sidebar="light" aria-pressed="false"><i class="bi bi-sun-fill me-2"></i>始终亮色</button>
+                                </div>
+                                <hr class="dropdown-divider my-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary w-100" id="ws-theme-reset">
+                                    <i class="bi bi-arrow-counterclockwise me-2"></i>恢复网站默认
+                                </button>
+                            </div>
+                        </li>
+                        <!-- 安全体检入口已迁入 wise-health-check 包（顶栏右侧扩展位 #top-nav-ext 注入） -->
+                        <!-- 消息中心 -->
+                        <li class="nav-item" data-bs-toggle="tooltip" title="消息中心" data-bs-placement="bottom">
+                            <a class="nav-link" href="{:url('/admin/system_message/index', [], false)}" data-frame-url="{:url('/admin/system_message/index', [], false)}" data-frame-title="消息中心" data-frame-icon="bi bi-bell-fill" id="message-center-link">
+                                <i class="bi bi-bell-fill"></i>
+                                <span class="navbar-badge badge text-bg-danger d-none" id="msg-unread-badge">0</span>
+                            </a>
+                        </li>
+                        <!-- 全屏 -->
+                        <li class="nav-item d-none d-md-block" data-bs-toggle="tooltip" title="全屏 F11" data-bs-placement="bottom">
+                            <a class="nav-link" href="#" data-lte-toggle="fullscreen">
+                                <i data-lte-icon="maximize" class="bi bi-arrows-fullscreen"></i>
+                                <i data-lte-icon="minimize" class="bi bi-fullscreen-exit" style="display: none"></i>
+                            </a>
+                        </li>
+                        <!-- 用户菜单 -->
+                        <li class="nav-item dropdown user-menu">
+                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                                <img src="{$admin.avatar|default='__IMG__/avatar/default_avatar.jpg'}" class="avatar user-image rounded-circle shadow"/>
+                                <span class="d-none d-md-inline">{$admin.nickname}</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+                                <li id="userHeader" class="user-header geometric-bg rounded-top {:['bg-secondary','text-white bg-success','text-black bg-warning', ' text-white bg-danger'][session('security_level')??3]}"
+                                    data-bg-classes="gradient-bg,stripes-bg,geometric-bg,gradient-mesh-bg">
+                                    <a id="securityLevel" class="fs-5 py-1 px-2 text-white position-absolute top-0 end-0" data-bs-toggle="tooltip" title="设备安全等级 {:['未知','高','中','低'][session('security_level')??3]}" href="javascript:void(0)">
+                                        <i class="bi bi-geo-alt"></i>
+                                    </a>
+                                    <img src="{$admin.avatar|default='__IMG__/avatar/default_avatar.jpg'}" class="avatar rounded-circle shadow"/>
+                                    <p class="small">登录于 {:session('admin_last_login_time')}</p>
+                                </li>
+                                <li class="user-body">
+                                    <div class="row">
+                                        <div class="col-4 text-center"><a href="#">Followers</a></div>
+                                        <div class="col-4 text-center"><a href="#">Sales</a></div>
+                                        <div class="col-4 text-center"><a href="#">Friends</a></div>
+                                    </div>
+                                </li>
+                                <li class="user-footer">
+                                    <a href="#" class="btn btn-outline-success" id="profile">个人资料</a>
+                                    <a href="{:url('/admin/login/logout')}" class="btn btn-outline-danger float-end" data-bs-toggle="tooltip" title="退出登录 Shift + X">退出</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <!-- 顶栏右侧扩展位：前端功能模块/插件注入按钮的专属节点（框架不感知具体实现） -->
+                    <ul class="navbar-nav" id="top-nav-ext"></ul>
+                </div>
+            </nav>
+            <!-- 第二行导航 - 可关闭标签页 -->
+            <nav class="navbar navbar-expand bg-body shadow pb-0">
+                <ul class="navbar-nav nav-tabs w-100 mw-100" id="dynamic-tabs" role="tablist"></ul>
+                <a href="#" class="position-absolute d-none d-md-block end-0 px-3 py-2 link-body-emphasis" data-bs-toggle="modal" data-bs-target="#shortcutsModal"><i class="bi bi-keyboard" data-bs-toggle="tooltip" title="快捷键"></i></a>
+            </nav>
+        </div>
+        <!-- data-ws-theme-scope="sidebar"：侧边栏拥有独立的明暗上下文，由 wise-theme.js 同步 data-bs-theme -->
+        <aside class="app-sidebar" data-ws-theme-scope="sidebar" data-bs-theme="{$wssite['sidebar']|default='dark'}" data-color-scheme="{$wssite['scheme']|default='blue'}">
+            <div class="aside-wrapper bg-body-secondary shadow">
+                <div class="sidebar-brand">
+                    <a href="./index.html" class="brand-link">
+                        <img src="__IMG__/admin/logo.jpg" alt="Logo" class="brand-image rounded-circle opacity-75 shadow"/>
+                        <span class="brand-text fw-light">{$wssite['name']|default='网站管理后台'}</span>
+                    </a>
+                </div>
+                <div class="sidebar-wrapper">
+                    <!-- 侧边栏搜索框 -->
+                    <div class="form-inline mt-2">
+                        <div class="input-group" data-lte-toggle="sidebar-search" data-min-length="2" data-not-found-text="没有找到任何元素！">
+                            <input class="form-control form-control-sidebar" type="search" placeholder="搜索菜单 (Shift+S)" aria-label="Search">
+                            <div class="input-group-append">
+                                <button class="btn btn-sidebar">
+                                    <i class="bi bi-search bi-fw"></i>
+                                </button>
+                            </div>
+                            <div class="sidebar-search-results">
+                                <div class="list-group"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <nav class="mt-2 mb-4">
+                        <!-- ===== 控制台区块侧边栏 ===== -->
+                        {volist name="consoleMenus" id="menu"}
+                        <ul class="nav sidebar-menu flex-column {neq name='$key' value='0'} d-none{/neq}" data-parent="{$menu.id}" data-lte-toggle="treeview" role="navigation" aria-label="Main navigation" data-accordion="false" id="navigation">
+                            {volist name="menu.childlist" id="menu2"}
+                            {notempty name="menu2['childlist']"}
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon {$menu2.icon ?: 'bi bi-circle'}"></i>
+                                    <p>{$menu2.name}<i class="nav-arrow bi bi-chevron-right"></i></p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    {volist name="menu2['childlist']" id="menu3"}
+                                    <li class="nav-item">
+                                        <a href="{$menu3.path}" class="nav-link" data-url="{$menu3.path}" data-title="{$menu3.name}">
+                                            <i class="nav-icon {$menu3.icon ?: 'bi bi-circle'}"></i>
+                                            <p>{$menu3.name}</p>
+                                        </a>
+                                    </li>
+                                    {/volist}
+                                </ul>
+                            </li>
+                            {else/}
+                            <li class="nav-item">
+                                <a href="{$menu2.path}" class="nav-link" data-url="{$menu2.path}" data-title="{$menu2.name}">
+                                    <i class="nav-icon {$menu2.icon ?: 'bi bi-circle'}"></i>
+                                    <p>{$menu2.name}</p>
+                                </a>
+                            </li>
+                            {/notempty}
+                            {/volist}
+                        </ul>
+                        {/volist}
+
+                        <!-- ===== 插件扩展侧边栏（平铺单顶级插件入口） ===== -->
+                        {notempty name="extendRoot"}
+                        <ul class="nav sidebar-menu flex-column d-none" data-parent="{$extendRoot.id}" data-lte-toggle="treeview" data-accordion="false">
+                            {volist name="extendRoot.childlist" id="pentry"}
+                            {notempty name="pentry['childlist']"}
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon {$pentry.icon ?: 'bi bi-plugin'}"></i>
+                                    <p>{$pentry.name}<i class="nav-arrow bi bi-chevron-right"></i></p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    {volist name="pentry['childlist']" id="pmenu"}
+                                    <li class="nav-item">
+                                        <a href="{$pmenu.path}" class="nav-link" data-url="{$pmenu.path}" data-title="{$pmenu.name}">
+                                            <i class="nav-icon {$pmenu.icon ?: 'bi bi-circle'}"></i>
+                                            <p>{$pmenu.name}</p>
+                                        </a>
+                                    </li>
+                                    {/volist}
+                                </ul>
+                            </li>
+                            {else/}
+                            <li class="nav-item">
+                                <a href="{$pentry.path}" class="nav-link" data-url="{$pentry.path}" data-title="{$pentry.name}">
+                                    <i class="nav-icon {$pentry.icon ?: 'bi bi-plugin'}"></i>
+                                    <p>{$pentry.name}</p>
+                                </a>
+                            </li>
+                            {/notempty}
+                            {/volist}
+                        </ul>
+                        {/notempty}
+
+                        <!-- ===== 常用插件区侧边栏（pinned 插件完整菜单树） ===== -->
+                        {volist name="pinnedPlugins" id="menu"}
+                        <ul class="nav sidebar-menu flex-column d-none" data-parent="{$menu.id}" data-lte-toggle="treeview" data-accordion="false">
+                            {volist name="menu.childlist" id="menu2"}
+                            {notempty name="menu2['childlist']"}
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon {$menu2.icon ?: 'bi bi-circle'}"></i>
+                                    <p>{$menu2.name}<i class="nav-arrow bi bi-chevron-right"></i></p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    {volist name="menu2['childlist']" id="menu3"}
+                                    <li class="nav-item">
+                                        <a href="{$menu3.path}" class="nav-link" data-url="{$menu3.path}" data-title="{$menu3.name}">
+                                            <i class="nav-icon {$menu3.icon ?: 'bi bi-circle'}"></i>
+                                            <p>{$menu3.name}</p>
+                                        </a>
+                                    </li>
+                                    {/volist}
+                                </ul>
+                            </li>
+                            {else/}
+                            <li class="nav-item">
+                                <a href="{$menu2.path}" class="nav-link" data-url="{$menu2.path}" data-title="{$menu2.name}">
+                                    <i class="nav-icon {$menu2.icon ?: 'bi bi-circle'}"></i>
+                                    <p>{$menu2.name}</p>
+                                </a>
+                            </li>
+                            {/notempty}
+                            {/volist}
+                        </ul>
+                        {/volist}
+
+                        <ul class="nav sidebar-menu flex-column d-none" data-parent="temp-plugin" data-lte-toggle="treeview" data-accordion="false" id="temp-plugin-sidebar"></ul>
+                    </nav>
+                </div>
+            </div>
+        </aside>
+        {include file="index/lockscreen" /}
+        <main class="app-main">
+            {include file="index/empty" /}
+            <div id="dynamic-tab-content" class="tab-content h-100"></div>
+        </main>
+        <!-- <footer class="app-footer">
+            <div class="float-end d-none d-sm-inline">Anything you want</div>
+            <strong>Copyright &copy; 2025-2026&nbsp;<a href="https://www.wiseadmin.top" class="text-decoration-none">WiseAdmin</a>.</strong>
+            All rights reserved.
+        </footer> -->
+        <!-- 应用启动台弹窗（九宫格插件网格） -->
+        <div class="modal fade" id="launcherModal" tabindex="-1" aria-labelledby="launcherModalTitle" aria-hidden="true" data-bs-focus="false">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+                <div class="modal-content border-0">
+                    <div class="modal-header py-2 px-3 border-0">
+                        <div class="d-flex align-items-center gap-2 flex-fill">
+                            <span class="launcher-logo rounded-circle d-inline-flex align-items-center justify-content-center"><i class="bi bi-grid-3x3-gap-fill"></i></span>
+                            <h5 class="modal-title" id="launcherModalTitle">应用启动台</h5>
+                            <small class="text-secondary">按插件查找 · 点击直达</small>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+                    </div>
+                    <div class="modal-body p-3 pt-0">
+                        <div class="input-group mb-3 launcher-search">
+                            <span class="input-group-text bg-body-secondary border-0"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="launcher-search-input" placeholder="搜索插件名称…" autocomplete="off">
+                        </div>
+                        <div class="row g-2 launcher-grid" id="launcher-grid">
+                            {volist name="launcherPlugins" id="lp"}
+                            <div class="col-6 col-md-4 col-lg-3">
+                                <div class="launcher-item position-relative d-flex flex-column align-items-center justify-content-center text-center py-3 rounded-3"
+                                   data-url="{$lp.path|default=''}" data-first-url="{$lp.firstUrl|default=''}"
+                                   data-ident="{$lp.ident|default=''}" data-can-pin="{$lp.canPin|default='0'}" data-pinned="{$lp.pinned|default='0'}" data-parent-id="{$lp.parentMenuId|default=''}">
+                                    {eq name="lp.canPin" value="1"}
+                                    <button type="button" class="btn btn-sm launcher-pin-btn position-absolute top-0 end-0 m-1 p-0 border-0" data-bs-toggle="tooltip" title="{eq name='lp.pinned' value='1'}取消钉选{else/}钉选到常用区{/eq}">
+                                        <i class="bi {eq name='lp.pinned' value='1'}bi-pin-fill text-primary{else/}bi-pin{/eq}"></i>
+                                    </button>
+                                    {/eq}
+                                    <span class="launcher-icon rounded-circle d-flex align-items-center justify-content-center mb-2"><i class="{$lp.icon|default='bi bi-plugin'}"></i></span>
+                                    <span class="launcher-name small text-truncate w-100 px-2">{$lp.title}</span>
+                                </div>
+                            </div>
+                            {/volist}
+                        </div>
+                        {empty name="launcherPlugins"}
+                        <div class="text-center text-secondary py-5" id="launcher-empty"><i class="bi bi-inbox fs-1 d-block mb-2"></i>暂无可用插件</div>
+                        {/empty}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 登录成功弹窗 -->
+        {include file="index/login_success_modal" /}
+        <!-- 快捷键弹窗 -->
+        {include file="index/shortcuts_modal" /}
+        <!-- 全局搜索弹窗 -->
+        {include file="index/global_search_modal" /}
+    </div>
+
+{/block}
+
+{block name="js"}
+<script nonce="{$csp_nonce|default=''}">
+// 启动台插件完整数据（含未固定插件的菜单树，供前端动态生成临时侧边栏）
+window.__launcherPlugins__ = {:json_encode($launcherPlugins)};
+$(function () {
+    // 消息中心未读徽标（优雅降级：接口不可用时保持隐藏）
+    $.ajax({
+        url: '/admin/system_message/getStats',
+        dataType: 'json',
+        success: function (res) {
+            var unread = res && res.data ? (parseInt(res.data.unread, 10) || 0) : 0;
+            var $badge = $('#msg-unread-badge');
+            if (unread > 0) {
+                $badge.text(unread > 99 ? '99+' : unread).removeClass('d-none');
+            }
+        }
+    });
+
+    // 安全体检风险徽标已迁入 wise-health-check 包（模块自行创建顶栏入口并轮询取数）
+
+    // ── 主题切换面板（由 Wise.theme 驱动）──
+    // 注意：Wise.theme 是 ESM 模块，此脚本为传统脚本。
+    // 通过轮询等待 Wise.theme 就绪（通常首帧即完成）。
+    var bindThemeUI = function () {
+        var W = window.Wise;
+        if (!W || !W.theme) {
+            return setTimeout(bindThemeUI, 200);
+        }
+        var theme = W.theme;
+        var $menu = $('#ws-theme-menu');
+        if (!$menu.length) {
+            return;
+        }
+
+        // 同步面板选中态
+        var syncThemeUI = function (t) {
+            t = t || theme.get();
+            $menu.find('[data-ws-theme-mode]').each(function () {
+                var $btn = $(this);
+                var active = $btn.attr('data-ws-theme-mode') === t.mode;
+                $btn.toggleClass('active', active).attr('aria-pressed', active);
+            });
+            $menu.find('[data-ws-scheme]').each(function () {
+                var $btn = $(this);
+                var active = $btn.attr('data-ws-scheme') === t.scheme;
+                $btn.toggleClass('active', active).attr('aria-pressed', active);
+            });
+            $menu.find('[data-ws-theme-sidebar]').each(function () {
+                var $btn = $(this);
+                var active = $btn.attr('data-ws-theme-sidebar') === t.sidebar;
+                $btn.toggleClass('active', active).attr('aria-pressed', active);
+            });
+        };
+
+        $menu.on('click', function (e) {
+            var $target = $(e.target).closest('[data-ws-theme-mode], [data-ws-scheme], [data-ws-theme-sidebar], #ws-theme-reset');
+            if (!$target.length) {
+                return;
+            }
+            if ($target.attr('data-ws-theme-mode')) {
+                theme.setMode($target.attr('data-ws-theme-mode'));
+            } else if ($target.attr('data-ws-scheme')) {
+                theme.setScheme($target.attr('data-ws-scheme'));
+            } else if ($target.attr('data-ws-theme-sidebar')) {
+                theme.setSidebar($target.attr('data-ws-theme-sidebar'));
+            } else if ($target.attr('id') === 'ws-theme-reset') {
+                theme.reset();
+            }
+        });
+
+        // 首次同步 + 后续变更订阅
+        syncThemeUI();
+        theme.onChange(function (payload) {
+            syncThemeUI(payload);
+        });
+
+        // 快捷键 Shift+T：明暗快捷切换
+        if (typeof window.HotKey !== 'undefined') {
+            new window.HotKey('admin').register('shift+t', function () {
+                theme.toggleMode();
+            }, '切换明暗主题');
+        }
+    };
+    bindThemeUI();
+});
+</script>
+{/block}

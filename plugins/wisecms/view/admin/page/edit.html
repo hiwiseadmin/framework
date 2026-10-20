@@ -1,0 +1,73 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}编辑单页{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-pencil-square" caption="编辑单页" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <form id="pageForm" method="post" action="{:plugin_url('wisecms/page/edit')}">
+                    {:csrf_field()}
+                    <input id="cms-f-id" type="hidden" name="id" value="{$page.id}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-title">标题 <span class="text-danger">*</span></label>
+                            <input id="cms-f-title" type="text" name="title" class="form-control" required maxlength="200" value="{$page.title}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-alias">别名</label>
+                            <input id="cms-f-alias" type="text" name="alias" class="form-control" maxlength="100" value="{$page.alias}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-catid">关联栏目（单页型）</label>
+                            <select id="cms-f-catid" name="catid" class="form-select">
+                                <option value="0">不关联</option>
+                                {foreach $catidOptions as $opt}
+                                <option value="{$opt.id}" {if $page.catid == $opt.id}selected{/if}>{$opt.name}</option>
+                                {/foreach}
+                            </select>
+                            <div class="form-text">栏目类型为「单页」时，前台栏目页会跳转到该单页</div>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label" for="cms-f-content">内容</label>
+                            <textarea id="cms-f-content" name="content" class="form-control" rows="12">{$page.content}</textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-thumb">缩略图</label>
+                            <input id="cms-f-thumb" type="text" name="thumb" class="form-control" maxlength="255" value="{$page.thumb}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-template">模板</label>
+                            <input id="cms-f-template" type="text" name="template" class="form-control" maxlength="50" value="{$page.template}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-seo_title">SEO 标题</label>
+                            <input id="cms-f-seo_title" type="text" name="seo_title" class="form-control" maxlength="100" value="{$page.seo_title}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-seo_keywords">SEO 关键词</label>
+                            <input id="cms-f-seo_keywords" type="text" name="seo_keywords" class="form-control" maxlength="255" value="{$page.seo_keywords}">
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label" for="cms-f-seo_description">SEO 描述</label>
+                            <textarea id="cms-f-seo_description" name="seo_description" class="form-control" rows="2" maxlength="500">{$page.seo_description}</textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-status">状态</label>
+                            <select id="cms-f-status" name="status" class="form-select">
+                                <option value="1" {if $page.status == 1}selected{/if}>已发布</option>
+                                <option value="0" {if $page.status == 0}selected{/if}>草稿</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                    <!-- 返回与提交均由 js/page.js 的 edit() 处理（模板零内联脚本） -->
+                    <button type="button" id="btn-page-back" class="btn btn-outline-secondary btn-sm">返回</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

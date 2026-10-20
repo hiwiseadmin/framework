@@ -1,0 +1,37 @@
+- generic [active] [ref=f33e1]:
+  - main [ref=f33e2]:
+    - heading " 内容管理" [level=3] [ref=f33e7]:
+      - generic [ref=f33e8]: 
+      - text: 内容管理
+    - text: 
+    - generic [ref=f33e11]:
+      - generic [ref=f33e14]:
+        - generic [ref=f33e15]: 
+        - generic [ref=f33e16]: 栏目导航
+      - generic [ref=f33e20]:
+        - generic [ref=f33e21]:
+          - combobox [ref=f33e23]:
+            - option "全部状态" [selected]
+            - option "草稿"
+            - option "待审核"
+            - option "已发布"
+            - option "已归档"
+          - textbox "搜索标题 / 关键词" [ref=f33e25]
+          - generic [ref=f33e26]:
+            - button " 搜索" [ref=f33e27] [cursor=pointer]:
+              - generic [ref=f33e28]: 
+              - text: 搜索
+            - button "重置" [ref=f33e29] [cursor=pointer]
+        - table
+  - status [ref=f33e32]
+  - generic [ref=f33e34]:
+    - generic [ref=f33e35]:
+      - heading " 跳转提示" [level=5] [ref=f33e36]:
+        - generic [ref=f33e37]: 
+        - text: 跳转提示
+      - button [ref=f33e39] [cursor=pointer]
+    - generic [ref=f33e40]: 是否从主页面访问
+    - generic [ref=f33e41]:
+      - button "确定" [ref=f33e42] [cursor=pointer]
+      - button "取消" [ref=f33e43] [cursor=pointer]
+  - text:       

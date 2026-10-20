@@ -1,0 +1,218 @@
+<!-- 关卡 新增/编辑 模态框（Level Schema v1 · 三层字符地图编辑器） -->
+<style>
+    .m3-grid { display: grid; gap: 1px; background: #dee2e6; border: 1px solid #ced4da; width: fit-content; user-select: none; }
+    .m3-cell { width: 26px; height: 26px; line-height: 26px; text-align: center; font-size: 11px; font-family: Consolas, monospace;
+               background: #fff; cursor: pointer; position: relative; }
+    .m3-cell.t-S { background: #d6d8db; color: #6c757d; }        /* 生成器 */
+    .m3-cell.t-o { background: #fff; }                            /* 普通格 */
+    .m3-cell.t-\. { background: #f1f3f5; color: #adb5bd; }        /* 无格子 */
+    .m3-cell.t-\# { background: #6c757d; color: #fff; }           /* 障碍 */
+    .m3-cell.t-D { background: #cce5ff; color: #004085; }         /* 出口 */
+    .m3-cell.t-P { background: #e2d9f3; color: #4a2f7a; }         /* 传送门 */
+    .m3-cell.t-belt { background: #fff3cd; }                       /* 传送带 */
+    .m3-cell.t-\* { background: #f8d7da; color: #721c24; }        /* 障碍生成器 */
+    .m3-ov { position: absolute; inset: 0; opacity: .45; }
+    .m3-ov-I, .m3-ov-J { background: #aee1f9; }                    /* 冰 */
+    .m3-ov-L { background: #f5b7b1; }                              /* 果冻 */
+    .m3-ov-K { background: #ecf0f1; }                              /* 雪块 */
+    .m3-ov-Q { background: #8d6e63; }                              /* 巧克力 */
+    .m3-ov-W { background: #a5d6a7; }                              /* 毒液 */
+    .m3-ov-N { background: #495057; }                              /* 锁定 */
+    .m3-brush { font-family: Consolas, monospace; min-width: 38px; }
+    .m3-brush.active { box-shadow: 0 0 0 2px #0d6efd inset; }
+    .m3-layer-text { font-family: Consolas, monospace; font-size: 12px; }
+</style>
+
+<div class="modal fade" id="level-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="form-title">新增关卡</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+            </div>
+            <form id="level-form" class="modal-body row g-3">
+                <input type="hidden" name="id" id="form-id" value="0">
+                <input type="hidden" name="regions" id="form-regions" value="">
+
+                <div class="col-md-3">
+                    <label class="form-label">关卡编码 <span class="text-danger">*</span></label>
+                    <input type="text" name="code" id="form-code" class="form-control" placeholder="M3-0101"
+                           data-validation="required|maxLength:50"
+                           data-validation-message-required="请填写关卡编码"
+                           data-validation-message-maxLength="关卡编码不能超过 50 个字符">
+                    <div class="invalid-feedback"><span class="validation-text"></span></div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">关卡名称 <span class="text-danger">*</span></label>
+                    <input type="text" name="name" id="form-name" class="form-control"
+                           data-validation="required|maxLength:50"
+                           data-validation-message-required="请填写关卡名称"
+                           data-validation-message-maxLength="关卡名称不能超过 50 个字符">
+                    <div class="invalid-feedback"><span class="validation-text"></span></div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">章节</label>
+                    <input type="text" name="chapter" id="form-chapter" class="form-control" placeholder="第一章·入门">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">难度(1-5)</label>
+                    <input type="number" name="difficulty" id="form-difficulty" class="form-control" value="1" min="1" max="5">
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">行数</label>
+                    <input type="number" id="form-rows" class="form-control" value="9" min="3" max="15">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">列数</label>
+                    <input type="number" id="form-cols" class="form-control" value="9" min="3" max="15">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">单元格像素</label>
+                    <input type="number" name="cell_size" id="form-cell-size" class="form-control" value="76">
+                </div>
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-outline-secondary btn-sm mt-4" id="btn-resize">
+                        <i class="bi bi-arrow-repeat"></i> 应用尺寸
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm mt-4" id="btn-fill-rect">
+                        <i class="bi bi-square"></i> 标准矩形
+                    </button>
+                </div>
+
+                <!-- ===== 三层字符地图编辑器 ===== -->
+                <div class="col-12">
+                    <label class="form-label">棋盘布局（三层字符地图，01 §4.2）</label>
+                    <ul class="nav nav-tabs nav-sm" id="layer-tabs">
+                        <li class="nav-item"><a class="nav-link active" href="#" data-layer="terrain">terrain 地形</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-layer="entity">entity 元素</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-layer="overlay">overlay 覆盖</a></li>
+                    </ul>
+                    <div class="border p-2">
+                        <div class="mb-2" id="brush-bar"></div>
+                        <div id="grid-canvas" class="m3-grid"></div>
+                        <div class="form-text">点击格子写入当前画笔字符。terrain 第 0 行通常为生成器行 <code>S</code>。</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">terrain（每行一条，可粘贴编辑）</label>
+                    <textarea id="text-terrain" class="form-control m3-layer-text" rows="9" spellcheck="false"></textarea>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">entity（留空 = 由 seed 随机填充）</label>
+                    <textarea id="text-entity" class="form-control m3-layer-text" rows="9" spellcheck="false"></textarea>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">overlay（留空 = 无覆盖）</label>
+                    <textarea id="text-overlay" class="form-control m3-layer-text" rows="9" spellcheck="false"></textarea>
+                </div>
+
+                <!-- ===== 通关条件（可视化控件，与下方 rules JSON 双向同步） ===== -->
+                <div class="col-12">
+                    <label class="form-label">通关条件 <span class="text-danger">*</span>（与下方 rules JSON 双向同步）</label>
+                    <div class="border rounded p-2">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label small mb-1">步数</label>
+                                <input type="number" id="form-moves" class="form-control form-control-sm" min="1" placeholder="如 30">
+                                <div class="form-text small">对应 <code>rules.moves</code>，必须 &gt; 0</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small mb-1">三星分数线</label>
+                                <div class="d-flex gap-2">
+                                    <input type="number" id="form-star-1" class="form-control form-control-sm" min="0" placeholder="1 星">
+                                    <input type="number" id="form-star-2" class="form-control form-control-sm" min="0" placeholder="2 星">
+                                    <input type="number" id="form-star-3" class="form-control form-control-sm" min="0" placeholder="3 星">
+                                </div>
+                                <div class="form-text small">对应 <code>rules.starScores</code>，必须 3 个且严格递增</div>
+                            </div>
+                        </div>
+
+                        <hr class="my-2">
+
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label small mb-0">通关目标（可多条，全部达成才算通关）</label>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="btn-add-goal">
+                                <i class="bi bi-plus-lg"></i> 添加目标
+                            </button>
+                        </div>
+                        <div id="goal-rows"></div>
+                        <div class="form-text">
+                            对应 <code>rules.goals</code>。清除类目标的「类型」需为可清除层：
+                            <code>ice</code> / <code>jelly</code> / <code>snow</code> / <code>vine</code> /
+                            <code>chocolate</code> / <code>poison</code> / <code>bubble</code> / <code>toffee</code>。
+                        </div>
+                        <datalist id="goal-gem-list"></datalist>
+                        <datalist id="goal-layer-list"></datalist>
+                    </div>
+                </div>
+
+                <!-- ===== rules / palette / reward ===== -->
+                <div class="col-md-4">
+                    <label class="form-label">rules JSON <span class="text-danger">*</span></label>
+                    <textarea name="rules" id="form-rules" class="form-control" rows="12"
+                              data-validation="required|validJson"
+                              data-validation-message-required="请填写 rules JSON"
+                              data-validation-message-validJson="rules 不是合法的 JSON">{"mode":"moves","moves":30,"minMatch":3,"starScores":[3000,6000,9000],"goals":[{"type":"score","count":2000}],"autoShuffle":true}</textarea>
+                    <div class="invalid-feedback"><span class="validation-text"></span></div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">palette JSON</label>
+                    <textarea name="palette" id="form-palette" class="form-control" rows="6">{"gems":["red_gem","blue_gem","yellow_gem","green_gem","purple_gem","orange_gem"],"theme":"orchard"}</textarea>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">奖励 JSON（插件自有）</label>
+                    <textarea name="reward_conf" id="form-reward-conf" class="form-control" rows="6">{"coins":[200,400,600]}</textarea>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">props JSON（P4 道具规则，02 §5.2，留空=不限制）</label>
+                    <textarea name="props" id="form-props" class="form-control" rows="4">{"allowed":["hammer","bomb","shuffle"],"costOnUse":{"hammer":1,"bomb":2,"shuffle":2},"freePerTry":1,"countsAsMove":false}</textarea>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">seed 策略</label>
+                    <select name="seed_policy" id="form-seed-policy" class="form-select">
+                        <option value="server">server</option>
+                        <option value="fixed">fixed</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">固定种子</label>
+                    <input type="number" name="fixed_seed" id="form-fixed-seed" class="form-control" placeholder="留空">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">前置关卡</label>
+                    <input type="text" name="pre_unlock" id="form-pre-unlock" class="form-control" placeholder="留空=无前置">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">解锁星数(0=通关即可)</label>
+                    <input type="number" name="unlock_stars" id="form-unlock-stars" class="form-control" value="0" min="0">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">排序</label>
+                    <input type="number" name="sort_order" id="form-sort-order" class="form-control" value="0">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">状态</label>
+                    <select name="status" id="form-status" class="form-select">
+                        <option value="1">已发布</option>
+                        <option value="0">草稿</option>
+                        <option value="2">下架</option>
+                    </select>
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label">描述</label>
+                    <input type="text" name="description" id="form-description" class="form-control">
+                </div>
+
+                <div class="col-12" id="validate-result"></div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-outline-info" id="btn-validate"><i class="bi bi-shield-check"></i> 校验</button>
+                <button type="submit" form="level-form" class="btn btn-primary"><i class="bi bi-check-lg"></i> 保存</button>
+            </div>
+        </div>
+    </div>
+</div>

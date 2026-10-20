@@ -1,0 +1,15 @@
+{if condition="!empty($pager) && $pager.last_page > 1"}
+<nav class="mt-4">
+    <ul class="pagination justify-content-center">
+        <li class="page-item {$pager.has_prev ? '' : 'disabled'}">
+            <a class="page-link" href="{:str_replace('__PAGE__', $pager.prev, $pager.url)}">上一页</a>
+        </li>
+        <li class="page-item disabled">
+            <span class="page-link">第 {$pager.page} / {$pager.last_page} 页</span>
+        </li>
+        <li class="page-item {$pager.has_next ? '' : 'disabled'}">
+            <a class="page-link" href="{:str_replace('__PAGE__', $pager.next, $pager.url)}">下一页</a>
+        </li>
+    </ul>
+</nav>
+{/if}

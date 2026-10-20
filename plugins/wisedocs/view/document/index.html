@@ -1,0 +1,99 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}文档管理{/block}
+
+{block name="css"}
+<link rel="stylesheet" href="/statics/plugins/wisedocs/css/admin.css">
+{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-file-earmark-text" caption="文档管理" buttongroup="" /}
+
+    <div class="docs-page">
+        <form class="docs-filter" id="search-form">
+            <div class="docs-filter__row">
+                <div class="docs-filter__item docs-filter__item--wide">
+                    <label class="docs-filter__label" for="search-keyword">关键词</label>
+                    <input type="text" class="form-control form-control-sm" id="search-keyword"
+                           placeholder="标题 / 摘要 / 标识">
+                </div>
+                <div class="docs-filter__item">
+                    <label class="docs-filter__label" for="search-category">分类</label>
+                    <select class="form-select form-select-sm" id="search-category">
+                        <option value="">全部分类</option>
+                        {volist name="categoryOptions" id="opt"}
+                        <option value="{$opt.id}">{$opt.prefix}{$opt.name}</option>
+                        {/volist}
+                    </select>
+                </div>
+                <div class="docs-filter__item">
+                    <label class="docs-filter__label" for="search-content-type">内容类型</label>
+                    <select class="form-select form-select-sm" id="search-content-type">
+                        <option value="">全部类型</option>
+                        <option value="1">文章</option>
+                        <option value="2">代码</option>
+                        <option value="3">组件</option>
+                        <option value="4">API</option>
+                    </select>
+                </div>
+                <div class="docs-filter__item">
+                    <label class="docs-filter__label" for="search-tag">标签</label>
+                    <select class="form-select form-select-sm" id="search-tag">
+                        <option value="">全部标签</option>
+                        {volist name="tagOptions" id="tag"}
+                        <option value="{$tag.id}">{$tag.name}</option>
+                        {/volist}
+                    </select>
+                </div>
+                <div class="docs-filter__item">
+                    <label class="docs-filter__label" for="search-status">状态</label>
+                    <select class="form-select form-select-sm" id="search-status">
+                        <option value="">全部状态</option>
+                        <option value="1">已发布</option>
+                        <option value="0">草稿</option>
+                    </select>
+                </div>
+                <div class="docs-filter__actions">
+                    <button type="submit" class="btn btn-sm btn-primary" id="btn-search">
+                        <i class="bi bi-search"></i> 搜索
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-reset">
+                        <i class="bi bi-arrow-clockwise"></i> 重置
+                    </button>
+                </div>
+            </div>
+
+            <!-- 发布状态筛选：由概览「待发布」等工作台入口带入，无独立控件 -->
+            <input type="hidden" id="search-publish-state" value="">
+        </form>
+
+        <div class="docs-table-card">
+            <div id="toolbar" class="toolbar"></div>
+            <table id="table"></table>
+        </div>
+    </div>
+</div>
+
+<!-- 发布前差异确认（行级对比，差异由前端计算） -->
+<div class="modal fade" id="publish-diff-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-file-diff"></i> 发布前差异确认</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+            </div>
+            <div class="modal-body">
+                <p class="docs-hint mb-2" id="diff-summary">正在比对…</p>
+                <div id="diff-host" class="docs-diff-host"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="btn-confirm-publish">
+                    <i class="bi bi-send-check"></i> 确认发布
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

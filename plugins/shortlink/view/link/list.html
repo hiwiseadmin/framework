@@ -1,0 +1,78 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="title"}短链接管理{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-link-45deg" caption="短链接管理" buttongroup="<button class='btn btn-primary btn-sm' onclick='handleAdd()'><i class='bi bi-plus-lg'></i> 新增短链接</button>" /}
+    <div class="plugin-shortlink">
+        <div class="container-fluid p-0">
+            <!-- 搜索栏 -->
+            <div class="search-bar mb-3">
+                <div class="row g-2">
+                    <div class="col-md-3">
+                        <input type="text" class="form-control form-control-sm" id="search-keyword" placeholder="标题/原链接">
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select form-select-sm" id="search-group-id">
+                            <option value="">全部分组</option>
+                            {foreach $groups as $g}
+                            <option value="{$g.id}">{$g.name}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select form-select-sm" id="search-status">
+                            <option value="">全部状态</option>
+                            <option value="1">启用</option>
+                            <option value="0">禁用</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-secondary btn-sm" onclick="handleSearch()">
+                                <i class="bi bi-search"></i> 搜索
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm" onclick="handleReset()">
+                                <i class="bi bi-arrow-clockwise"></i> 重置
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 数据表格 -->
+            <table id="data-table"
+                   data-toggle="table"
+                   data-url="{:url('/plugin/shortlink/link/getList')}"
+                   data-side-pagination="server"
+                   data-pagination="true"
+                   data-page-list="[10, 25, 50, 100]"
+                   data-page-size="20"
+                   data-id-field="id"
+                   data-toolbar="#toolbar"
+                   data-query-params="queryParams">
+                <thead>
+                    <tr>
+                        <th data-field="id" data-width="60" data-align="center">ID</th>
+                        <th data-field="title" data-width="140">标题</th>
+                        <th data-field="short_url" data-width="260" data-formatter="shortUrlFormatter">短链接</th>
+                        <th data-field="long_url" data-width="220" data-formatter="urlFormatter">原链接</th>
+                        <th data-field="status" data-width="70" data-align="center">状态</th>
+                        <th data-field="create_time" data-width="150">创建时间</th>
+                        <th data-field="operate" data-width="150" data-align="center" data-formatter="operateFormatter" data-events="operateEvents">操作</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<script type="module">
+import api from '/statics/plugins/shortlink/js/common/api.js';
+import module from '/statics/plugins/shortlink/js/link/index.js';
+
+        $(function() {
+            module.index();
+        });
+</script>
+{/block}

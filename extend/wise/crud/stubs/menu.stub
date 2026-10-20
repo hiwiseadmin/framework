@@ -1,0 +1,59 @@
+<?php
+declare(strict_types=1);
+
+use think\migration\Migrator;
+
+/**
+ * 为「{$menu_title}」注册后台菜单与权限。
+ *
+ * 由 `php think wise:crud` 于 {$create_time} 生成。
+ *
+ * 宿主模块的菜单走**迁移**落地 —— 这是框架既有约定（`20251001000003_create_menus_table.php`
+ * 即以迁移 seed 系统菜单），与插件「manifest → 安装期注册」是两条并行通道，互不替代。
+ *
+ * 走 `Menu::createMenusWithPermissions()`（**幂等**）而不是裸 SQL INSERT：
+ *   - 同 plugin + parent_id + path 的菜单已存在（含软删除）→ 复用/恢复
+ *   - 菜单有 path → 自动创建/复用权限并双向绑定（auth_permissions）
+ * 因此本迁移可重复执行，也兼容「先手工建了菜单再跑迁移」的场景（见下 preserveExisting）。
+ */
+class {$menu_class} extends Migrator
+{
+    /** 菜单路径：幂等识别键（框架级 /admin/...，插件级 /plugin/{ident}/...） */
+    private const MENU_PATH = '{$api_base}/index';
+
+    public function up(): void
+    {
+        // preserveExisting: true → 已存在同 path 菜单时**不改写**其 name/icon/sort/status，
+        // 只补建缺失项、恢复软删除项：这样「先手工在后台建好菜单、再跑迁移」（或迁移被
+        // 回滚后重跑）不会把运营排版冲掉。需要以声明为准强制覆盖时才传 false。
+        \app\admin\model\Menu::createMenusWithPermissions('{$menu_plugin}', [
+            [
+                'name' => '{$menu_title}',
+                'icon' => 'bi bi-circle',
+                'path' => self::MENU_PATH,
+                'type' => 'menu',
+                'sort' => 0,
+            ],
+        ], preserveExisting: true);
+    }
+
+    /**
+     * 回滚：移除本模块注册的菜单（**软删除**，可恢复）。
+     *
+     * 与插件 / 库包卸载同一语义（`MenuItemSync::uninstall()` 的默认分支）：
+     *   - 软删（写 `delete_time`）而不是物理删 —— 运营可能改过排版、甚至手工补过子节点，
+     *     物理删不可恢复；
+     *   - **权限行不在此删除**（可能已被角色引用）。如需彻底清理，请在后台「权限管理」
+     *     删除对应权限。
+     */
+    public function down(): void
+    {
+        $menus = \app\admin\model\Menu::where('path', self::MENU_PATH)
+            ->where('plugin', '{$menu_plugin}')
+            ->select();
+
+        foreach ($menus as $menu) {
+            $menu->delete();
+        }
+    }
+}

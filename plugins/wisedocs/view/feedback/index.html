@@ -1,0 +1,70 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}反馈管理{/block}
+
+{block name="css"}
+<link rel="stylesheet" href="/statics/plugins/wisedocs/css/admin.css">
+{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-chat-left-text" caption="反馈管理" buttongroup="" /}
+
+    <div class="docs-page">
+        <form class="docs-filter" id="search-form">
+            <div class="docs-filter__row">
+                <div class="docs-filter__item docs-filter__item--wide">
+                    <label class="docs-filter__label" for="search-document">关联文档</label>
+                    <select class="form-select form-select-sm" id="search-document">
+                        <option value="">全部文档</option>
+                        {volist name="documents" id="doc"}
+                        <option value="{$doc.id}">{$doc.title}</option>
+                        {/volist}
+                    </select>
+                </div>
+                <div class="docs-filter__item">
+                    <label class="docs-filter__label" for="search-type">反馈类型</label>
+                    <select class="form-select form-select-sm" id="search-type">
+                        <option value="">全部类型</option>
+                        <option value="1">有帮助</option>
+                        <option value="0">没帮助</option>
+                        <option value="2">建议</option>
+                    </select>
+                </div>
+                <div class="docs-filter__item">
+                    <label class="docs-filter__label" for="search-processed">处理状态</label>
+                    <select class="form-select form-select-sm" id="search-processed">
+                        <option value="">全部状态</option>
+                        <option value="0">待处理</option>
+                        <option value="1">已处理</option>
+                        <option value="2">已忽略</option>
+                    </select>
+                </div>
+                <div class="docs-filter__item">
+                    <label class="docs-filter__label" for="search-start">开始日期</label>
+                    <input type="date" class="form-control form-control-sm" id="search-start">
+                </div>
+                <div class="docs-filter__item">
+                    <label class="docs-filter__label" for="search-end">结束日期</label>
+                    <input type="date" class="form-control form-control-sm" id="search-end">
+                </div>
+                <div class="docs-filter__actions">
+                    <button type="submit" class="btn btn-sm btn-primary" id="btn-search">
+                        <i class="bi bi-search"></i> 搜索
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-reset">
+                        <i class="bi bi-arrow-clockwise"></i> 重置
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <div class="docs-table-card">
+            <div id="toolbar" class="toolbar"></div>
+            <table id="table"></table>
+        </div>
+    </div>
+</div>
+
+{include file="feedback/modal" /}
+{/block}

@@ -1,0 +1,43 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}Webhook 管理{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-broadcast" caption="Webhook 管理" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <!-- data-* 由控制器下发（服务端才能真正判定依赖与投递模式） -->
+        <div id="cmsWebhookPage" data-mode="{$webhookMode|default='auto'}"
+             data-installed="{if $webhookInstalled}1{else}0{/if}">
+            <div class="card">
+                <div class="card-body">
+                    <div class="alert alert-light border py-2 mb-3 small">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Webhook 订阅为 <b>全站共享</b>（不受顶部「当前站点」影响）；
+                        列表<b>不回显密钥明文</b>，只显示是否已设置。
+                        {if condition="$webhookInstalled !== true"}
+                        <div class="text-danger mt-1">
+                            <i class="bi bi-exclamation-triangle me-1"></i>
+                            <b>未检测到 wise-webhook 包</b>：投递会被静默短路，下方订阅<b>不会真正发送</b>。
+                        </div>
+                        {/if}
+                        {if condition="$webhookMode === 'queue'"}
+                        <div class="text-danger mt-1">
+                            <i class="bi bi-exclamation-triangle me-1"></i>
+                            投递模式为 <code>queue</code>：必须部署队列 worker
+                            （<code>php think queue:work</code>），否则事件只入队、<b>永远不投递</b>。
+                        </div>
+                        {/if}
+                    </div>
+
+                    <div id="toolbar" class="toolbar"></div>
+                    <table id="table"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/webhook.js（由 wsconfig.js 自动加载） -->
+{/block}

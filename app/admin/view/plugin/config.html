@@ -1,0 +1,64 @@
+{extend name="public/base" /}
+
+{block name="title"}插件配置 - {$plugin.display_name|default=$plugin.name|default=''}{/block}
+
+{block name="css"}
+<style>
+    /* iframe 弹窗内无需外层容器的留白，按弹窗尺寸紧凑排布 */
+    body { padding-bottom: 1rem; }
+    .config-form { padding: 1rem 1.25rem; }
+    .config-group-title {
+        font-size: .95rem;
+        font-weight: 600;
+        padding-bottom: .5rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid var(--bs-border-color);
+    }
+    .config-form .col-form-label { font-weight: 500; }
+    /* 分组 Tab：弹层内横向滚动，避免分组多时折行挤压内容 */
+    .config-tabs { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; }
+    .config-tabs .nav-link { white-space: nowrap; }
+    .config-tabs .nav-link .badge { font-weight: 400; opacity: .75; }
+    .config-tab-content { padding-top: .25rem; }
+    /* 末行的下边距由 pane 承担，避免切换分组后底部多出空白 */
+    .config-tab-content > .tab-pane > .row:last-child { margin-bottom: 0; }
+    .config-empty { padding: 3rem 1rem; text-align: center; }
+</style>
+{/block}
+
+{block name="content"}
+<body>
+<div class="app-main container-fluid">
+    {include file="public/index_header" /}
+
+    <div class="config-form">
+        {if empty($schema)}
+        <div class="config-empty">
+            <i class="bi bi-inbox" style="font-size:2.5rem;opacity:.35;"></i>
+            <p class="mt-3 mb-0 text-muted">该插件未在 manifest.json 中声明任何配置项。</p>
+        </div>
+        {else}
+
+        <!-- {/*
+            前端契约（public/statics/admin/plugin.js:264-293）：
+              1. iframe 中必须有且仅有一个 form 元素 —— plugin.js:269 用
+                 querySelector('form') 抓取，若缺失会直接关闭弹窗。
+              2. 字段名统一为 config[key] 形式 —— plugin.js:272 用 serialize() 序列化。
+              3. CSRF：serialize() 会带上表单内的 token 隐藏域，
+                 因此无需修改前端 JS 即可通过 VerifyCsrfToken 校验。
+                 这里用 csrf_field() 而非 {\$__csrf__}：后者由中间件注入，
+                 中间件未执行时会为空，导致提交空 token 被拦截。
+                 注意 VerifyCsrfToken 在每次写请求成功后会轮换 token，
+                 故连续多次保存需重新打开弹窗（属既有架构行为）。
+        */} -->
+        <form id="plugin-config-form" method="post" action="{:url('admin/plugin/config', [], false)}">
+            {:csrf_field()}
+            <input type="hidden" name="name" value="{$plugin_ident|default=''}">
+
+            {$form_html|raw}
+        </form>
+
+        {/if}
+    </div>
+</div>
+{/block}

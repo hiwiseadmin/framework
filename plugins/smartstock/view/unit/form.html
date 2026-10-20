@@ -1,0 +1,37 @@
+<!-- 计量单位 新增/编辑 模态框片段 -->
+<div class="modal fade" id="unit-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="form-title">新增单位</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+            </div>
+            <form id="unit-form" class="modal-body row g-3">
+                <input type="hidden" name="id" id="form-id" value="0">
+                <div class="col-md-12">
+                    <label class="form-label">单位名称 <span class="text-danger">*</span></label>
+                    <input type="text" name="name" id="form-name" class="form-control" placeholder="如：个、箱、公斤"
+                           data-validation="required|maxLength:50"
+                           data-validation-message-required="请填写单位名称"
+                           data-validation-message-maxLength="单位名称不能超过 50 个字符">
+                    <div class="invalid-feedback"><span class="validation-text"></span></div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">排序</label>
+                    <input type="number" name="sort_order" id="form-sort" class="form-control" value="0">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">状态</label>
+                    <select name="status" id="form-status" class="form-select">
+                        <option value="1">启用</option>
+                        <option value="0">禁用</option>
+                    </select>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" form="unit-form" class="btn btn-primary"><i class="bi bi-check-lg"></i> 保存</button>
+            </div>
+        </div>
+    </div>
+</div>

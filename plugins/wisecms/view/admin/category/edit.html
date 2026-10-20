@@ -1,0 +1,81 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}编辑栏目{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-pencil-square" caption="编辑栏目" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <form id="categoryForm" method="post" action="{:plugin_url('wisecms/category/edit')}">
+                    {:csrf_field()}
+                    <input id="cms-f-id" type="hidden" name="id" value="{$category.id}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-parent_id">上级栏目</label>
+                            <select id="cms-f-parent_id" name="parent_id" class="form-select">
+                                <option value="0">顶级栏目</option>
+                                {foreach $parentOptions as $opt}
+                                <option value="{$opt.id}" {if $category.parent_id == $opt.id}selected{/if}>{$opt.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-name">栏目名称 <span class="text-danger">*</span></label>
+                            <input id="cms-f-name" type="text" name="name" class="form-control" required maxlength="50" value="{$category.name}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-alias">别名（URL）</label>
+                            <input id="cms-f-alias" type="text" name="alias" class="form-control" maxlength="50" value="{$category.alias}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-type">栏目类型</label>
+                            <select id="cms-f-type" name="type" class="form-select">
+                                <option value="0" {if $category.type == 0}selected{/if}>内部栏目</option>
+                                <option value="1" {if $category.type == 1}selected{/if}>单页</option>
+                                <option value="2" {if $category.type == 2}selected{/if}>外部链接</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-model_id">绑定内容模型</label>
+                            <select id="cms-f-model_id" name="model_id" class="form-select">
+                                <option value="0">不绑定</option>
+                                {foreach $modelOptions as $m}
+                                <option value="{$m.id}" {if $category.model_id == $m.id}selected{/if}>{$m.title}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-url">外链地址</label>
+                            <input id="cms-f-url" type="text" name="url" class="form-control" maxlength="255" value="{$category.url}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-sort">排序</label>
+                            <input id="cms-f-sort" type="number" name="sort" class="form-control" value="{$category.sort|default=0}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-status">状态</label>
+                            <select id="cms-f-status" name="status" class="form-select">
+                                <option value="1" {if $category.status == 1}selected{/if}>启用</option>
+                                <option value="0" {if $category.status == 0}selected{/if}>禁用</option>
+                            </select>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label" for="cms-f-description">栏目描述</label>
+                            <textarea id="cms-f-description" name="description" class="form-control" rows="3" maxlength="500">{$category.description}</textarea>
+                        </div>
+                    </div>
+                    <div class="cms-form-actions">
+                        <a href="{:plugin_url('wisecms/category/index')}" class="btn btn-outline-secondary btn-sm cms-form-actions-secondary">返回</a>
+                        <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 零内联脚本：提交逻辑由 js/category.js 的 edit() 方法（cmsFormPage）接管 -->
+{/block}

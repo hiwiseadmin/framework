@@ -1,0 +1,114 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}赛季管理{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-trophy" caption="赛季管理" buttongroup="" /}
+    <div class="plugin-match3game">
+        <div class="container-fluid p-0">
+
+            <div class="alert alert-secondary py-2 small">
+                赛季周期 <b>2 周</b>；段位 6 档（青铜→王者）；负分<b>不降段</b>（不低于当前段位下限）。
+                积分：胜 +25（分差&gt;20% 则 +30）/ 负 -15 / 超时 -20 / 每日首胜额外 +10。
+                当前进行中：<b>{$current.season_id}</b>（{$current.start_at} → {$current.end_at}）
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <form class="row g-2 mb-3" id="search-form">
+                        <div class="col-md-3">
+                            <select class="form-select form-select-sm" id="search-status">
+                                <option value="">全部状态</option>
+                                {foreach $status as $k => $v}
+                                <option value="{$k}">{$v}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm" id="btn-search"><i class="bi bi-search"></i> 搜索</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-reset"><i class="bi bi-arrow-clockwise"></i> 重置</button>
+                            <button type="button" class="btn btn-outline-warning btn-sm" id="btn-switch"><i class="bi bi-arrow-left-right"></i> 结算并切换赛季</button>
+                        </div>
+                    </form>
+
+                    <div id="toolbar" class="toolbar mb-2"></div>
+                    <table id="table"></table>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header"><i class="bi bi-list-stars"></i> 段位与奖励</div>
+                <div class="card-body p-0">
+                    <table class="table table-sm mb-0">
+                        <thead>
+                        <tr><th>段位</th><th>积分区间</th><th>金币</th><th>道具</th><th>外观</th></tr>
+                        </thead>
+                        <tbody>
+                        {foreach $tiers as $t}
+                        <tr>
+                            <td>{$t.name} <code>{$t.tier}</code></td>
+                            <td>{$t.min} ~ {$t.max ?? '∞'}</td>
+                            <td>{$t.rewards.coin ?? 0}</td>
+                            <td>{:json_encode($t.rewards.props ?? [], JSON_UNESCAPED_UNICODE)}</td>
+                            <td>{:implode('、', $t.rewards.cosmetics ?? [])}</td>
+                        </tr>
+                        {/foreach}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="season-modal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="season-form-title">赛季</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="season-form">
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="season-form-id" value="0">
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <label class="form-label">赛季 ID</label>
+                            <input type="text" name="season_id" id="season-form-season-id" class="form-control form-control-sm" placeholder="S2026-01">
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">名称</label>
+                            <input type="text" name="name" id="season-form-name" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">开始时间</label>
+                            <input type="datetime-local" name="start_at" id="season-form-start" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">结束时间</label>
+                            <input type="datetime-local" name="end_at" id="season-form-end" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">状态</label>
+                            <select name="status" id="season-form-status" class="form-select form-select-sm">
+                                {foreach $status as $k => $v}
+                                <option value="{$k}">{$v}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">段位奖励配置（JSON）</label>
+                            <textarea name="reward_conf" id="season-form-reward" class="form-control form-control-sm" rows="8"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{/block}

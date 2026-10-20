@@ -1,0 +1,12 @@
+{extend name="public/base" /}
+
+{block name="title"}{$crudTitle}{/block}
+
+{block name="content"}
+<body>
+<div class="app-main container-fluid">
+    {include file="public/index_header" /}
+    <div id="toolbar" class="toolbar"></div>
+    <table id="table"></table>
+</div>
+{/block}

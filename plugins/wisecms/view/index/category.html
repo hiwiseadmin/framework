@@ -1,0 +1,52 @@
+{extend name="index/layout" /}
+
+{block name="title"}{$category.name} - {$cms.site_name}{/block}
+{block name="meta"}
+<meta name="keywords" content="{$category.seo_keywords|default=$category.name}">
+<meta name="description" content="{$category.seo_description|default=$category.description}">
+{/block}
+
+{block name="main"}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb small">
+        <li class="breadcrumb-item"><a href="{$cms.home_url}">首页</a></li>
+        <li class="breadcrumb-item active">{$category.name}</li>
+    </ol>
+</nav>
+
+<div class="cms-card p-3 mb-4">
+    <h4 class="mb-1">{$category.name}</h4>
+    {if condition="!empty($category['description'])"}
+    <p class="cms-desc mb-0">{$category.description}</p>
+    {/if}
+</div>
+
+<div class="cms-card p-3">
+    {empty name="list.data"}
+    <p class="text-muted py-4 text-center mb-0">该栏目下暂无内容。</p>
+    {else /}
+    {foreach $list.data as $item}
+    <div class="d-flex gap-3 py-3 border-bottom">
+        {if condition="!empty($item['thumb'])"}
+        <img class="cms-thumb" src="{$item.thumb}" alt="{$item.title}">
+        {/if}
+        <div class="flex-grow-1">
+            <a class="cms-title fw-bold d-block mb-1"
+               href="{$item.url|default=''}">{$item.title}</a>
+            <div class="cms-desc mb-2">{$item.description|default=''|mb_substr=0,80}</div>
+            <div class="cms-meta">
+                <span>{:substr($item.create_time, 0, 10)}</span>
+                <span class="mx-2">·</span>
+                <span>{$item.view_count} 次浏览</span>
+                {if condition="!empty($item['is_top'])"}
+                <span class="badge bg-danger ms-2">置顶</span>
+                {/if}
+            </div>
+        </div>
+    </div>
+    {/foreach}
+    {/empty}
+
+    {include file="index/pager" /}
+</div>
+{/block}

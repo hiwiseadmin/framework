@@ -1,0 +1,32 @@
+<?php
+declare(strict_types=1);
+
+namespace plugin\{$name}\model;
+
+use plugin\BaseModel;
+
+/**
+ * {$name} 示例模型
+ *
+ * 约定：
+ *   1. 继承 plugin\BaseModel（而非 think\Model），以获得框架统一能力；
+ *   2. $name 需带插件前缀：{$name}_example —— 与迁移文件中的表名保持一致，
+ *      避免多个插件表名相撞。
+ */
+class Example extends BaseModel
+{
+    protected $name = '{$name}_example';
+
+    protected $autoWriteTimestamp = true;
+    protected $createTime = 'create_time';
+    protected $updateTime = 'update_time';
+
+    protected $schema = [
+        'id'          => 'int',
+        'title'       => 'string',
+        'content'     => 'string',
+        'status'      => 'int',
+        'create_time' => 'datetime',
+        'update_time' => 'datetime',
+    ];
+}

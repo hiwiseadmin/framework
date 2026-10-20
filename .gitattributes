@@ -1,0 +1,15 @@
+# composer dist / git archive 打包时排除的内容
+# 说明：statics 下的构建产物与 sourcemap 不在排除范围内，
+# 它们是使用方 composer 安装后开箱即用的前提。
+
+# 换行策略：统一入库为 LF，避免 dist 中出现 CRLF
+* text=auto
+
+/node_modules/      export-ignore
+/runtime/           export-ignore
+/.codebuddy/        export-ignore
+/.workbuddy/        export-ignore
+/tests/             export-ignore
+/docs/              export-ignore
+/composer.lock      export-ignore
+*.log               export-ignore

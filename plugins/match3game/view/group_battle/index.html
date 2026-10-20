@@ -1,0 +1,55 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}群擂台{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-people-fill" caption="群擂台周期" buttongroup="" /}
+    <div class="plugin-match3game">
+        <div class="container-fluid p-0">
+
+            <div class="alert alert-info py-2 small">
+                周期每周一 00:00 刷新；全群统一 seed；计分 = 群内 <b>Top{$rules.topN}</b> 累加；
+                个人每关每日 <b>{$rules.dailyPlays}</b> 次；群间排名每日 02:00 重算。
+                <br>
+                <b>合规</b>：本表只存<b>加密群标识</b>（openGId），不存在明文群名 —— 页面也不提供填写群名的入口。
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <form class="row g-2 mb-3" id="search-form">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control form-control-sm" id="search-period" placeholder="周期 2026-W37" value="{$periodId}">
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control form-control-sm" id="search-group" placeholder="加密群标识（模糊）">
+                        </div>
+                        <div class="col-md-5">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm" id="btn-search"><i class="bi bi-search"></i> 搜索</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-reset"><i class="bi bi-arrow-clockwise"></i> 重置</button>
+                            <button type="button" class="btn btn-outline-warning btn-sm" id="btn-recalc"><i class="bi bi-calculator"></i> 重算本期排名</button>
+                        </div>
+                    </form>
+
+                    <div id="toolbar" class="toolbar mb-2"></div>
+                    <table id="table"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="members-modal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">群成员明细（Top{$rules.topN} 计入总分）</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="members-body">
+                <div class="text-muted small">加载中…</div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

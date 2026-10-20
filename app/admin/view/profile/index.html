@@ -1,0 +1,534 @@
+{extend name="public/base" /}
+
+{block name="title"}会员管理{/block}
+
+{block name="css"}
+<link rel="stylesheet" href="/statics/js/cropperjs/1.5.12/cropper.min.css">
+<style>
+.profile-container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 15px;
+}
+
+.profile-card {
+    background-color: var(--bs-secondary-bg);
+    border-radius: var(--bs-border-radius);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.profile-header {
+    background: linear-gradient(135deg, var(--bs-primary), var(--bs-secondary));
+    color: white;
+    padding: 30px 30px 100px;
+    position: relative;
+}
+
+.profile-avatar {
+    position: absolute;
+    bottom: -60px;
+    left: 30px;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 5px solid white;
+    background-color: white;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-upload {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: var(--bs-secondary-color);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.profile-avatar:hover .avatar-upload, .avatar-upload:hover {
+    background-color: var(--bs-primary);
+    transform: scale(1.1);
+}
+
+.profile-info {
+    padding: 40px 30px 30px;
+    margin-top: 80px;
+}
+
+.profile-name {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.profile-email {
+    color: var(--bs-secondary-color);
+    margin-bottom: 20px;
+}
+
+.info-section {
+    margin-bottom: 30px;
+}
+
+.section-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--bs-primary);
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.info-item {
+    display: flex;
+    margin-bottom: 12px;
+    align-items: center;
+}
+
+.info-label {
+    min-width: 120px;
+    font-weight: 600;
+    color: var(--bs-body-color);
+}
+
+.info-value {
+    color: var(--bs-secondary-color);
+    flex-grow: 1;
+}
+
+.btn-edit {
+    background-color: var(--bs-primary);
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 5px;
+    transition: all 0.3s;
+}
+
+.btn-edit:hover {
+    background-color: var(--bs-secondary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.stats-card {
+    background-color: var(--bs-secondary-bg);
+    border-radius: var(--bs-border-radius);
+    padding: 20px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    height: 100%;
+    transition: transform 0.3s;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+}
+
+.stats-icon {
+    font-size: 2.5rem;
+    color: var(--bs-primary);
+    margin-bottom: 15px;
+}
+
+.stats-number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--bs-body-color);
+}
+
+.stats-label {
+    color: var(--bs-secondary-text-emphasis);
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .profile-header {
+        padding: 20px 20px 80px;
+    }
+    
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        bottom: -50px;
+        left: 20px;
+    }
+    
+    .profile-info {
+        padding: 30px 20px 20px;
+        margin-top: 60px;
+    }
+    
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .info-label {
+        margin-bottom: 5px;
+    }
+}
+</style>
+{include file="profile/avatar_upload_style" /}
+{/block}
+
+{block name="content"}
+<body>
+    <div class="profile-container">
+        <!-- 页面标题 -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 fw-bold text-primary">
+                <i class="bi bi-person-circle me-2"></i>个人资料
+            </h1>
+            <div class="d-flex">
+                <button type="button" class="btn btn-outline-primary me-2" id="refreshBtn">
+                    <i class="bi bi-arrow-clockwise me-1"></i>刷新
+                </button>
+                <button type="button" class="btn btn-primary" id="editProfileBtn">
+                    <i class="bi bi-pencil-square me-1"></i>编辑资料
+                </button>
+            </div>
+        </div>
+        
+        <!-- 消息提示 -->
+        <div id="messageContainer" style="display: none;">
+            <div class="alert alert-dismissible fade show" role="alert">
+                <span id="messageText"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- 左侧个人信息 -->
+            <div class="col-lg-8">
+                <div class="profile-card">
+                    <!-- 头部区域 -->
+                    <div class="profile-header">
+                        <h2 class="h4">个人信息</h2>
+                        <p class="mb-0">管理您的个人资料和联系方式</p>
+                        
+                        <!-- 头像 -->
+                        <div class="profile-avatar">
+                            <img src="{$admin.avatar|default='/statics/images/avatar/default_avatar.jpg'}" alt="用户头像" id="avatarImg">
+                            <div class="avatar-upload" id="avatarUploadBtn" title="更换头像">
+                                <i class="bi bi-camera"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 个人信息 -->
+                    <div class="profile-info">
+                        <div class="row mb-4">
+                            <div class="col-md">
+                                <h3 class="profile-name" id="usernameDisplay">{$admin.username}</h3>
+                                <p class="profile-email" id="emailDisplay">
+                                    <i class="bi bi-envelope me-1"></i>{$admin.email}
+                                </p>
+                            </div>
+                            <div class="col-md-auto text-md-end">
+                                <span class="badge bg-primary px-3 py-2">
+                                    <i class="bi bi-calendar-check me-1"></i>注册于 {$admin.create_time}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <!-- 基本信息 -->
+                            <div class="col-md-6 info-section">
+                                <h4 class="section-title">
+                                    <i class="bi bi-info-circle me-2"></i>基本信息
+                                </h4>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-person me-1"></i>用户名
+                                    </div>
+                                    <div class="info-value" id="usernameValue">{$admin.username}</div>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-gender-ambiguous me-1"></i>性别
+                                    </div>
+                                    <div class="info-value" id="genderValue">
+                                        {if $admin.gender == 'male'}
+                                            男
+                                        {elseif $admin.gender == 'female'}
+                                            女
+                                        {else}
+                                            保密
+                                        {/if}
+                                    </div>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-calendar me-1"></i>生日
+                                    </div>
+                                    <div class="info-value" id="birthdayValue">{$admin.birthday|default='未填写'}</div>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-geo-alt me-1"></i>所在地
+                                    </div>
+                                    <div class="info-value" id="locationValue">{$admin.location|default='未填写'}</div>
+                                </div>
+                            </div>
+                            
+                            <!-- 联系信息 -->
+                            <div class="col-md-6 info-section">
+                                <h4 class="section-title">
+                                    <i class="bi bi-telephone me-2"></i>联系信息
+                                </h4>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-envelope me-1"></i>邮箱
+                                    </div>
+                                    <div class="info-value" id="emailValue">{$admin.email}</div>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-phone me-1"></i>手机号
+                                    </div>
+                                    <div class="info-value" id="phoneValue">{$admin.mobile|default='未填写'}</div>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-link-45deg me-1"></i>个人网站
+                                    </div>
+                                    <div class="info-value" id="websiteValue">
+                                        <a href="{$admin.website|default='#'}" target="_blank">{$admin.website|default='未填写'}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 个人简介 -->
+                        <div class="info-section">
+                            <h4 class="section-title">
+                                <i class="bi bi-card-text me-2"></i>个人简介
+                            </h4>
+                            <div class="p-3 rounded" id="bioValue">{$admin.bio|default='未填写'}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧统计信息 -->
+            <div class="col-lg-4">
+                <!-- 修改密码 -->
+                <div class="profile-card p-4 mb-4">
+                    <h5 class="section-title mb-3">
+                        <i class="bi bi-shield-lock me-2"></i>账户安全
+                    </h5>
+                    <p class="text-muted small mb-3">定期修改密码可以提高账户安全性</p>
+                    <button type="button" class="btn btn-outline-primary w-100" id="changePasswordBtn">
+                        <i class="bi bi-key me-1"></i>修改密码
+                    </button>
+                </div>
+
+                <!-- 统计信息 -->
+                <div class="row mb-4">
+                    <div class="col-md-6 col-lg-12 mb-3">
+                        <div class="stats-card">
+                            <div class="stats-icon">
+                                <i class="bi bi-calendar-event"></i>
+                            </div>
+                            <div class="stats-number">3年</div>
+                            <div class="stats-label">注册时间</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-12 mb-3">
+                        <div class="stats-card">
+                            <div class="stats-icon">
+                                <i class="bi bi-file-text"></i>
+                            </div>
+                            <div class="stats-number">127</div>
+                            <div class="stats-label">发布文章</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-12 mb-3">
+                        <div class="stats-card">
+                            <div class="stats-icon">
+                                <i class="bi bi-chat-dots"></i>
+                            </div>
+                            <div class="stats-number">342</div>
+                            <div class="stats-label">评论数量</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-12 mb-3">
+                        <div class="stats-card">
+                            <div class="stats-icon">
+                                <i class="bi bi-hand-thumbs-up"></i>
+                            </div>
+                            <div class="stats-number">1,208</div>
+                            <div class="stats-label">获得点赞</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 编辑资料模态框 -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">编辑个人资料</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="profileForm" class="ws-form needs-validation" novalidate>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editUsername" class="form-label">用户名 *</label>
+                                <input type="text" class="form-control" id="editUsername" value="{$admin.username}" disabled>
+                                <div class="form-text">用户名禁止修改</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editEmail" class="form-label">邮箱 *</label>
+                                <input type="email" class="form-control" id="editEmail" name="email" value="{$admin.email|default=''} " required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editPhone" class="form-label">手机号 *</label>
+                                <input type="tel" class="form-control" id="editPhone" name="phone" value="{$admin.phone|default=''} " required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editGender" class="form-label">性别</label>
+                                <select class="form-select" id="editGender" name="gender">
+                                    <option value="male" {$admin.gender == 'male' ? 'selected' : ''}>男</option>
+                                    <option value="female" {$admin.gender == 'female' ? 'selected' : ''}>女</option>
+                                    <option value="secret" {$admin.gender == 'secret' ? 'selected' : ''}>保密</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editBirthday" class="form-label">生日</label>
+                                <input type="date" class="form-control" id="editBirthday" name="birthday" value="{$admin.birthday|default=''}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editLocation" class="form-label">所在地</label>
+                                <input type="text" class="form-control" id="editLocation" name="location" placeholder="例如：北京市海淀区">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editWebsite" class="form-label">个人网站</label>
+                            <input type="url" class="form-control" id="editWebsite" name="website" placeholder="https://" value="{$admin.website|default=''}">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editBio" class="form-label">个人简介</label>
+                            <textarea class="form-control" id="editBio" name="bio" rows="4" placeholder="介绍一下自己...">{$admin.bio|default=''}</textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-primary" id="saveProfileBtn">保存更改</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 修改密码模态框 -->
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">修改密码</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="passwordForm" class="ws-form needs-validation" novalidate>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="oldPassword" class="form-label">原密码 *</label>
+                            <input type="password" class="form-control" id="oldPassword" name="old_password" placeholder="请输入原始密码"
+                                data-validation="required|minLength:6|maxLength:30" 
+                                data-validation-message-required="请输入用户原始密码"
+                                data-validation-message-minLength="密码至少需要6个字符"
+                                data-validation-message-maxLength="密码不能超过30个字符">
+                            <div class="invalid-feedback">
+                                <i class="bi bi-exclamation-circle validation-icon"></i>
+                                <span class="validation-text"></span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label">新密码 *</label>
+                            <input type="password" class="form-control" id="newPassword" name="new_password" placeholder="请输入新密码"
+                                data-validation="required|passwordStrength:8,letter,digit" 
+                                data-validation-message-required="请输入用户新密码">
+                            <div id="newPasswordStrength" class="password-strength"></div>
+                            <div class="invalid-feedback">
+                                <i class="bi bi-exclamation-circle validation-icon"></i>
+                                <span class="validation-text"></span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">确认新密码 *</label>
+                            <input type="password" class="form-control" id="confirmPassword" name="confirm_password" placeholder="请再次输入新密码"
+                                data-validation="required|confirmPassword:newPassword" 
+                                data-validation-message-required="请确认用户新密码"
+                                data-validation-message-confirmPassword="两次输入的密码不一致">
+                            <div class="invalid-feedback">
+                                <i class="bi bi-exclamation-circle validation-icon"></i>
+                                <span class="validation-text">两次输入密码保持一致</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-primary">确认修改</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {include file="profile/avatar_upload" /}
+{/block}

@@ -1,0 +1,27 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}邮件订阅{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-envelope-paper" caption="邮件订阅" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <div class="alert alert-light border py-2 mb-3 small">
+                    <i class="bi bi-info-circle me-1"></i>
+                    邮箱默认<b>脱敏显示</b>（<code>ab***@example.com</code>），点行内
+                    <i class="bi bi-clipboard"></i> 复制完整地址；
+                    勾选后可<b>批量删除</b>，工具栏可<b>导出 CSV</b>（订阅是个人信息，请按最小必要原则处理）。
+                </div>
+
+                <div id="toolbar" class="toolbar"></div>
+                <table id="table"></table>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/newsletter.js（由 wsconfig.js 自动加载） -->
+{/block}

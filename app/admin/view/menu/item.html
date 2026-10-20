@@ -1,0 +1,61 @@
+<!-- 菜单项模板 -->
+<div class="menu-item" data-id="{$menu.id}">
+    <!-- 拖拽手柄 -->
+    <div class="menu-handle">
+        <i class="fa fa-bars"></i>
+    </div>
+    
+    <!-- 层级指示器 -->
+    {if $level > 0}
+        {for start="1" end="$level"}
+            <span class="menu-level-indicator">│</span>
+        {/for}
+        <span class="menu-level-indicator">├─</span>
+    {/if}
+    
+    <!-- 菜单图标 -->
+    {if $menu.icon}
+        <div class="menu-icon"><i class="fa {$menu.icon}"></i></div>
+    {else/}
+        <div class="menu-icon"><i class="fa fa-circle-o"></i></div>
+    {/if}
+    
+    <!-- 菜单名称 -->
+    <div class="menu-name">
+        {$menu.name}
+        {if $menu.status == 0}
+            <span class="badge badge-danger ml-2">禁用</span>
+        {/if}
+        {if $menu.is_show == 0}
+            <span class="badge badge-secondary ml-2">隐藏</span>
+        {/if}
+    </div>
+    
+    <!-- 操作按钮 -->
+    <div class="menu-actions">
+        {if $menu.children}
+            <button type="button" class="btn btn-xs btn-outline-secondary" onclick="toggleChildren({$menu.id})">
+                <i class="fa fa-angle-down" id="toggleIcon_{$menu.id}"></i>
+            </button>
+        {/if}
+        <button type="button" class="btn btn-xs btn-outline-success" data-toggle="modal" data-target="#menuModal" data-action="add" data-id="0" data-parent-id="{$menu.id}">
+            <i class="fa fa-plus"></i>
+        </button>
+        <button type="button" class="btn btn-xs btn-outline-primary" data-toggle="modal" data-target="#menuModal" data-action="edit" data-id="{$menu.id}">
+            <i class="fa fa-edit"></i>
+        </button>
+        <button type="button" class="btn btn-xs btn-outline-danger" onclick="showDeleteModal({$menu.id})">
+            <i class="fa fa-trash"></i>
+        </button>
+    </div>
+    
+    <!-- 子菜单容器 -->
+    {if $menu.children}
+        <div class="menu-children ml-4" id="children_{$menu.id}">
+            {volist name="menu.children" id="child"}
+                {include file="menu/item" menu="$child" level="$level+1" /}
+            {/volist}
+        </div>
+    {/if}
+</div>
+    

@@ -1,0 +1,93 @@
+<!--
+  侧栏导航片段（被 index/layout.html 默认引入，各页面可覆盖 sidebar 块）
+
+  约定变量：
+    $categoryTree        分类树（含 children）
+    $activeCategoryId    当前高亮的分类 id（由控制器 assign，缺失时视为 0）
+    $sidebarCategoryBase 可选：分类链接的基地址（默认首页；搜索页传搜索地址）
+    $sidebarCategoryQuery 可选：分类链接附加查询串（搜索页用于保留关键词）
+    $categoryDocs        可选：当前分类下的文档列表（详情页传入）
+    $currentCategoryName 可选：上述列表的标题
+-->
+<div class="wd-sidebar-group">
+    <p class="wd-sidebar-group__title">文档导航</p>
+    <ul class="wd-sidebar-list">
+        <li class="wd-sidebar-item">
+            <div class="wd-sidebar-item__row">
+                <a class="wd-sidebar-link{if empty($activeCategoryId)} active{/if}"
+                   href="/plugin/wisedocs/index/index">
+                    <i class="bi bi-grid"></i>全部文档
+                </a>
+            </div>
+        </li>
+    </ul>
+</div>
+
+{if !empty($categoryTree)}
+<div class="wd-sidebar-group">
+    <p class="wd-sidebar-group__title">分类导航</p>
+    <ul class="wd-sidebar-list">
+        {volist name="categoryTree" id="cat"}
+        <li class="wd-sidebar-item has-children" data-open="true">
+            <div class="wd-sidebar-item__row">
+                <a class="wd-sidebar-link{if !empty($activeCategoryId) && $activeCategoryId == $cat.id} active{/if}"
+                   href="{$sidebarCategoryBase|default='/plugin/wisedocs/index/index'}?category_id={$cat.id}{$sidebarCategoryQuery|default=''}"
+                   title="{$cat.name}">
+                    <i class="bi {$cat.icon|default='bi-folder'}"></i>{$cat.name}
+                </a>
+                {if !empty($cat.children)}
+                <button class="wd-sidebar-toggle" type="button" aria-expanded="true"
+                        aria-label="折叠 {$cat.name}"><i class="bi bi-chevron-right"></i></button>
+                {/if}
+            </div>
+            {if !empty($cat.children)}
+            <ul class="wd-sidebar-sub">
+                {volist name="cat.children" id="child"}
+                <li class="wd-sidebar-item{if !empty($child.children)} has-children{/if}" data-open="true">
+                    <div class="wd-sidebar-item__row">
+                        <a class="wd-sidebar-link{if !empty($activeCategoryId) && $activeCategoryId == $child.id} active{/if}"
+                           href="{$sidebarCategoryBase|default='/plugin/wisedocs/index/index'}?category_id={$child.id}{$sidebarCategoryQuery|default=''}"
+                           title="{$child.name}">{$child.name}</a>
+                        {if !empty($child.children)}
+                        <button class="wd-sidebar-toggle" type="button" aria-expanded="true"
+                                aria-label="折叠 {$child.name}"><i class="bi bi-chevron-right"></i></button>
+                        {/if}
+                    </div>
+                    {if !empty($child.children)}
+                    <ul class="wd-sidebar-sub">
+                        {volist name="child.children" id="grand"}
+                        <li class="wd-sidebar-item">
+                            <div class="wd-sidebar-item__row">
+                                <a class="wd-sidebar-link{if !empty($activeCategoryId) && $activeCategoryId == $grand.id} active{/if}"
+                                   href="{$sidebarCategoryBase|default='/plugin/wisedocs/index/index'}?category_id={$grand.id}{$sidebarCategoryQuery|default=''}"
+                                   title="{$grand.name}">{$grand.name}</a>
+                            </div>
+                        </li>
+                        {/volist}
+                    </ul>
+                    {/if}
+                </li>
+                {/volist}
+            </ul>
+            {/if}
+        </li>
+        {/volist}
+    </ul>
+</div>
+{/if}
+
+{if !empty($categoryDocs)}
+<div class="wd-sidebar-group">
+    <p class="wd-sidebar-group__title">{$currentCategoryName|default='本章文档'}</p>
+    <ul class="wd-sidebar-list wd-sidebar-docs">
+        {volist name="categoryDocs" id="item"}
+        <li class="wd-sidebar-item">
+            <div class="wd-sidebar-item__row">
+                <a class="wd-sidebar-link{if !empty($document) && $item.id == $document.id} active{/if}"
+                   href="/plugin/wisedocs/index/detail?slug={$item.slug}" title="{$item.title}">{$item.title}</a>
+            </div>
+        </li>
+        {/volist}
+    </ul>
+</div>
+{/if}

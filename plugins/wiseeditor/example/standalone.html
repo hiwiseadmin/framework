@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-CN" data-bs-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WiseEditor 示例 · 直开版（双击即可测）</title>
+
+    <!--
+      ============================================================
+      直开版：把浏览器地址栏当成 `file:///.../example/standalone.html` 也能跑。
+      与 index/markdown/api 三个「线上形态」示例页的区别只有两处：
+
+        1. 资源路径全部改成**相对路径**（/statics/... 在 file:// 下会落到磁盘根）；
+        2. 脚本全部改成 **classic 脚本**（file:// 下 <script type="module"> 会被
+           浏览器按 CORS 拦掉，模块永远不执行）；
+        3. 引擎 bundle 内联进单文件 —— 它是 ES module（带 export），file:// 下
+           经典、动态两种加载方式都用不了，只能一起打包。
+
+      组件片段本身与线上逐字一致 —— 服务端 TipTapDriver::renderHtml() 输出的
+      就是下面这种 div + 隐藏域，直接拷进模板即可。
+
+      唯一的外部依赖产物：./dist/wiseeditor.example.js（npm run build:editor 生成，
+      已内联引擎与适配器，故本页只需再引一个自己的交互脚本。）
+      改了 plugins/wiseeditor/statics/js/*.js 之后必须重跑 build:editor，否则本页用的是旧代码。
+      ============================================================
+    -->
+
+    <!-- 图标字体（工具栏按钮靠它显示）。宿主级静态资源，不在插件目录内，故用相对路径回上一层再进 public/ -->
+    <link rel="stylesheet" href="../../../public/statics/libs/bootstrap-icons/bootstrap-icons.css">
+    <!-- 编辑器样式：插件源码目录，与线上同一份 -->
+    <link rel="stylesheet" href="../statics/css/wiseeditor.css">
+    <link rel="stylesheet" href="../statics/css/milkdown-theme.css">
+    <!-- Markdown 预览栏的样式（.ws-md 作用域）。JS 已内联进 dist/，样式仍需单独引 -->
+    <link rel="stylesheet" href="../../../public/statics/libs/ws-markdown/ws-markdown.css">
+    <link rel="stylesheet" href="./example.css">
+</head>
+<body>
+    <header class="ex-head">
+        <h1>WiseEditor 示例 · 直开版</h1>
+        <nav class="ex-nav">
+            <span>双击本文件即可运行，无需起服务</span>
+        </nav>
+    </header>
+
+    <p class="hint">
+        富文本 / 只读 / Markdown 三种形态 + 全部实例 API 都在这一个页面上。<br>
+        引擎与适配器全部内联在 <code>./dist/wiseeditor.example.js</code> 里 ——
+        它是 <code>wiseeditor-init.js</code>（线上同一个入口）的 classic 打包版，
+        所以这里跑的就是线上那套代码，差别只在加载方式。<br>
+        图片上传按钮<span style="color:#d97706">不会真的上传</span>：<code>data-upload-url</code>
+        指向后台真实接口，而 file:// 下没有 PHP。要试上传请把片段放进真实后台页面。
+    </p>
+
+    <form id="demoForm">
+        <div class="field">
+            <label>富文本 <code>data-editor-type="tiptap" data-mode="richtext"</code> · full 工具栏</label>
+            <div id="editor_content" class="wiseeditor-container" style="height:260px"
+                 data-editor="wiseeditor" data-editor-type="tiptap" data-mode="richtext"
+                 data-name="content" data-upload-url="/admin/attachment/upload"
+                 data-placeholder="请输入内容…"></div>
+            <input type="hidden" name="content" id="editor_content_input"
+                   value="&lt;p&gt;Hello &lt;strong&gt;world&lt;/strong&gt;&lt;/p&gt;">
+        </div>
+
+        <div class="field">
+            <label>只读 <code>data-readonly="true"</code> · 不渲染工具栏、不可编辑</label>
+            <div id="editor_ro" class="wiseeditor-container" style="height:110px"
+                 data-editor="wiseeditor" data-editor-type="tiptap" data-mode="richtext"
+                 data-name="ro" data-readonly="true"></div>
+            <input type="hidden" name="ro" id="editor_ro_input"
+                   value="&lt;p&gt;只读内容：&lt;em&gt;仅渲染，不可编辑&lt;/em&gt;&lt;/p&gt;">
+        </div>
+
+        <div class="field">
+            <label>Markdown <code>data-editor-type="milkdown" data-mode="markdown"</code> · 表单字段是 textarea</label>
+            <div class="wiseeditor-wrapper">
+                <div id="editor_body" class="wiseeditor-container milkdown-editor" style="height:240px"
+                     data-editor="wiseeditor" data-editor-type="milkdown" data-mode="markdown"
+                     data-name="body"></div>
+                <textarea name="body" id="editor_body_textarea" style="display:none;"># 标题
+
+正文段落，支持 **加粗**、*斜体*、`代码`。
+
+- 列表项 A
+- 列表项 B
+
+> 引用块</textarea>
+            </div>
+        </div>
+
+        <div class="ex-actions">
+            <button type="submit">提交表单</button>
+            <button type="button" id="btnDump">读取全部字段</button>
+            <button type="button" id="btnTheme">切换暗色</button>
+        </div>
+
+        <p class="hint">EditorInstance 契约（与具体引擎无关）：取实例 <code>window.WiseEditor.get('容器 id')</code></p>
+
+        <div class="ex-actions">
+            <button type="button" id="btnGet">getContent()</button>
+            <button type="button" id="btnSet">setContent() 写入表格</button>
+            <button type="button" id="btnDirty">isDirty()</button>
+            <button type="button" id="btnFocus">focus()</button>
+            <button type="button" id="btnDestroy">destroy()</button>
+        </div>
+    </form>
+
+    <pre id="out">等待初始化…</pre>
+
+    <!-- 1) 自包含入口（wiseeditor-init.js 的 classic 打包版）：引擎 + 适配器 + 扫描挂载 -->
+    <script src="./dist/wiseeditor.example.js"></script>
+    <!-- 2) 本页交互 -->
+    <script src="./standalone.js"></script>
+</body>
+</html>

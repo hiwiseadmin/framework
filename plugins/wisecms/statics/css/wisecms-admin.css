@@ -1,0 +1,261 @@
+/**
+ * wisecms 后台样式（插件级，全部基于 Bootstrap 5.3 CSS 变量 → 自动适配明暗主题）
+ *
+ * 为什么需要这个文件：
+ *   视图里早就在用 `.cms-anchor-nav` / `.cms-context-bar` 这类语义类，
+ *   但插件**没有任何 CSS 文件**，这些类一直是"有名字、无样式"的空壳
+ *   （实机表现：内容表单右侧「分区导航」7 个链接没有激活态，用户不知道自己在哪一区）。
+ *   见 docs/wisecms-后台UIUX-评审建议.md §2 P0-3。
+ *
+ * 约束：
+ *   1. 只用 `var(--bs-*)`，不写死颜色，避免暗色二次返工；
+ *   2. 只作用于插件页面（本文件由 admin 视图的 css block 引入），不改全局组件行为；
+ *   3. 不引入新依赖、不用 @import。
+ */
+
+/* ==========================================================================
+ * 1. 站点上下文条（admin/common/cms_context_bar.html）
+ * ========================================================================== */
+.cms-context-bar {
+    padding: .4rem .75rem;
+    margin-bottom: .75rem;
+    border: 1px solid var(--bs-border-color);
+    border-radius: .5rem;
+    background: var(--bs-tertiary-bg);
+}
+
+.cms-context-bar .form-select-sm {
+    min-width: 9rem;
+}
+
+/* ==========================================================================
+ * 2. 分区导航（内容 create / edit 右侧锚点）
+ *    以前完全没有激活态 → 现在用左侧色条 + 底色 + 加粗三重指示。
+ * ========================================================================== */
+.cms-anchor-nav {
+    gap: .125rem;
+}
+
+.cms-anchor-nav .nav-link {
+    padding: .4rem .75rem;
+    border-left: 3px solid transparent;
+    border-radius: .375rem;
+    color: var(--bs-secondary-color);
+    transition: background-color .15s ease-in-out, color .15s ease-in-out;
+}
+
+.cms-anchor-nav .nav-link:hover,
+.cms-anchor-nav .nav-link:focus-visible {
+    background: var(--bs-tertiary-bg);
+    color: var(--bs-body-color);
+}
+
+.cms-anchor-nav .nav-link.active {
+    border-left-color: var(--bs-primary);
+    background: var(--bs-primary-bg-subtle);
+    color: var(--bs-primary-text-emphasis);
+    font-weight: 600;
+}
+
+/* ==========================================================================
+ * 3. 弹层内的表单页：隐藏自带页头与站点条（避免"弹层标题 + 页面标题"双层）
+ *    由 cms-admin.js 的 cmsFormPage() 在 iframe 内给 <html> 加 `.cms-in-layer`。
+ * ========================================================================== */
+html.cms-in-layer .app-content-header {
+    display: none;
+}
+
+html.cms-in-layer .cms-context-bar {
+    display: none !important;
+}
+
+html.cms-in-layer .app-main {
+    padding-top: .5rem;
+}
+
+/* ==========================================================================
+ * 4. 窄屏表格：把横向滚动收进表格容器（而不是整页横滚）
+ *
+ * 背景：`statics/css/base.css` 里有 `.fixed-table-body{overflow-x:visible !important}`，
+ * 于是窄屏下表格只能把整页撑宽（375 视口实测 docOverflow=343~397px），
+ * 工具栏与分页被一起带走，体验很差。
+ *
+ * 这里不去动框架级 base.css（影响所有 bootstrap-table 使用方），
+ * 只用**同为 !important 但选择器更具体**的规则，把本插件的表格滚动收进容器内。
+ * ========================================================================== */
+.bootstrap-table .fixed-table-container .fixed-table-body {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* 手写表格（非 cmsTable）放进 .table-responsive 后，光有滚动容器还不够：
+   表格默认 width:100% 会把自己压扁，列宽形同虚设。
+   给它一个下限宽度，让「容器内横滚」真正生效。 */
+.cms-table-min {
+    min-width: 40rem;
+}
+
+/* ==========================================================================
+ * 5. 表单字段错误：红框 + 文案 + 左侧强调条（配合 content.js 的跨 Tab 校验）
+ * ========================================================================== */
+.cms-field-invalid > .form-label {
+    color: var(--bs-form-invalid-color);
+}
+
+.cms-field-invalid .form-control,
+.cms-field-invalid .form-select {
+    border-color: var(--bs-form-invalid-border-color);
+}
+
+.cms-field-error {
+    display: block;
+    margin-top: .25rem;
+    font-size: .8125rem;
+    color: var(--bs-form-invalid-color);
+}
+
+/* Tab 上有错误时的红点（跨 Tab 校验定位用） */
+.cms-tab-error::after {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-left: 6px;
+    border-radius: 50%;
+    background: var(--bs-danger);
+    vertical-align: middle;
+}
+
+/* ==========================================================================
+ * 6. 站点切换后的数据刷新提示（cms_context_bar 里使用的轻提示位）
+ * ========================================================================== */
+.cms-inline-note {
+    font-size: .8125rem;
+    color: var(--bs-secondary-color);
+}
+
+/* ==========================================================================
+ * 7. 表单操作条（统一契约，UIUX-P1-07）
+ *
+ *   <div class="cms-form-actions">
+ *       <button class="btn btn-outline-secondary">取消 / 返回</button>
+ *       <button class="btn btn-primary">保存（主操作）</button>
+ *   </div>
+ *
+ * 约定：主操作只有一个且用 `btn-primary`；`success/danger` 只用于状态结果与破坏性操作。
+ * 窄屏下操作条吸底，避免"发布按钮在 1.4 屏之外"（评审 §9.3-2）。
+ * ========================================================================== */
+.cms-form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: .5rem;
+    margin-top: 1.25rem;
+    padding-top: .75rem;
+    border-top: 1px solid var(--bs-border-color);
+}
+
+.cms-form-actions .cms-form-actions-secondary {
+    margin-right: auto;
+}
+
+@media (max-width: 767.98px) {
+    .cms-form-actions {
+        position: sticky;
+        bottom: 0;
+        z-index: 5;
+        margin-top: 1rem;
+        padding: .625rem .75rem;
+        background: var(--bs-body-bg);
+        border-top: 1px solid var(--bs-border-color);
+        box-shadow: 0 -.25rem .75rem rgba(0, 0, 0, .08);
+    }
+
+    /* 窄屏触控目标：31px 的 btn-sm 太小（<44px 建议值） */
+    .btn-sm {
+        min-height: 2.25rem;
+        padding-top: .375rem;
+        padding-bottom: .375rem;
+    }
+}
+
+/* ==========================================================================
+ * 8. 双层容器去重：页内再套一层 .container-fluid 会多出 24px 内边距，
+ *    导致卡片与页头标题左右不对齐（评审 §4 P2-2）。用样式抵消，不改 54 个模板。
+ * ========================================================================== */
+.app-main > .container-fluid {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+/* ==========================================================================
+ * 8.1 看板 KPI 卡（UIUX-P2-01 视觉）
+ *
+ * 旧实现用 `text-bg-*` 实心填充：4 块高饱和色块 + 白字，
+ * 「草稿」的 secondary 灰在暗色下看起来像**禁用**（评审 §9.2）。
+ * 改为「常规卡面 + 左侧语义色条 + 同色图标」，数值用等宽数字避免跳动。
+ * ========================================================================== */
+.cms-kpi {
+    border: 1px solid var(--bs-border-color);
+    border-left: 4px solid var(--bs-secondary);
+    transition: box-shadow .15s ease-in-out;
+}
+
+.cms-kpi:hover {
+    box-shadow: 0 .25rem 1rem rgba(0, 0, 0, .12);
+}
+
+.cms-kpi-value {
+    font-variant-numeric: tabular-nums;
+}
+
+.cms-kpi-icon {
+    color: var(--bs-secondary);
+    opacity: .6;
+}
+
+.cms-kpi-link {
+    opacity: 0;
+    transition: opacity .15s ease-in-out;
+}
+
+.cms-kpi:hover .cms-kpi-link,
+.cms-kpi:focus-visible .cms-kpi-link {
+    opacity: 1;
+}
+
+.cms-kpi-primary { border-left-color: var(--bs-primary); }
+.cms-kpi-primary .cms-kpi-icon { color: var(--bs-primary); }
+
+.cms-kpi-success { border-left-color: var(--bs-success); }
+.cms-kpi-success .cms-kpi-icon { color: var(--bs-success); }
+
+.cms-kpi-info { border-left-color: var(--bs-info); }
+.cms-kpi-info .cms-kpi-icon { color: var(--bs-info); }
+
+/* ==========================================================================
+ * 9. 暗色主题下的固定浅色类兜底
+ *
+ * Bootstrap 5.3 的 `.alert-light` 在暗色主题里不换色（仍是浅灰底 + 深字），
+ * 出现在 dark 页面上会像一块"贴上去的白纸"（评审 §4 P2-6）。
+ * 这里把它映射到主题变量，模板里可以继续用 `.alert-light` 而不必逐个改。
+ * ========================================================================== */
+[data-bs-theme="dark"] .alert-light {
+    --bs-alert-color: var(--bs-body-color);
+    --bs-alert-bg: var(--bs-tertiary-bg);
+    --bs-alert-border-color: var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] .alert-light .text-danger {
+    color: var(--bs-danger-text-emphasis) !important;
+}
+
+/* ==========================================================================
+ * 10. 表格里的行内排序输入：不要撑爆列宽
+ * ========================================================================== */
+.fixed-table-body .form-control.form-control-sm.cms-sort-input,
+.fixed-table-body input.cms-sort-input {
+    width: 4.5rem;
+    margin: 0 auto;
+    text-align: center;
+}

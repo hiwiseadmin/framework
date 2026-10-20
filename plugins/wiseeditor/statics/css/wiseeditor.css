@@ -1,0 +1,536 @@
+/**
+ * ============================================================
+ * WiseEditor 编辑器样式
+ * ============================================================
+ *
+ * 适配 AdminLTE 4 + Bootstrap 5.3 主题体系，支持亮色 / 暗色。
+ * 覆盖三个引擎：
+ *   - 真实 TipTap（ProseMirror DOM，见 vendor/tiptap.bundle.js）
+ *   - 内置 contenteditable 降级引擎
+ *   - Milkdown 分栏 Markdown
+ *
+ * 暗色约定（项目规范）：暗色用深色背景 + 浅色文字，所有硬编码颜色
+ * 都集中在文件末尾的 [data-bs-theme="dark"] 区块内。
+ */
+
+/* ===== 容器骨架 ===== */
+.wiseeditor-container {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    border-radius: var(--bs-border-radius, 6px);
+    overflow: hidden;
+    background: var(--bs-body-bg, #fff);
+}
+
+.wiseeditor-container:focus-within {
+    border-color: var(--bs-primary, #534ab7);
+    box-shadow: 0 0 0 0.2rem rgba(83, 74, 183, 0.15);
+}
+
+/* 内容区（工具栏下方的可伸缩滚动区） */
+.wiseeditor-body {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    overflow: hidden;
+}
+
+/* 真实引擎的挂载层：包住 ProseMirror，便于源码模式整体隐藏 */
+.wiseeditor-pane {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    overflow: hidden;
+}
+
+.wiseeditor-pane[hidden],
+.wiseeditor-source[hidden],
+.wiseeditor-tablebar[hidden] {
+    display: none;
+}
+
+.wiseeditor-content {
+    flex: 1 1 auto;
+    width: 100%;
+    overflow-y: auto;
+    padding: 16px 20px;
+    outline: none;
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--bs-body-color, #333);
+}
+
+/* ===== 工具栏 ===== */
+.wiseeditor-toolbar,
+.wiseeditor-tablebar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 10px;
+    background: var(--bs-tertiary-bg, #f7f8fa);
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+/* 表格工具条：仅当光标位于表格内时显示 */
+.wiseeditor-tablebar {
+    padding: 4px 10px;
+    background: var(--bs-primary-bg-subtle, #eeedfe);
+}
+
+.wiseeditor-toolbar .toolbar-group {
+    display: flex;
+    align-items: center;
+}
+
+.wiseeditor-toolbar .toolbar-divider,
+.wiseeditor-tablebar .toolbar-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--bs-border-color, #ddd);
+    margin: 0 4px;
+}
+
+/* 按钮：工具栏与表格工具条共用 .wiseeditor-btn */
+.wiseeditor-container .wiseeditor-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--bs-body-color, #555);
+    cursor: pointer;
+    font-size: 15px;
+    transition: background 0.15s, color 0.15s;
+}
+
+.wiseeditor-container .wiseeditor-btn:hover {
+    background: var(--bs-secondary-bg, #e9ecef);
+    color: var(--bs-primary, #534ab7);
+}
+
+.wiseeditor-container .wiseeditor-btn.is-active {
+    background: var(--bs-primary-bg-subtle, #eeedfe);
+    color: var(--bs-primary, #534ab7);
+    border-color: rgba(83, 74, 183, 0.2);
+}
+
+.wiseeditor-container .wiseeditor-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.wiseeditor-container .wiseeditor-btn:disabled:hover {
+    background: transparent;
+    color: var(--bs-body-color, #555);
+}
+
+/* ===== ProseMirror 基线 ===== */
+.wiseeditor-container .ProseMirror {
+    min-height: 100%;
+    padding: 16px 20px;
+    outline: none;
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--bs-body-color, #333);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.wiseeditor-container .ProseMirror:focus,
+.wiseeditor-container .ProseMirror:focus-visible {
+    outline: none;
+}
+
+/* 节点选中态（图片 / 表格整体选中） */
+.wiseeditor-container .ProseMirror-selectednode {
+    outline: 2px solid var(--bs-primary, #534ab7);
+    outline-offset: 1px;
+    border-radius: 4px;
+}
+
+/* 光标占位（gapcursor，粘贴表格/代码块后的空位提示） */
+.wiseeditor-container .ProseMirror-gapcursor {
+    display: none;
+    pointer-events: none;
+    position: absolute;
+}
+
+.wiseeditor-container .ProseMirror-gapcursor::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: -2px;
+    width: 20px;
+    border-top: 1px solid var(--bs-body-color, #212529);
+    animation: wiseeditor-cursor-blink 1.1s steps(2, start) infinite;
+}
+
+.wiseeditor-container .ProseMirror-focused .ProseMirror-gapcursor {
+    display: block;
+}
+
+@keyframes wiseeditor-cursor-blink {
+    to { visibility: hidden; }
+}
+
+/* ===== 占位符 =====
+ * 真实引擎由 Placeholder 扩展在「当前空文本块」上挂装饰：
+ *   class="is-empty is-editor-empty" data-placeholder="..."
+ * 内置引擎则在容器为空时用 :empty。
+ */
+.wiseeditor-container .ProseMirror .is-empty::before {
+    content: attr(data-placeholder);
+    color: var(--bs-secondary-color, #adb5bd);
+    float: left;
+    height: 0;
+    pointer-events: none;
+    font-weight: 400;
+}
+
+.wiseeditor-content:empty::before {
+    content: attr(data-placeholder);
+    color: var(--bs-secondary-color, #999);
+    pointer-events: none;
+}
+
+/* ===== 富文本元素 ===== */
+.wiseeditor-container .ProseMirror p {
+    margin-bottom: 0.75rem;
+}
+
+.wiseeditor-container h1 { font-size: 1.75rem; }
+.wiseeditor-container h2 { font-size: 1.5rem; }
+.wiseeditor-container h3 { font-size: 1.25rem; }
+.wiseeditor-container h4 { font-size: 1.1rem; }
+.wiseeditor-container h5 { font-size: 1rem; }
+.wiseeditor-container h6 { font-size: 0.875rem; }
+
+.wiseeditor-container blockquote {
+    border-left: 3px solid var(--bs-primary, #534ab7);
+    padding: 4px 16px;
+    margin: 0 0 0.75rem;
+    color: var(--bs-secondary-color, #666);
+    background: var(--bs-tertiary-bg, #f8f9fa);
+    border-radius: 0 4px 4px 0;
+}
+
+.wiseeditor-container blockquote > p:last-child {
+    margin-bottom: 0;
+}
+
+.wiseeditor-container pre,
+.wiseeditor-container pre.wiseeditor-codeblock {
+    background: var(--bs-dark, #1e1e2e);
+    color: #d4d4d4;
+    padding: 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.6;
+    overflow-x: auto;
+    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+}
+
+.wiseeditor-container code {
+    background: var(--bs-secondary-bg, #f0f0f0);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.9em;
+    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+}
+
+.wiseeditor-container pre code {
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    font-size: inherit;
+    color: inherit;
+}
+
+.wiseeditor-container ul,
+.wiseeditor-container ol {
+    padding-left: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.wiseeditor-container li > p {
+    margin-bottom: 0;
+}
+
+.wiseeditor-container hr {
+    border: 0;
+    border-top: 1px solid var(--bs-border-color, #dee2e6);
+    margin: 1rem 0;
+}
+
+.wiseeditor-container img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.wiseeditor-container img.ProseMirror-selectednode {
+    outline-offset: 2px;
+}
+
+.wiseeditor-container a {
+    color: var(--bs-primary, #534ab7);
+    text-decoration: underline;
+}
+
+/* ===== 表格 ===== */
+.wiseeditor-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+.wiseeditor-container th,
+.wiseeditor-container td {
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    padding: 8px 12px;
+    text-align: left;
+    min-width: 80px;
+}
+
+.wiseeditor-container th {
+    background: var(--bs-tertiary-bg, #f7f8fa);
+}
+
+/* ProseMirror 表格：列宽可拖拽，需 fixed 布局 + 相对定位单元格 */
+.wiseeditor-container .ProseMirror .tableWrapper {
+    overflow-x: auto;
+    margin-bottom: 1rem;
+}
+
+.wiseeditor-container .ProseMirror table {
+    table-layout: fixed;
+    margin-bottom: 0;
+    overflow: hidden;
+}
+
+.wiseeditor-container .ProseMirror th,
+.wiseeditor-container .ProseMirror td {
+    position: relative;
+    vertical-align: top;
+    min-width: 60px;
+}
+
+.wiseeditor-container .ProseMirror th > p,
+.wiseeditor-container .ProseMirror td > p {
+    margin-bottom: 0;
+}
+
+/* 拖拽列宽时的高亮手柄 */
+.wiseeditor-container .ProseMirror .column-resize-handle {
+    position: absolute;
+    right: -2px;
+    top: 0;
+    bottom: -2px;
+    width: 4px;
+    background: var(--bs-primary, #534ab7);
+    pointer-events: none;
+    z-index: 20;
+}
+
+.wiseeditor-container .ProseMirror.resize-cursor {
+    cursor: col-resize;
+}
+
+/* 单元格区域选中 */
+.wiseeditor-container .ProseMirror .selectedCell::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(83, 74, 183, 0.14);
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* ===== 任务列表 ===== */
+.wiseeditor-container ul[data-type="taskList"] {
+    list-style: none;
+    padding-left: 0;
+}
+
+.wiseeditor-container ul[data-type="taskList"] li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.wiseeditor-container ul[data-type="taskList"] li label {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* ===== 源码模式 ===== */
+.wiseeditor-source {
+    flex: 1 1 auto;
+    width: 100%;
+    border: none;
+    outline: none;
+    resize: none;
+    padding: 16px 20px;
+    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--bs-body-color, #333);
+    background: var(--bs-tertiary-bg, #f8f9fa);
+}
+
+/* ===== Markdown 分栏编辑器 ===== */
+.wiseeditor-md-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    gap: 0;
+}
+
+.wiseeditor-md-input {
+    flex: 0 0 50%;
+    width: 50%;
+    min-height: 0;
+    border: none;
+    border-right: 1px solid var(--bs-border-color, #dee2e6);
+    outline: none;
+    resize: none;
+    padding: 16px 18px;
+    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--bs-body-color, #333);
+    background: var(--bs-body-bg, #fff);
+}
+
+.wiseeditor-md-preview {
+    flex: 1 1 50%;
+    min-width: 0;
+    overflow-y: auto;
+    padding: 16px 20px;
+    font-size: 14px;
+    line-height: 1.75;
+    background: var(--bs-tertiary-bg, #f8f9fa);
+}
+
+/* ===== 只读模式 ===== */
+.wiseeditor-container[data-readonly="true"] .ProseMirror {
+    background: var(--bs-secondary-bg, #fafafa);
+    cursor: default;
+}
+
+/* ===== 退化为 textarea ===== */
+textarea.editor-fallback {
+    width: 100%;
+    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    resize: vertical;
+}
+
+/* ===== 暗色模式（深色底 + 浅色字） ===== */
+[data-bs-theme="dark"] .wiseeditor-container {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: var(--bs-body-bg, #212529);
+}
+
+[data-bs-theme="dark"] .wiseeditor-toolbar {
+    background: rgba(255, 255, 255, 0.04);
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-bs-theme="dark"] .wiseeditor-tablebar {
+    background: rgba(83, 74, 183, 0.18);
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-bs-theme="dark"] .wiseeditor-container .wiseeditor-btn {
+    color: rgba(255, 255, 255, 0.78);
+}
+
+[data-bs-theme="dark"] .wiseeditor-container .wiseeditor-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .wiseeditor-container .wiseeditor-btn.is-active {
+    background: rgba(83, 74, 183, 0.35);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-bs-theme="dark"] .wiseeditor-container .ProseMirror,
+[data-bs-theme="dark"] .wiseeditor-container h1,
+[data-bs-theme="dark"] .wiseeditor-container h2,
+[data-bs-theme="dark"] .wiseeditor-container h3,
+[data-bs-theme="dark"] .wiseeditor-container h4,
+[data-bs-theme="dark"] .wiseeditor-container h5,
+[data-bs-theme="dark"] .wiseeditor-container h6 {
+    color: rgba(255, 255, 255, 0.88);
+}
+
+[data-bs-theme="dark"] .wiseeditor-container pre,
+[data-bs-theme="dark"] .wiseeditor-container pre.wiseeditor-codeblock {
+    background: #111;
+    color: #d4d4d4;
+}
+
+[data-bs-theme="dark"] .wiseeditor-container code {
+    background: rgba(255, 255, 255, 0.06);
+    color: #f1c9d0;
+}
+
+[data-bs-theme="dark"] .wiseeditor-container pre code {
+    background: none;
+    color: inherit;
+}
+
+[data-bs-theme="dark"] .wiseeditor-container blockquote {
+    background: rgba(255, 255, 255, 0.04);
+    color: rgba(255, 255, 255, 0.72);
+    border-left-color: rgba(167, 159, 245, 0.75);
+}
+
+/* 暗色下 --bs-primary(#534ab7) 对比度不足，链接/拖拽手柄改用亮紫色 */
+[data-bs-theme="dark"] .wiseeditor-container a {
+    color: #a79ff5;
+}
+
+[data-bs-theme="dark"] .wiseeditor-container .ProseMirror .column-resize-handle {
+    background: #a79ff5;
+}
+
+[data-bs-theme="dark"] .wiseeditor-container .ProseMirror .selectedCell::after {
+    background: rgba(167, 159, 245, 0.22);
+}
+
+[data-bs-theme="dark"] .wiseeditor-container .ProseMirror-selectednode {
+    outline-color: #a79ff5;
+}
+
+[data-bs-theme="dark"] .wiseeditor-container th {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+[data-bs-theme="dark"] .wiseeditor-container th,
+[data-bs-theme="dark"] .wiseeditor-container td {
+    border-color: rgba(255, 255, 255, 0.16);
+}
+
+[data-bs-theme="dark"] .wiseeditor-source,
+[data-bs-theme="dark"] .wiseeditor-md-preview {
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(255, 255, 255, 0.88);
+}
+
+[data-bs-theme="dark"] .wiseeditor-md-input {
+    background: var(--bs-body-bg, #212529);
+    color: rgba(255, 255, 255, 0.88);
+    border-right-color: rgba(255, 255, 255, 0.08);
+}

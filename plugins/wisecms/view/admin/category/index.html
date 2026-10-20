@@ -1,0 +1,25 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}栏目管理{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-list-ul" caption="栏目管理" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <!-- 栏目树表：
+                     扁平行由 category/tree 提供（含禁用栏目），树结构由 bootstrap-table 的
+                     treegrid 扩展依据 parent_id 自行构建（见 js/category.js 的 treeColumn 说明）。
+                     本页不提供关键词/类型筛选 —— category/tree 不支持筛选参数，
+                     宁可不做，也不放一个点了没反应的筛选项。 -->
+                <div id="toolbar" class="toolbar"></div>
+                <table id="table"></table>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/category.js（由 wsconfig.js 自动加载） -->
+{/block}

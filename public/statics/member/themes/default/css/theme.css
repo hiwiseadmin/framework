@@ -1,0 +1,40 @@
+/* wise-member 默认主题（default） */
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: #f4f5f7; color: #23272f; }
+.auth-page { min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding-top: 10vh; }
+.auth-box { background: #fff; padding: 28px; width: 340px; border-radius: 10px; box-shadow: 0 6px 24px rgba(0,0,0,.07); }
+.auth-box h1 { font-size: 20px; margin: 0 0 6px; }
+.auth-box label { display: block; font-size: 13px; margin-bottom: 12px; }
+.auth-box input { display: block; width: 100%; padding: 9px 10px; margin-top: 4px; border: 1px solid #d3d7de; border-radius: 6px; }
+.auth-box button, .topbar button { width: 100%; padding: 10px; background: #2f6bff; color: #fff; border: 0; border-radius: 6px; cursor: pointer; }
+.topbar { display: flex; gap: 12px; align-items: center; padding: 12px 20px; background: #fff; border-bottom: 1px solid #e6e8eb; }
+.topbar form { margin-left: auto; }
+.topbar button { width: auto; padding: 6px 12px; background: #6b7280; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; padding: 20px; }
+.card { background: #fff; border-radius: 10px; padding: 18px; box-shadow: 0 4px 16px rgba(0,0,0,.05); }
+.card h2 { font-size: 15px; margin: 0 0 12px; }
+.card ul { list-style: none; margin: 0; padding: 0; }
+.card li { padding: 8px 0; border-bottom: 1px dashed #eceef1; }
+.card li:last-child { border-bottom: 0; }
+.muted { color: #8a919f; font-size: 13px; }
+.msg { min-height: 16px; color: #e11d48; font-size: 13px; }
+.entries a { color: #2f6bff; text-decoration: none; }
+
+/* —— 通用页面/表单/列表扩展 —— */
+.page { max-width: 760px; margin: 0 auto; padding: 20px; }
+.panel { background:#fff; border-radius:10px; padding:18px; box-shadow:0 4px 16px rgba(0,0,0,.05); margin-bottom:16px; }
+.panel h2 { font-size:16px; margin:0 0 14px; }
+.form-field { display:block; font-size:13px; margin-bottom:12px; color:#374151; }
+.form-field input, .form-field select, .form-field textarea { display:block; width:100%; padding:8px 10px; margin-top:4px; border:1px solid #d3d7de; border-radius:6px; font:inherit; }
+.btn { display:inline-block; padding:9px 16px; background:#2f6bff; color:#fff; border:0; border-radius:6px; cursor:pointer; text-decoration:none; font-size:14px; }
+.btn-block { display:block; width:100%; text-align:center; }
+.btn-secondary { background:#6b7280; }
+.msg { min-height:18px; color:#e11d48; font-size:13px; margin:6px 0; }
+.ok { color:#059669; }
+.table { width:100%; border-collapse:collapse; font-size:13px; }
+.table th, .table td { text-align:left; padding:8px 6px; border-bottom:1px solid #eceef1; }
+.kv { margin:0; padding:0; }
+.kv li { list-style:none; display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px dashed #eceef1; font-size:14px; }
+.kv li b { font-weight:600; }
+.row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.spacer { flex:1; }

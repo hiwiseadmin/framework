@@ -1,0 +1,72 @@
+{extend name="index/layout"}
+
+{block name="title"}API 文档{/block}
+
+{block name="sidebar"}
+<div class="wd-sidebar-group">
+    <p class="wd-sidebar-group__title">API 导航</p>
+    <ul class="wd-sidebar-list">
+        {volist name="grouped" id="items" key="method"}
+        <li class="wd-sidebar-item has-children" data-open="true">
+            <div class="wd-sidebar-item__row">
+                <span class="wd-sidebar-link" style="cursor:default">
+                    <span class="wd-badge wd-badge--brand">{$method}</span>
+                    <span class="wd-badge wd-badge--muted">{$items|count}</span>
+                </span>
+                <button class="wd-sidebar-toggle" type="button" aria-expanded="true"
+                        aria-label="折叠 {$method}"><i class="bi bi-chevron-right"></i></button>
+            </div>
+            <ul class="wd-sidebar-sub">
+                {volist name="items" id="doc"}
+                <li class="wd-sidebar-item">
+                    <div class="wd-sidebar-item__row">
+                        <a class="wd-sidebar-link" href="/plugin/wisedocs/api/detail?slug={$doc.slug}"
+                           title="{$doc.title}">{$doc.title}</a>
+                    </div>
+                </li>
+                {/volist}
+            </ul>
+        </li>
+        {/volist}
+    </ul>
+</div>
+{/block}
+
+{block name="content"}
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:28px">
+    <h1 class="wd-page-title" style="margin:0">API 文档</h1>
+    <a class="wd-btn wd-btn--outline wd-btn--sm" style="margin-left:auto"
+       href="/plugin/wisedocs/api/export">
+        <i class="bi bi-download"></i> 导出 OpenAPI
+    </a>
+</div>
+
+{if empty($grouped)}
+<div class="wd-empty">
+    <i class="bi bi-inbox"></i>
+    暂无 API 文档
+</div>
+{else /}
+{volist name="grouped" id="items" key="method"}
+<section class="wd-section" style="margin-top:32px">
+    <h2 class="wd-section__title">
+        <span class="wd-badge wd-badge--brand">{$method}</span>
+        共 {$items|count} 个接口
+    </h2>
+    <ul class="wd-list">
+        {volist name="items" id="doc"}
+        <li>
+            <a class="wd-list__item" href="/plugin/wisedocs/api/detail?slug={$doc.slug}">
+                <div class="wd-list__top">
+                    <code>{$doc.api_endpoint|default='-'}</code>
+                    <span class="wd-list__title">{$doc.title}</span>
+                    <span class="wd-list__meta">{$doc.category.name|default='未分类'}</span>
+                </div>
+            </a>
+        </li>
+        {/volist}
+    </ul>
+</section>
+{/volist}
+{/if}
+{/block}

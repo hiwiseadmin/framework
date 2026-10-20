@@ -1,0 +1,86 @@
+# ========================
+# IDE / Editor
+# ========================
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# ========================
+# OS generated files
+# ========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.user
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ========================
+# Composer Dependencies
+# ---------------------------------------------------------------
+# 必须锚定成 `/vendor/`：无锚定写法会匹配任意层级的 vendor 目录，误伤插件里的
+# 自托管第三方产物（plugins/wiseeditor/statics/js/vendor/tiptap.bundle.js 是编辑器引擎，
+# 丢了会静默退化成内置 contenteditable 引擎）。插件 vendor 的忽略规则见其目录内 .gitignore。
+# ========================
+/vendor/
+/vendor2/
+
+# ========================
+# Local Packages / Plugins
+# ========================
+# monorepo 模式下 packages/ 与 plugins/ 纳入版本库，不再忽略
+
+# ========================
+# Runtime & Temp
+# ========================
+runtime/
+backup/
+*.log
+*.tmp
+*.cache
+
+# ========================
+# Environment
+# ========================
+.env
+.env.cli-backup
+.env.local
+.env.*.local
+
+# ========================
+# Build / Dist
+# ========================
+/public/build/
+/public/dist/
+/node_modules/
+# 编辑器闭环验证（npm run verify:editor）产出的截图与 Chrome 临时 profile
+/.verify-out/
+
+# ========================
+# Static / Third-party
+# ========================
+/public/statics/plugins/
+
+# ========================
+# SSL / ACME
+# ========================
+.well-known/
+
+# ========================
+# Test & Dev Tools
+# ========================
+phpunit.phar
+*.phar
+
+# ========================
+# CodeBuddy / WorkBuddy
+# ========================
+.codebuddy/
+.workbuddy/

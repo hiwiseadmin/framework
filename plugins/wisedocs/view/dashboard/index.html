@@ -1,0 +1,141 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}文档中心概览{/block}
+
+{block name="css"}
+<link rel="stylesheet" href="/statics/plugins/wisedocs/css/admin.css">
+{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-journal-text" caption="文档中心概览" buttongroup="" /}
+
+    <div class="docs-page">
+        <!-- ===== 统计卡：全部可点击，直达对应列表 ===== -->
+        <div class="row g-3">
+            <div class="col-6 col-lg-3">
+                <a class="docs-stat" href="/plugin/wisedocs/document">
+                    <span class="docs-stat__icon bg-primary-subtle text-primary"><i class="bi bi-file-earmark-text"></i></span>
+                    <div class="docs-stat__label">文档（已发布 {$counts.published}）</div>
+                    <div class="docs-stat__value">{$counts.documents}</div>
+                </a>
+            </div>
+            <div class="col-6 col-lg-3">
+                <a class="docs-stat" href="/plugin/wisedocs/category">
+                    <span class="docs-stat__icon bg-success-subtle text-success"><i class="bi bi-diagram-2"></i></span>
+                    <div class="docs-stat__label">分类</div>
+                    <div class="docs-stat__value">{$counts.categories}</div>
+                </a>
+            </div>
+            <div class="col-6 col-lg-3">
+                <a class="docs-stat" href="/plugin/wisedocs/tag">
+                    <span class="docs-stat__icon bg-warning-subtle text-warning"><i class="bi bi-tags"></i></span>
+                    <div class="docs-stat__label">标签</div>
+                    <div class="docs-stat__value">{$counts.tags}</div>
+                </a>
+            </div>
+            <div class="col-6 col-lg-3">
+                <a class="docs-stat" href="/plugin/wisedocs/feedback?processed=0">
+                    <span class="docs-stat__icon bg-danger-subtle text-danger"><i class="bi bi-chat-left-text"></i></span>
+                    <div class="docs-stat__label">反馈（待处理 {$todos.pending_feedback}）</div>
+                    <div class="docs-stat__value">{$counts.feedback}</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- ===== 待处理事项 ===== -->
+        <h2 class="mt-4 mb-2 small fw-bold text-muted">待处理</h2>
+        <div class="row g-3">
+            <div class="col-6 col-md-3">
+                <a class="docs-todo" href="/plugin/wisedocs/feedback?processed=0">
+                    <i class="bi bi-chat-left-dots fs-5 text-warning"></i>
+                    <span>
+                        <span class="d-block fw-medium">待处理反馈</span>
+                        <span class="docs-hint">用户提交的建议与评价</span>
+                    </span>
+                    <span class="docs-todo__count text-warning">{$todos.pending_feedback}</span>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a class="docs-todo" href="/plugin/wisedocs/document?publish_state=2">
+                    <i class="bi bi-send-check fs-5 text-primary"></i>
+                    <span>
+                        <span class="d-block fw-medium">待发布</span>
+                        <span class="docs-hint">已改但尚未生效</span>
+                    </span>
+                    <span class="docs-todo__count text-primary">{$todos.pending_publish}</span>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a class="docs-todo" href="/plugin/wisedocs/document?status=0">
+                    <i class="bi bi-file-earmark fs-5 text-secondary"></i>
+                    <span>
+                        <span class="d-block fw-medium">草稿文档</span>
+                        <span class="docs-hint">尚未发布的文档</span>
+                    </span>
+                    <span class="docs-todo__count text-secondary">{$todos.draft_documents}</span>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a class="docs-todo" href="/plugin/wisedocs/document?status=0">
+                    <i class="bi bi-clock-history fs-5 text-info"></i>
+                    <span>
+                        <span class="d-block fw-medium">定时待发布</span>
+                        <span class="docs-hint">到点后前台自动转为已发布</span>
+                    </span>
+                    <span class="docs-todo__count text-info">{$todos.scheduled}</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- ===== 最近更新 ===== -->
+        {if !empty($recent)}
+        <div class="docs-table-card mt-4">
+            <div class="d-flex align-items-center mb-2">
+                <span class="fw-bold">最近更新</span>
+                <a class="ms-auto small text-decoration-none" href="/plugin/wisedocs/document">
+                    查看全部 <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+            <div class="table-responsive">
+                <table class="docs-recent">
+                    <thead>
+                    <tr>
+                        <th>标题</th>
+                        <th style="width:110px;">类型</th>
+                        <th style="width:90px;">状态</th>
+                        <th style="width:170px;">更新时间</th>
+                        <th style="width:90px;">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {volist name="recent" id="doc"}
+                    <tr>
+                        <td>
+                            <a class="text-decoration-none fw-medium"
+                               href="/plugin/wisedocs/document?edit={$doc.id}">{$doc.title}</a>
+                        </td>
+                        <td>{$doc.content_type_text}</td>
+                        <td>
+                            {if $doc.status == 1}
+                            <span class="badge bg-success-subtle text-success">{$doc.status_text}</span>
+                            {else /}
+                            <span class="badge bg-secondary-subtle text-secondary">{$doc.status_text}</span>
+                            {/if}
+                        </td>
+                        <td class="text-muted">{$doc.update_time}</td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-primary" href="/plugin/wisedocs/document?edit={$doc.id}">
+                                <i class="bi bi-pencil"></i> 编辑
+                            </a>
+                        </td>
+                    </tr>
+                    {/volist}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {/if}
+    </div>
+</div>
+{/block}

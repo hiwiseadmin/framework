@@ -1,0 +1,44 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}标签管理{/block}
+
+{block name="css"}
+<link rel="stylesheet" href="/statics/plugins/wisedocs/css/admin.css">
+{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-tags" caption="标签管理" buttongroup="" /}
+
+    <div class="docs-page">
+        <form class="docs-filter" id="search-form">
+            <div class="docs-filter__row">
+                <div class="docs-filter__item docs-filter__item--wide">
+                    <label class="docs-filter__label" for="search-keyword">关键词</label>
+                    <input type="text" class="form-control form-control-sm" id="search-keyword"
+                           placeholder="标签名称 / 标识">
+                </div>
+                <div class="docs-filter__actions">
+                    <button type="submit" class="btn btn-sm btn-primary" id="btn-search">
+                        <i class="bi bi-search"></i> 搜索
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-reset">
+                        <i class="bi bi-arrow-clockwise"></i> 重置
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-warning" id="btn-merge">
+                        <i class="bi bi-intersect"></i> 合并标签
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <div class="docs-table-card">
+            <div id="toolbar" class="toolbar"></div>
+            <table id="table"></table>
+        </div>
+    </div>
+</div>
+
+{include file="tag/form" /}
+{include file="tag/merge" /}
+{/block}

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{$name} - 插件首页</title>
+</head>
+<body>
+    <div class="container-fluid p-4">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">{$name} 插件</h4>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">插件开发模板，在此基础上开始构建你的功能。</p>
+                <ul>
+                    <li>版本: {$version}</li>
+                    <li>作者: {$author}</li>
+                    <li>创建时间: {$create_time}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

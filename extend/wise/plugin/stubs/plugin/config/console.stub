@@ -1,0 +1,9 @@
+<?php
+// {$name} 插件 — CLI 命令注册（boot 链 Step 6）
+// 框架扫描 plugins/{ident}/config/console.php，按「命令名 => Command 类」注册。
+// 命令类需继承 think\console\Command 并实现 configure() / execute()。
+return [
+    'commands' => [
+        // '{$name}:example' => \plugin\{$name}\command\Example::class,
+    ],
+];

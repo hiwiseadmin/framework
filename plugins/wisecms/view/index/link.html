@@ -1,0 +1,39 @@
+{extend name="index/layout" /}
+
+{block name="title"}友情链接 - {$cms.site_name}{/block}
+
+{block name="main"}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb small">
+        <li class="breadcrumb-item"><a href="{$cms.home_url}">首页</a></li>
+        <li class="breadcrumb-item active">友情链接</li>
+    </ol>
+</nav>
+
+{empty name="linkGroups"}
+<div class="cms-card p-4 text-center text-muted">暂无友情链接。</div>
+{else /}
+{foreach $linkGroups as $groupName => $items}
+<div class="cms-card p-3 mb-4">
+    <h6 class="border-bottom pb-2">{$groupName}</h6>
+    <div class="row g-3">
+        {foreach $items as $link}
+        <div class="col-md-3 col-sm-6">
+            {if condition="!empty($link.is_image) && !empty($link.logo)"}
+            <a href="{$link.url}" target="{$link.target|default='_blank'}" rel="{$link.rel}"
+               title="{$link.name}">
+                <img src="{$link.logo}" alt="{$link.name}" style="max-width:100%;height:40px;object-fit:contain">
+            </a>
+            {else /}
+            <a href="{$link.url}" target="{$link.target|default='_blank'}" rel="{$link.rel}">{$link.name}</a>
+            {/if}
+            {if condition="$showDesc && !empty($link.description)"}
+            <div class="text-muted small mt-1">{$link.description}</div>
+            {/if}
+        </div>
+        {/foreach}
+    </div>
+</div>
+{/foreach}
+{/empty}
+{/block}

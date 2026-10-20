@@ -1,0 +1,39 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}预警记录{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-bell" caption="预警记录" buttongroup="" /}
+    <div class="plugin-smartstock">
+        <div class="container-fluid p-0">
+            <form class="row g-2 mb-3" id="search-form">
+                <div class="col-md-3">
+                    <input type="text" class="form-control form-control-sm" id="search-keyword" placeholder="商品名称/SKU">
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select form-select-sm" id="search-alert-type">
+                        <option value="">全部类型</option>
+                        <option value="low_stock">库存下限</option>
+                        <option value="expiry">临期</option>
+                        <option value="overstock">积压</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select form-select-sm" id="search-is-read">
+                        <option value="">全部状态</option>
+                        <option value="0">未读</option>
+                        <option value="1">已读</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm" id="btn-search"><i class="bi bi-search"></i> 搜索</button>
+                </div>
+            </form>
+
+            <div id="toolbar" class="toolbar mb-2"></div>
+            <table id="table"></table>
+        </div>
+    </div>
+</div>
+{/block}

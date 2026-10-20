@@ -1,0 +1,103 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}事件配置{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-signpost-split" caption="事件配置" buttongroup="" /}
+    <div class="plugin-match3game">
+        <div class="container-fluid p-0">
+
+            <div class="alert alert-secondary py-2 small">
+                事件 = 一段文案 + 2~4 个选项，每个选项带 <code>effects</code>（效果字典见
+                <code>service/rogue/RunEffects.php</code>）。策划自助维护，<b>改文案不需要发版</b>。
+                要求：事件数 ≥ 20；至少 80% 含「风险选项」（04 设计要点：双刃剑才有肉鸽乐趣）。
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <form class="row g-2 mb-3" id="search-form">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control form-control-sm" id="search-keyword" placeholder="事件 ID / 标题">
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select form-select-sm" id="search-enabled">
+                                <option value="">全部状态</option>
+                                <option value="1">启用</option>
+                                <option value="0">停用</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm" id="btn-search"><i class="bi bi-search"></i> 搜索</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-reset"><i class="bi bi-arrow-clockwise"></i> 重置</button>
+                        </div>
+                    </form>
+
+                    <div id="toolbar" class="toolbar mb-2"></div>
+                    <table id="table"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="event-modal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="event-form-title">事件</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="event-form">
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="event-form-id" value="0">
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <label class="form-label">事件 ID</label>
+                            <input type="text" name="event_id" id="event-form-event-id" class="form-control form-control-sm" placeholder="ev_xxx">
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">标题</label>
+                            <input type="text" name="title" id="event-form-title-input" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">权重 / 最早层</label>
+                            <div class="input-group input-group-sm">
+                                <input type="number" name="weight" id="event-form-weight" class="form-control" value="100">
+                                <input type="number" name="min_layer" id="event-form-min-layer" class="form-control" value="1" min="1" max="3">
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <label class="form-label">情境描述</label>
+                            <input type="text" name="desc" id="event-form-desc" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">状态</label>
+                            <select name="enabled" id="event-form-enabled" class="form-select form-select-sm">
+                                <option value="1">启用</option>
+                                <option value="0">停用</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">
+                                options（JSON）
+                                <button type="button" class="btn btn-outline-info btn-sm ms-2" id="btn-event-check">试跑 effects</button>
+                            </label>
+                            <textarea name="options" id="event-form-options" class="form-control form-control-sm" rows="12"></textarea>
+                            <div class="form-text">
+                                可选 kind：
+                                {foreach $kinds as $k => $v}<code>{$k}</code> {/foreach}
+                            </div>
+                        </div>
+                        <div class="col-12" id="event-check-result"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{/block}

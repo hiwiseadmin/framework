@@ -1,0 +1,92 @@
+{extend name="index/layout"}
+
+{block name="title"}{$title|default='帮助中心'}{/block}
+
+{block name="content"}
+<section class="wd-hero">
+    <h1 class="wd-hero__title">{$space.name|default='文档中心'}</h1>
+    <p class="wd-hero__tagline">
+        {$space.description|default='在这里查找产品使用指南、开发文档与常见问题解答。'}
+    </p>
+
+    <form method="get" action="/plugin/wisedocs/index/search"
+          style="display:flex;gap:10px;max-width:480px;margin:0 auto 24px">
+        <input class="wd-input" type="search" name="keyword" placeholder="搜索文档标题、内容..." aria-label="搜索文档">
+        <button class="wd-btn wd-btn--brand" type="submit"><i class="bi bi-search"></i> 搜索</button>
+    </form>
+
+    <div class="wd-hero__actions">
+        <a class="wd-btn wd-btn--alt" href="#all-docs"><i class="bi bi-journal-text"></i> 浏览全部文档</a>
+        <a class="wd-btn wd-btn--outline" href="/plugin/wisedocs/api/index"><i class="bi bi-code-square"></i> API 文档</a>
+    </div>
+</section>
+
+{if !empty($featured)}
+<section class="wd-section">
+    <h2 class="wd-section__title"><i class="bi bi-star"></i> 推荐文档</h2>
+    <div class="wd-cards">
+        {volist name="featured" id="doc"}
+        <a class="wd-card" href="/plugin/wisedocs/index/detail?slug={$doc.slug}">
+            <h3 class="wd-card__title">{$doc.title}</h3>
+            {if !empty($doc.excerpt)}
+            <p class="wd-card__desc">{$doc.excerpt}</p>
+            {/if}
+            <div class="wd-card__foot">
+                <span><i class="bi bi-eye"></i> {$doc.view_count|default=0}</span>
+            </div>
+        </a>
+        {/volist}
+    </div>
+</section>
+{/if}
+
+<section class="wd-section" id="all-docs">
+    <h2 class="wd-section__title">
+        <i class="bi bi-file-earmark-text"></i>
+        {if !empty($currentCategory)}{$currentCategory.name}{else /}全部文档{/if}
+        <span class="wd-badge wd-badge--muted">{$documents|count}</span>
+    </h2>
+
+    {if empty($documents)}
+    <div class="wd-empty">
+        <i class="bi bi-inbox"></i>
+        该分类下暂无已发布文档
+    </div>
+    {else /}
+    <ul class="wd-list">
+        {volist name="documents" id="doc"}
+        <li>
+            <a class="wd-list__item" href="/plugin/wisedocs/index/detail?slug={$doc.slug}">
+                <div class="wd-list__top">
+                    {if !empty($doc.is_top)}<span class="wd-badge wd-badge--danger">置顶</span>{/if}
+                    <span class="wd-list__title">{$doc.title}</span>
+                    <span class="wd-list__meta"><i class="bi bi-eye"></i> {$doc.view_count|default=0}</span>
+                </div>
+                {if !empty($doc.excerpt)}
+                <p class="wd-list__desc">{$doc.excerpt|mb_substr=0,90}</p>
+                {/if}
+            </a>
+        </li>
+        {/volist}
+    </ul>
+    {/if}
+</section>
+
+{if !empty($hot)}
+<section class="wd-section">
+    <h2 class="wd-section__title"><i class="bi bi-fire"></i> 热门文档</h2>
+    <ul class="wd-list">
+        {volist name="hot" id="doc"}
+        <li>
+            <a class="wd-list__item" href="/plugin/wisedocs/index/detail?slug={$doc.slug}">
+                <div class="wd-list__top">
+                    <span class="wd-list__title">{$doc.title}</span>
+                    <span class="wd-list__meta"><i class="bi bi-eye"></i> {$doc.view_count|default=0}</span>
+                </div>
+            </a>
+        </li>
+        {/volist}
+    </ul>
+</section>
+{/if}
+{/block}

@@ -1,0 +1,48 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}添加模型{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-plus-circle" caption="添加模型" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <form id="modelForm" method="post" action="{:plugin_url('wisecms/model/create')}">
+                    {:csrf_field()}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-name">模型标识 <span class="text-danger">*</span></label>
+                            <input id="cms-f-name" type="text" name="name" class="form-control" required placeholder="小写字母/数字/下划线，如 article">
+                            <div class="form-text">将据此创建数据表 wisecms_content_{标识}</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-title">模型名称 <span class="text-danger">*</span></label>
+                            <input id="cms-f-title" type="text" name="title" class="form-control" required maxlength="50" placeholder="如 文章模型">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-table_name">数据表名</label>
+                            <input id="cms-f-table_name" type="text" name="table_name" class="form-control" placeholder="留空自动生成">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-status">状态</label>
+                            <select id="cms-f-status" name="status" class="form-select">
+                                <option value="1">启用</option>
+                                <option value="0">禁用</option>
+                            </select>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label" for="cms-f-description">模型描述</label>
+                            <textarea id="cms-f-description" name="description" class="form-control" rows="3" maxlength="200"></textarea>
+                        </div>
+                    </div>
+                    <div class="cms-form-actions">
+                        <a href="{:plugin_url('wisecms/model/index')}" class="btn btn-outline-secondary btn-sm cms-form-actions-secondary">返回</a>
+                        <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

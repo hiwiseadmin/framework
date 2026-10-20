@@ -1,0 +1,137 @@
+<!--
+  后台「站点上下文条」（UIUX-P0-05）
+
+  用法：wisecms 后台页在 index_header 之后引入本区块（admin/common/cms_context_bar）。
+  旧页面继续引 site_switch 也可以 —— 后者会 include 本文件，调用点零改动。
+
+  设计要点：
+    1) 只切换**后台编辑上下文**（会话级，见 SiteService::resolveAdminSiteId()），
+       不修改任何业务数据；只有 1 个启用站点时自动隐藏（避免无意义噪声），
+       无权限（site/options 返回 403）时同样静默隐藏；
+    2) 幂等：重复引入（或被 site_switch 间接引入）不会重复绑定事件与重复发请求；
+    3) 与旧 site_switch 的差异仅在展示（多显示站点域名与数据时间），切换行为保持一致；
+    4) 不用模板字符串（反引号 + dollar 花括号）—— think-template 会把 dollar 花括号
+       当变量标签解析，本文件一律用字符串拼接。
+
+  注意（历史踩坑，勿改）：本注释内**不可**书写带花括号的 include 示例 ——
+  think-template 的 parseInclude() 先于注释剥离执行，会把注释里的 include 当真并
+  递归引入本文件，导致无限递归 + 内存耗尽；花括号 + 斜杠星号 的「模板注释」写法
+  在本引擎下同样不成立。
+-->
+<div class="cms-context-bar d-none" id="cmsContextBar">
+    <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
+        <i class="bi bi-globe2 text-muted"></i>
+        <span class="text-muted small">当前站点</span>
+        <select id="cmsSiteSelect" class="form-select form-select-sm w-auto" title="切换后台当前站点"></select>
+        <span class="text-muted small" id="cmsSiteDomain"></span>
+        <span class="text-muted small ms-auto" id="cmsSiteUpdatedAt"></span>
+    </div>
+</div>
+<script>
+(function () {
+    // 幂等守卫：site_switch 与本片段可能被同时引入，避免重复绑定
+    if (window.__cmsContextBarBound) { return; }
+    window.__cmsContextBarBound = true;
+
+    var $bar = $('#cmsContextBar');
+    if (!$bar.length) { return; }
+
+    var url = {
+        options: '{:plugin_url("wisecms/site/options")}',
+        switchTo: '{:plugin_url("wisecms/site/switch")}'
+    };
+
+    // P1-14：切换后更新页头域名要用到站点列表，闭包内缓存一份
+    var _siteList = [];
+
+    function wise() { return window.Wise || {}; }
+
+    function toast(message, type) {
+        var w = wise();
+        if (w.ui && w.ui.toast) {
+            var fn = w.ui.toast[type] || w.ui.toast.info;
+            fn.call(w.ui.toast, message);
+            return;
+        }
+        if (window.Layer && typeof Layer.toast === 'function') {
+            Layer.toast({ content: message, type: type || 'success' });
+            return;
+        }
+        window.alert(message);
+    }
+
+    // P1-14：切换成功后**不再整页 reload**，改为广播事件让当前页面局部刷新。
+    // 其它已打开的标签页（iframe）保持原站点上下文（既有行为，需手动刷新），
+    // 事件只在当前框架内派发，不会跨 iframe 传播。
+    function notifySwitched(siteId, siteName) {
+        // 更新页头：域名 + 数据时间（站点名已由 select 自身回显）
+        var site = null;
+        for (var i = 0; i < _siteList.length; i++) {
+            if (String(_siteList[i].id) === String(siteId)) { site = _siteList[i]; break; }
+        }
+        if (site) {
+            $('#cmsSiteDomain').text(site.domain ? ('（' + site.domain + '）') : '');
+        }
+        $('#cmsSiteUpdatedAt').text('数据时间 ' + new Date().toTimeString().slice(0, 8));
+
+        var evt;
+        try {
+            evt = new CustomEvent('cms-site-switched', { detail: { siteId: siteId, siteName: siteName } });
+        } catch (e) {
+            evt = document.createEvent('Event');
+            evt.initEvent('cms-site-switched', true, true);
+            evt.detail = { siteId: siteId, siteName: siteName };
+        }
+        document.dispatchEvent(evt);
+    }
+
+    $.get(url.options).done(function (res) {
+        // 403（未授权）/ 异常：静默隐藏，不影响页面其它功能
+        if (!res || res.code !== 0 || !res.data) { return; }
+
+        var list = res.data.list || [];
+        _siteList = list;
+        // 单站点无切换意义
+        if (list.length < 2) { return; }
+
+        var current = null;
+        var $select = $('#cmsSiteSelect');
+
+        $.each(list, function (i, site) {
+            $select.append($('<option>').val(site.id).text(site.name));
+            if (String(site.id) === String(res.data.current)) { current = site; }
+        });
+        $select.val(String(res.data.current));
+
+        if (current && current.domain) {
+            $('#cmsSiteDomain').text('（' + current.domain + '）');
+        }
+        // 不引 moment：取本地时分秒即可，避免模板字符串
+        $('#cmsSiteUpdatedAt').text('数据时间 ' + new Date().toTimeString().slice(0, 8));
+
+        $bar.removeClass('d-none');
+
+        $select.on('change', function () {
+            var siteId = parseInt($(this).val(), 10);
+            var siteName = $select.find('option:selected').text() || '';
+            var done = function (msg) {
+                toast(msg || '已切换站点', 'success');
+                // P1-14：不再 location.reload()，广播事件让当前页面局部刷新（表格/栏目树）
+                notifySwitched(siteId, siteName);
+            };
+
+            var w = wise();
+            if (w.util && w.util.http) {
+                // 内核 http 已带 CSRF 头与统一错误 toast（失败走 catch，无需再提示）
+                w.util.http.post(url.switchTo, { site_id: siteId })
+                    .then(function (r) { done(r && r.msg); })
+                    .catch(function () { /* 拦截器已提示 */ });
+                return;
+            }
+
+            // 兜底：内核未就绪时退回 jQuery（CSRF 由 wise-framework 的 ajaxSend 统一注入）
+            $.post(url.switchTo, { site_id: siteId }).done(function (r) { done(r && r.msg); });
+        });
+    });
+})();
+</script>

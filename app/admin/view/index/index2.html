@@ -1,0 +1,305 @@
+{extend name="public/base" /}
+
+{block name="title"}首页{/block}
+
+{block name="content"}
+<body class="layout-fixed fixed-header fixed-footer sidebar-expand-lg sidebar-open bg-body-tertiary sidebar-mini">
+    <div class="app-wrapper">
+        <div class="app-header border-0">
+            <nav class="navbar navbar-expand bg-body">
+                <div class="container-fluid">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
+                            <i class="bi bi-list"></i>
+                        </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" role="button" data-lte-widget="refresh" ><i class="bi bi-arrow-counterclockwise"></i></a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        {volist name="menus" id="menu"}
+                        {eq name="menu.parent_id" value="0"}
+                        <li class="nav-item d-none d-md-block">
+                            <a href="#" class="nav-link top-menu-item text-nowrap active" data-menu="{$menu.path}" data-id="{$menu.id}">{$menu.name}</a>
+                        </li>
+                        {/eq}
+                        {/volist}
+                    </ul>
+        
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item d-none d-md-block" data-lte-widget="lockscreen" data-bs-toggle="tooltip" title="临时锁屏 Shift + L" data-bs-placement="bottom">
+                    <a class="nav-link" href="#" role="button"><i class="bi bi-lock"></i></a>
+                    </li>
+                    <li class="nav-item d-none d-md-block" data-bs-toggle="tooltip" title="搜索" data-bs-placement="bottom">
+                        <a class="nav-link" data-lte-widget="navbar-search" href="#" role="button"><i class="bi bi-search"></i></a>
+                    </li>
+                    <li class="nav-item dropdown d-none d-md-block" data-bs-toggle="tooltip" title="切换主题">
+                        <button class="btn btn-link nav-link py-2 px-0 px-lg-2 dropdown-toggle d-flex align-items-center" id="bd-theme"
+                            type="button" aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static">
+                            <span class="theme-icon-active">
+                                <i class="my-1"></i>
+                            </span>
+                            <!-- <span class="d-lg-none ms-2" id="bd-theme-text">Toggle theme</span> -->
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-theme-text" style="--bs-dropdown-min-width: 8rem;">
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="auto" aria-pressed="true">
+                                    <i class="bi bi-circle-half me-2"></i>自动<i class="bi bi-check-lg ms-auto d-none"></i>
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="light" aria-pressed="false">
+                                    <i class="bi bi-sun-fill me-2"></i>亮色<i class="bi bi-check-lg ms-auto d-none"></i>
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">
+                                    <i class="bi bi-moon-fill me-2"></i>暗色<i class="bi bi-check-lg ms-auto d-none"></i>
+                                </button>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item d-none d-md-block" data-bs-toggle="tooltip" title="切换颜色" data-bs-placement="bottom">
+                        <a class="nav-link" href="#" data-lte-widget="color-scheme" role="button"><i class="bi bi-palette"></i></a>
+                    </li>
+                    <li class="nav-item dropdown" data-bs-toggle="tooltip" title="消息通知" data-bs-placement="bottom">
+                        <a class="nav-link" data-bs-toggle="dropdown" href="#">
+                            <i class="bi bi-chat-text"></i>
+                            <span class="navbar-badge badge text-bg-danger">3</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+                            <a href="#" class="dropdown-item">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                <img
+                                    src="/static/images/avatar/16.jpg"
+                                    alt="User Avatar"
+                                    class="img-size-50 rounded-circle me-3"
+                                />
+                                </div>
+                                <div class="flex-grow-1">
+                                <h3 class="dropdown-item-title">
+                                    Brad Diesel
+                                    <span class="float-end fs-7 text-danger"
+                                    ><i class="bi bi-star-fill"></i
+                                    ></span>
+                                </h3>
+                                <p class="fs-7">Call me whenever you can...</p>
+                                <p class="fs-7 text-secondary">
+                                    <i class="bi bi-clock-fill me-1"></i> 4 Hours Ago
+                                </p>
+                                </div>
+                            </div>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                <img
+                                    src="/static/images/avatar/17.jpg"
+                                    alt="User Avatar"
+                                    class="img-size-50 rounded-circle me-3"
+                                />
+                                </div>
+                                <div class="flex-grow-1">
+                                <h3 class="dropdown-item-title">
+                                    John Pierce
+                                    <span class="float-end fs-7 text-secondary">
+                                    <i class="bi bi-star-fill"></i>
+                                    </span>
+                                </h3>
+                                <p class="fs-7">I got your message bro</p>
+                                <p class="fs-7 text-secondary">
+                                    <i class="bi bi-clock-fill me-1"></i> 4 Hours Ago
+                                </p>
+                                </div>
+                            </div>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                <img
+                                    src="/static/images/avatar/18.jpg"
+                                    alt="User Avatar"
+                                    class="img-size-50 rounded-circle me-3"
+                                />
+                                </div>
+                                <div class="flex-grow-1">
+                                <h3 class="dropdown-item-title">
+                                    Nora Silvester
+                                    <span class="float-end fs-7 text-warning">
+                                    <i class="bi bi-star-fill"></i>
+                                    </span>
+                                </h3>
+                                <p class="fs-7">The subject goes here</p>
+                                <p class="fs-7 text-secondary">
+                                    <i class="bi bi-clock-fill me-1"></i> 4 Hours Ago
+                                </p>
+                                </div>
+                            </div>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
+                        </div>
+                    </li>
+        
+                    <li class="nav-item dropdown" data-bs-toggle="tooltip" title="通知" data-bs-placement="bottom">
+                        <a class="nav-link" data-bs-toggle="dropdown" href="#">
+                            <i class="bi bi-bell-fill"></i>
+                            <span class="navbar-badge badge text-bg-warning">15</span>
+                        </a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+                        <span class="dropdown-item dropdown-header">15 Notifications</span>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item">
+                        <i class="bi bi-envelope me-2"></i> 4 new messages
+                        <span class="float-end text-secondary fs-7">3 mins</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item">
+                        <i class="bi bi-people-fill me-2"></i> 8 friend requests
+                        <span class="float-end text-secondary fs-7">12 hours</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item">
+                        <i class="bi bi-file-earmark-fill me-2"></i> 3 new reports
+                        <span class="float-end text-secondary fs-7">2 days</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item dropdown-footer"> See All Notifications </a>
+                    </div>
+                    </li>
+        
+                    <li class="nav-item d-none d-md-block" data-bs-toggle="tooltip" title="全屏 F11" data-bs-placement="bottom">
+                        <a class="nav-link" href="#" data-lte-toggle="fullscreen">
+                            <i data-lte-icon="maximize" class="bi bi-arrows-fullscreen"></i>
+                            <i data-lte-icon="minimize" class="bi bi-fullscreen-exit" style="display: none"></i>
+                        </a>
+                    </li>
+        
+                    <li class="nav-item dropdown user-menu">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <img
+                            src="/static/images/avatar/16.jpg"
+                            class="user-image rounded-circle shadow"
+                            alt="User Image"
+                            />
+                            <span class="d-none d-md-inline">{:session('admin_nickname')}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+                            <li class="user-header text-bg-primary">
+                            <img
+                                src="/static/images/avatar/16.jpg"
+                                class="rounded-circle shadow"
+                                alt="User Image"
+                            />
+                            <p>
+                                Alexander Pierce - Web Developer
+                                <small>Member since Nov. 2023</small>
+                            </p>
+                            </li>
+                            <li class="user-body">
+                            <div class="row">
+                                <div class="col-4 text-center">
+                                <a href="#">Followers</a>
+                                </div>
+                                <div class="col-4 text-center">
+                                <a href="#">Sales</a>
+                                </div>
+                                <div class="col-4 text-center">
+                                <a href="#">Friends</a>
+                                </div>
+                            </div>
+                            </li>
+                            <li class="user-footer">
+                            <a href="#" class="btn btn-success" id="profile">个人资料</a>
+                            <a href="{:url('/admin/login/logout')}" class="btn btn-danger float-end" data-bs-toggle="tooltip" title="退出登录 Shift + X">退出</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                </div>
+            </nav>
+            <!-- 第二行导航 - 可关闭标签页 -->
+            <nav class="navbar navbar-expand bg-body">
+                <ul class="navbar-nav nav-tabs w-100 mw-100" id="dynamic-tabs" role="tablist"></ul>
+            </nav>
+        </div>
+        <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+            <div class="sidebar-brand">
+            <a href="./index.html" class="brand-link">
+                <img src="/static/images/admin/logo.jpg" alt="Logo" class="brand-image rounded-circle opacity-75 shadow"/>
+                <span class="brand-text fw-light">{$wssite['name']|default='网站管理后台'}</span>
+            </a>
+            </div>
+            <div class="sidebar-wrapper">
+                <!-- 侧边栏搜索框 -->
+                <div class="form-inline mt-2">
+                <div class="input-group" data-lte-toggle="sidebar-search" data-min-length="2" data-not-found-text="没有找到任何元素！">
+                    <input class="form-control form-control-sidebar" type="search" placeholder="搜索菜单" aria-label="Search">
+                    <div class="input-group-append">
+                        <button class="btn btn-sidebar">
+                            <i class="bi bi-search bi-fw"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar-search-results">
+                        <div class="list-group"></div>
+                    </div>
+                </div>
+                </div>
+            <nav class="mt-2">
+                <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" aria-label="Main navigation" data-accordion="false" id="navigation">
+                    {volist name="menus" id="menu"}
+                    {volist name="menu.children" id="menu2"}
+                    {eq name="menu2.type" value="2"}
+                    <li class="nav-item">
+                        <a href="{$menu2.path}" class="nav-link" data-url="{$menu2.path}" data-title="{$menu2.name}">
+                            <i class="nav-icon {$menu2.icon ?: 'bi bi-circle'}"></i>
+                            <p>{$menu2.name}</p>
+                        </a>
+                    </li>
+                    {else/}
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon {$menu2.icon ?: 'bi bi-circle'}"></i>
+                            <p>{$menu2.name}<i class="nav-arrow bi bi-chevron-right"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            {volist name="menu2['children']" id="menu3"}
+                            {eq name="menu3.type" value="2"}
+                            <li class="nav-item">
+                                <a href="{$menu3.path}" class="nav-link" data-url="{$menu3.path}" data-title="{$menu3.name}">
+                                    <i class="nav-icon {$menu3.icon ?: 'bi bi-circle'}"></i>
+                                    <p>{$menu3.name}</p>
+                                </a>
+                            </li>
+                            {/eq}
+                            {/volist}
+                        </ul>
+                    </li>
+                    {/eq}
+                    {/volist}
+                    {/volist}
+                    </ul>
+                </li>
+                </ul>
+            </nav>
+            </div>
+        </aside>
+            {include file="index/lockscreen" /}
+        <main class="app-main">
+            <div id="dynamic-tab-content" class="tab-content h-100"></div>
+        </main>
+        <!-- <footer class="app-footer">
+            <div class="float-end d-none d-sm-inline">Anything you want</div>
+            <strong>Copyright &copy; 2014-2025&nbsp;<a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>.</strong>
+            All rights reserved.
+        </footer> -->
+        <!-- 登录成功弹窗 -->
+         {include file="index/login_success_modal" /}
+    </div>
+
+{/block}

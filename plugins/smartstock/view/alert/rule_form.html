@@ -1,0 +1,73 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}预警规则编辑{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-bell" caption="预警规则" buttongroup="" /}
+    <div class="plugin-smartstock">
+        <div class="container-fluid p-0">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title" id="form-title">新增预警规则</h3>
+                </div>
+                <div class="card-body">
+                    <form id="alert-rule-form" class="row g-3">
+                        <input type="hidden" name="id" value="{$row.id|default=0}">
+                        <div class="col-md-6">
+                            <label class="form-label">商品</label>
+                            <select id="form-product-id" name="product_id" class="form-select">
+                                <option value="">全部商品</option>
+                                {foreach $products as $p}
+                                <option value="{$p.id}" {if isset($row.product_id) && $row.product_id == $p.id}selected{/if}>{$p.name} ({$p.sku_code})</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">仓库</label>
+                            <select id="form-warehouse-id" name="warehouse_id" class="form-select">
+                                <option value="">全部仓库</option>
+                                {foreach $warehouses as $w}
+                                <option value="{$w.id}" {if isset($row.warehouse_id) && $row.warehouse_id == $w.id}selected{/if}>{$w.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">预警类型 <span class="text-danger">*</span></label>
+                            <select name="alert_type" class="form-select"
+                                    data-validation="required"
+                                    data-validation-message-required="请选择预警类型">
+                                <option value="low_stock" {if isset($row.alert_type) && $row.alert_type == 'low_stock'}selected{/if}>库存下限</option>
+                                <option value="expiry" {if isset($row.alert_type) && $row.alert_type == 'expiry'}selected{/if}>临期预警</option>
+                                <option value="overstock" {if isset($row.alert_type) && $row.alert_type == 'overstock'}selected{/if}>积压预警</option>
+                            </select>
+                            <div class="invalid-feedback"><span class="validation-text"></span></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">阈值 <span class="text-danger">*</span></label>
+                            <input type="number" name="threshold" class="form-control" value="{$row.threshold|default=10}"
+                                   data-validation="required|min:0"
+                                   data-validation-message-required="请填写预警阈值"
+                                   data-validation-message-min="阈值不能小于 0">
+                            <div class="invalid-feedback"><span class="validation-text"></span></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">状态</label>
+                            <select name="status" class="form-select">
+                                <option value="1" {if isset($row.status) && $row.status == 1}selected{/if}>启用</option>
+                                <option value="0" {if isset($row.status) && $row.status == 0}selected{/if}>禁用</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg"></i> 保存
+                            </button>
+                            <a href="{:url('/plugin/smartstock/alert/ruleIndex')}" class="btn btn-outline-secondary">返回</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

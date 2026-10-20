@@ -1,0 +1,89 @@
+<!-- 商品 新增/编辑 模态框片段 -->
+<div class="modal fade" id="product-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="form-title">新增商品</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+            </div>
+            <form id="product-form" class="modal-body row g-3">
+                <input type="hidden" name="id" id="form-id" value="0">
+                <div class="col-md-6">
+                    <label class="form-label">商品名称 <span class="text-danger">*</span></label>
+                    <input type="text" name="name" id="form-name" class="form-control"
+                           data-validation="required|maxLength:100"
+                           data-validation-message-required="请填写商品名称"
+                           data-validation-message-maxLength="商品名称不能超过 100 个字符">
+                    <div class="invalid-feedback"><span class="validation-text"></span></div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">SKU 编码</label>
+                    <input type="text" name="sku_code" id="form-sku-code" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">分类</label>
+                    <select name="category_id" id="form-category-id" class="form-select">
+                        <option value="0">未分类</option>
+                        {foreach $categories as $c}
+                        <option value="{$c.id}">{$c.name}</option>
+                        {/foreach}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">单位</label>
+                    <select name="unit_id" id="form-unit-id" class="form-select">
+                        <option value="0">请选择</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">默认仓库</label>
+                    <select name="warehouse_id" id="form-warehouse-id" class="form-select">
+                        <option value="0">未指定</option>
+                        {foreach $warehouses as $w}
+                        <option value="{$w.id}">{$w.name}</option>
+                        {/foreach}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">条码</label>
+                    <input type="text" name="barcode" id="form-barcode" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">规格说明</label>
+                    <input type="text" name="spec_summary" id="form-spec-summary" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">成本价</label>
+                    <input type="number" step="0.01" name="cost_price" id="form-cost-price" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">售价</label>
+                    <input type="number" step="0.01" name="selling_price" id="form-selling-price" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">有效期至</label>
+                    <input type="date" name="expiry_date" id="form-expiry-date" class="form-control">
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label">图片地址</label>
+                    <input type="text" name="image" id="form-image" class="form-control">
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label">状态</label>
+                    <select name="status" id="form-status" class="form-select">
+                        <option value="1">启用</option>
+                        <option value="0">禁用</option>
+                    </select>
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label">描述</label>
+                    <textarea name="description" id="form-description" class="form-control" rows="3"></textarea>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" form="product-form" class="btn btn-primary"><i class="bi bi-check-lg"></i> 保存</button>
+            </div>
+        </div>
+    </div>
+</div>

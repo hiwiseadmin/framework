@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订单详情 - 工作流演示</title>
+    <?php /* 后台写操作需 CSRF 令牌：本页为独立 HTML（未继承插件统一布局），故显式输出 meta */ ?>
+    <meta name="csrf-token" content="<?php echo csrf_token(); ?>">
+    <link href="__CSS__/bootstrap.min.css" rel="stylesheet">
+    <link href="__CSS__/adminlte.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">订单详情</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="<?php echo plugin_url('workflowdemo/order/index'); ?>">订单列表</a></li>
+                    <li class="breadcrumb-item active">订单详情</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content">
+    <div class="container-fluid">
+        <!-- 订单信息 -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">订单信息</h3>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th style="width: 150px;">订单ID</th>
+                                <td><?php echo $order['id']; ?></td>
+                            </tr>
+                            <tr>
+                                <th>订单标题</th>
+                                <td><?php echo htmlspecialchars($order['title']); ?></td>
+                            </tr>
+                            <tr>
+                                <th>订单描述</th>
+                                <td><?php echo htmlspecialchars($order['description']); ?></td>
+                            </tr>
+                            <tr>
+                                <th>订单金额</th>
+                                <td>¥<?php echo number_format($order['amount'], 2); ?></td>
+                            </tr>
+                            <tr>
+                                <th>当前状态</th>
+                                <td>
+                                    <span class="badge bg-primary" id="current-status">
+                                        <?php 
+                                        $currentPlace = !empty($currentPlaces) ? array_key_first($currentPlaces) : '';
+                                        echo $placeLabels[$currentPlace] ?? $currentPlace; 
+                                        ?>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>创建时间</th>
+                                <td><?php echo date('Y-m-d H:i:s', $order['create_time']); ?></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 工作流历史 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">工作流历史</h3>
+                    </div>
+                    <div class="card-body">
+                        <?php if (empty($history)): ?>
+                        <p class="text-muted">暂无历史记录</p>
+                        <?php else: ?>
+                        <ul class="timeline">
+                            <?php foreach ($history as $item): ?>
+                            <li>
+                                <i class="fas fa-arrow-right bg-blue"></i>
+                                <div class="timeline-item">
+                                    <span class="time"><i class="fas fa-clock"></i> <?php echo date('Y-m-d H:i:s', $item['create_time']); ?></span>
+                                    <h3 class="timeline-header">
+                                        <strong><?php echo $item['transition_name']; ?></strong>
+                                    </h3>
+                                    <div class="timeline-body">
+                                        从 <code><?php echo $item['from_place']; ?></code> 
+                                        到 <code><?php echo $item['to_place']; ?></code>
+                                        <?php if (!empty($item['context'])): ?>
+                                        <br>备注：<?php echo htmlspecialchars($item['context']); ?>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </li>
+                            <?php endforeach; ?>
+                        </ul>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 工作流操作面板 -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">工作流操作</h3>
+                    </div>
+                    <div class="card-body">
+                        <?php if (empty($enabledTransitions)): ?>
+                        <p class="text-muted">当前状态无可用操作</p>
+                        <?php else: ?>
+                        <p>当前状态：<strong><?php $currentPlace = !empty($currentPlaces) ? array_key_first($currentPlaces) : ''; echo $placeLabels[$currentPlace] ?? $currentPlace; ?></strong></p>
+                        <hr>
+                        <p>可执行操作：</p>
+                        <?php foreach ($enabledTransitions as $transition): ?>
+                        <div class="mb-2">
+                            <?php $tName = $transition->getName(); ?>
+                            <button class="btn btn-block btn-outline-primary btn-sm transition-btn" 
+                                    data-transition="<?php echo $tName; ?>"
+                                    data-label="<?php echo $transitionLabels[$tName] ?? $tName; ?>">
+                                <?php echo $transitionLabels[$tName] ?? $tName; ?>
+                            </button>
+                        </div>
+                        <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- 工作流状态图 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">状态流程图</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="workflow-diagram">
+                            <?php 
+                            $allPlaces = [
+                                'draft'     => ['label' => '草稿',     'next' => ['submitted', 'cancelled']],
+                                'submitted' => ['label' => '已提交',   'next' => ['reviewing', 'cancelled']],
+                                'reviewing' => ['label' => '审核中',   'next' => ['approved', 'rejected']],
+                                'approved'  => ['label' => '已通过',   'next' => []],
+                                'rejected'  => ['label' => '已拒绝',   'next' => ['draft']],
+                                'cancelled' => ['label' => '已取消',   'next' => []],
+                            ];
+                            ?>
+                            <?php $currentPlace = !empty($currentPlaces) ? array_key_first($currentPlaces) : ''; ?>
+                            <?php foreach ($allPlaces as $placeKey => $placeInfo): ?>
+                            <div class="place-item <?php echo $currentPlace == $placeKey ? 'active' : ''; ?>" 
+                                 style="margin-bottom: 10px; padding: 8px; border-radius: 4px; 
+                                        background: <?php echo $currentPlace == $placeKey ? '#e3f2fd' : '#f8f9fa'; ?>
+                                        border: 1px solid <?php echo $currentPlace == $placeKey ? '#2196f3' : '#dee2e6'; ?>;">
+                                <strong><?php echo $placeInfo['label']; ?></strong>
+                                <?php if ($currentPlace == $placeKey): ?>
+                                <span class="badge bg-primary float-right">当前</span>
+                                <?php endif; ?>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 操作确认模态框 -->
+<div class="modal fade" id="transitionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">确认操作</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>确定要执行 <strong id="modal-transition-label"></strong> 操作吗？</p>
+                <input type="hidden" id="modal-transition-name">
+                <div class="form-group">
+                    <label>备注（可选）</label>
+                    <textarea class="form-control" id="modal-context" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="modal-confirm-btn">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="__JS__/jquery.min.js"></script>
+<script src="__JS__/bootstrap.bundle.min.js"></script>
+<script>
+$(function() {
+    var orderId = <?php echo $order['id']; ?>;
+
+    // 工作流转换按钮点击
+    $('.transition-btn').click(function() {
+        var transitionName = $(this).data('transition');
+        var transitionLabel = $(this).data('label');
+        
+        $('#modal-transition-name').val(transitionName);
+        $('#modal-transition-label').text(transitionLabel);
+        $('#transitionModal').modal('show');
+    });
+
+    // 确认执行转换
+    $('#modal-confirm-btn').click(function() {
+        var transitionName = $('#modal-transition-name').val();
+        var context = $('#modal-context').val();
+
+        var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+
+        $.post('<?php echo plugin_url("workflowdemo/order/transition"); ?>', {
+            id: orderId,
+            transition: transitionName,
+            context: context,
+            _token: csrfMeta ? csrfMeta.getAttribute('content') : ''
+        }, function(res) {
+            if (res.code === 1) {
+                alert('操作成功');
+                location.reload();
+            } else {
+                alert(res.msg || '操作失败');
+            }
+        }, 'json').fail(function() {
+            alert('请求失败，请重试');
+        });
+    });
+});
+</script>
+</body>
+</html>

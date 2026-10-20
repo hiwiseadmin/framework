@@ -1,0 +1,541 @@
+{extend name="public/base" /}
+
+{block name="title"}角色权限配置{/block}
+
+{block name="css"}
+<style>
+/* ===== 角色权限配置中心布局 ===== */
+.role-permission-layout {
+    display: flex;
+    height: calc(100vh - 190px);
+    min-height: 600px;
+    gap: 0;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.375rem;
+    overflow: hidden;
+    background: var(--bs-body-bg);
+}
+
+/* 左侧角色面板 */
+.role-left-panel {
+    width: 280px;
+    min-width: 240px;
+    border-right: 1px solid var(--bs-border-color);
+    display: flex;
+    flex-direction: column;
+    background: var(--bs-tertiary-bg);
+}
+
+.role-left-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--bs-border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.role-left-header .input-group {
+    flex: 1;
+}
+
+.role-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 0;
+}
+
+.role-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all 0.15s ease;
+    gap: 8px;
+    position: relative;
+}
+
+.role-item:hover {
+    background: var(--bs-primary-bg-subtle);
+}
+
+.role-item.active {
+    background: rgba(var(--bs-primary-rgb), 0.1);
+    border-left-color: var(--bs-primary);
+    font-weight: 600;
+}
+
+.role-item .role-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.role-item .role-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.role-item .role-name {
+    font-size: 13px;
+    line-height: 1.3;
+}
+
+.role-item .role-meta {
+    font-size: 11px;
+    color: var(--bs-secondary-color);
+    display: flex;
+    gap: 8px;
+    margin-top: 2px;
+}
+
+.role-item .role-badge {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 10px;
+}
+
+/* 右侧矩阵面板 */
+.role-right-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.role-right-toolbar {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--bs-border-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    background: var(--bs-body-bg);
+}
+
+.role-right-toolbar .btn-group .btn {
+    font-size: 12px;
+    padding: 4px 10px;
+}
+
+.matrix-container {
+    flex: 1;
+    overflow: auto;
+    position: relative;
+}
+
+/* 权限矩阵表格 */
+.perm-matrix-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: auto;
+}
+
+.perm-matrix-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    /* 表头统一底色：此前除首列外是 body-bg，滚动时与内容混在一起看不清 */
+    background: var(--bs-tertiary-bg);
+    border-bottom: 2px solid var(--bs-border-color);
+    padding: 6px 8px;
+    font-size: 12px;
+    text-align: center;
+    min-width: 70px;
+    white-space: nowrap;
+    font-weight: 600;
+}
+
+/* 首列固定：横向滚动时「权限项」列始终可见 */
+.perm-matrix-table thead th.perm-col {
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 13; /* 高于普通表头与固定列单元格 */
+    background: var(--bs-secondary-bg);
+    border-bottom: 2px solid var(--bs-border-color);
+    box-shadow: inset -1px 0 0 var(--bs-border-color);
+    text-align: left;
+    min-width: 200px;
+    padding: 6px 12px;
+}
+
+.perm-matrix-table tbody td {
+    padding: 0;
+    border-bottom: 1px solid var(--bs-border-color-light, rgba(0,0,0,0.06));
+    vertical-align: middle;
+}
+
+.perm-matrix-table tbody td.perm-col {
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    background: var(--bs-body-bg);
+    box-shadow: inset -1px 0 0 var(--bs-border-color);
+    padding: 5px 12px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+/* 分组行的首列需保持自己的底色，避免固定列透出下层内容 */
+.matrix-group-row td.perm-col {
+    background: var(--bs-tertiary-bg);
+}
+
+.perm-matrix-table tbody td.perm-col.tree-indent-0 { padding-left: 12px; }
+.perm-matrix-table tbody td.perm-col.tree-indent-1 { padding-left: 32px; }
+.perm-matrix-table tbody td.perm-col.tree-indent-2 { padding-left: 52px; }
+.perm-matrix-table tbody td.perm-col.tree-indent-3 { padding-left: 72px; }
+.perm-matrix-table tbody td.perm-col.tree-indent-4 { padding-left: 92px; }
+
+.perm-matrix-table tbody td.perm-col .perm-type-badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 0 4px;
+    border-radius: 3px;
+    margin-left: 6px;
+    vertical-align: middle;
+    opacity: 0.6;
+}
+
+/* 矩阵单元格 */
+.matrix-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 34px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: 2px solid transparent;
+    border-radius: 2px;
+    margin: 1px;
+}
+
+.matrix-cell:hover {
+    border-color: var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb), 0.05);
+}
+
+.matrix-cell.perm-direct {
+    background: var(--bs-success-bg-subtle);
+    color: var(--bs-success);
+    font-weight: 600;
+    border-color: var(--bs-success-border-subtle);
+}
+
+.matrix-cell.perm-direct:hover {
+    background: rgba(25, 135, 84, 0.25);
+}
+
+.matrix-cell.perm-inherited {
+    background: rgba(255, 193, 7, 0.15);
+    color: #b8860b;
+    border-color: rgba(255, 193, 7, 0.3);
+}
+
+.matrix-cell.perm-inherited:hover {
+    background: rgba(255, 193, 7, 0.25);
+}
+
+.matrix-cell.perm-none {
+    color: var(--bs-secondary-color);
+}
+
+.matrix-cell.perm-none:hover {
+    background: rgba(var(--bs-primary-rgb), 0.03);
+}
+
+.matrix-cell .cell-icon {
+    font-size: 14px;
+    line-height: 1;
+}
+
+.matrix-cell .cell-icon.i-inherited {
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+/* 权限分组行 */
+.matrix-group-row td {
+    background: var(--bs-tertiary-bg) !important;
+    font-weight: 600;
+    padding: 6px 12px !important;
+    font-size: 13px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.matrix-group-row td .group-toggle {
+    margin-right: 6px;
+    font-size: 11px;
+}
+
+.matrix-group-row .group-header-cell {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.group-header-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 4px;
+}
+
+.group-header-actions .btn {
+    font-size: 10px;
+    padding: 1px 6px;
+    line-height: 1.4;
+}
+
+/* 详情面板 */
+.role-detail-panel {
+    border-top: 1px solid var(--bs-border-color);
+    padding: 12px 16px;
+    background: var(--bs-tertiary-bg);
+    display: none;
+}
+
+.role-detail-panel.show {
+    display: block;
+}
+
+.role-detail-panel .detail-stats {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.role-detail-panel .detail-stat {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+}
+
+.role-detail-panel .detail-stat .stat-value {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+/* 状态图例 */
+.matrix-legend {
+    display: flex;
+    gap: 16px;
+    font-size: 12px;
+    margin-left: auto;
+}
+
+.matrix-legend .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.matrix-legend .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.legend-dot.l-direct { background: rgba(25, 135, 84, 0.3); }
+.legend-dot.l-inherited { background: rgba(255, 193, 7, 0.3); }
+.legend-dot.l-none { background: transparent; border: 1px dashed var(--bs-secondary-color); }
+
+/* 空状态 */
+.matrix-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--bs-secondary-color);
+    font-size: 14px;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.matrix-empty i {
+    font-size: 48px;
+    opacity: 0.3;
+}
+
+/* 选中角色高亮头部 */
+.role-current-header {
+    padding: 8px 12px;
+    background: rgba(var(--bs-primary-rgb), 0.08);
+    border-bottom: 1px solid var(--bs-border-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    display: none;
+}
+
+.role-current-header.show {
+    display: flex;
+}
+
+.role-current-header .btn-close {
+    font-size: 10px;
+}
+
+/* 继承链标签 */
+.inherit-chain {
+    font-size: 11px;
+    padding: 2px 8px;
+    background: rgba(255,193,7,0.15);
+    border-radius: 10px;
+    color: #b8860b;
+}
+
+/* 成员列表 */
+.member-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.member-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: rgba(var(--bs-primary-rgb), 0.08);
+    color: var(--bs-body-color);
+    border: 1px solid rgba(var(--bs-primary-rgb), 0.15);
+}
+
+.member-chip .avatar {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--bs-secondary-bg);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    overflow: hidden;
+}
+
+.member-empty {
+    font-size: 11px;
+    color: var(--bs-secondary-color);
+}
+</style>
+{/block}
+
+{block name="content"}
+<body>
+<div class="app-main container-fluid">
+    {include file="public/index_header" /}
+    <div class="role-permission-layout mt-2">
+        <!-- 左侧角色面板 -->
+        <div class="role-left-panel">
+            <div class="role-left-header">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" id="role-search" placeholder="搜索角色...">
+                </div>
+                <button class="btn btn-sm btn-primary" id="btn-add-role" title="新建角色">
+                    <i class="bi bi-plus"></i>
+                </button>
+            </div>
+            <div class="role-list" id="role-list">
+                <div class="text-center text-secondary py-4">
+                    <i class="bi bi-hourglass-split fs-3 d-block mb-2 opacity-50"></i>
+                    <small>加载中...</small>
+                </div>
+            </div>
+            <!-- 角色详情摘要 -->
+            <div class="role-detail-panel" id="role-detail-panel">
+                <div class="detail-stats mb-2">
+                    <div class="detail-stat">
+                        <i class="bi bi-shield-check text-success"></i>
+                        <span>直接: <span class="stat-value text-success" id="stat-direct">0</span></span>
+                    </div>
+                    <div class="detail-stat">
+                        <i class="bi bi-shield-shaded text-warning"></i>
+                        <span>继承: <span class="stat-value text-warning" id="stat-inherited">0</span></span>
+                    </div>
+                    <div class="detail-stat">
+                        <i class="bi bi-people text-primary"></i>
+                        <span>成员: <span class="stat-value text-primary" id="stat-users">0</span></span>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-primary" id="btn-edit-role" title="编辑基本信息"><i class="bi bi-pencil"></i></button>
+                    <button class="btn btn-sm btn-outline-info" id="btn-inherit-chain" title="查看继承链"><i class="bi bi-diagram-3"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" id="btn-delete-role" title="删除角色"><i class="bi bi-trash"></i></button>
+                    <button class="btn btn-sm btn-outline-secondary" id="btn-detail-close" title="收起"><i class="bi bi-chevron-up"></i></button>
+                </div>
+                <div id="conflict-display" class="mt-2"></div>
+                <div id="member-list-container" class="mt-2"></div>
+                <div id="inherit-chain-display" class="mt-2"></div>
+            </div>
+        </div>
+
+        <!-- 右侧矩阵面板 -->
+        <div class="role-right-panel">
+            <div class="role-current-header" id="role-current-header">
+                <i class="bi bi-person-badge"></i>
+                <strong id="role-current-name">请选择一个角色</strong>
+                <span class="text-secondary" id="role-current-ident"></span>
+                <span class="inherit-chain d-none" id="role-current-inherit">继承自: -</span>
+                <div class="ms-auto">
+                    <button class="btn btn-xs btn-link text-secondary p-0" id="btn-clear-role" title="清除选择">✕</button>
+                </div>
+            </div>
+            <div class="role-right-toolbar">
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-secondary" id="btn-expand-all" title="展开全部权限分组"><i class="bi bi-arrows-expand"></i> 展开</button>
+                    <button class="btn btn-outline-secondary" id="btn-collapse-all" title="折叠全部权限分组"><i class="bi bi-arrows-collapse"></i> 折叠</button>
+                </div>
+                <div class="input-group input-group-sm" style="max-width:200px;">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" id="perm-search" placeholder="搜索权限...">
+                </div>
+                <select class="form-select form-select-sm" id="perm-type-filter" style="max-width:120px;">
+                    <option value="">全部类型</option>
+                    <option value="menu">菜单</option>
+                    <option value="api">API接口</option>
+                    <option value="custom">自定义</option>
+                </select>
+                <div class="matrix-legend">
+                    <span class="legend-item" title="直接分配"><span class="legend-dot l-direct"></span> 直接</span>
+                    <span class="legend-item" title="继承自父角色"><span class="legend-dot l-inherited"></span> 继承</span>
+                    <span class="legend-item" title="未分配"><span class="legend-dot l-none"></span> 未分配</span>
+                </div>
+            </div>
+            <div class="matrix-container" id="matrix-container">
+                <div class="matrix-empty" id="matrix-empty">
+                    <i class="bi bi-hand-index-thumb"></i>
+                    <span>请从左侧选择一个角色开始配置权限</span>
+                    <small class="text-secondary">或在下方列表中直接浏览所有角色的权限状态</small>
+                </div>
+                <div id="matrix-table-wrapper" style="display:none;">
+                    <table class="perm-matrix-table" id="perm-matrix-table">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="js"}
+
+{/block}

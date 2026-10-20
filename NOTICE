@@ -1,0 +1,37 @@
+WiseAdmin
+Copyright 2024-2026 WiseAdmin Development Team
+https://www.wiseadmin.top
+
+This product includes software developed by WiseAdmin Development Team
+under the Apache License, Version 2.0.
+
+本产品为以下组件的聚合发行版，各组件版权与许可如下：
+
+1. ThinkPHP (http://www.thinkphp.cn)
+   Copyright (c) 2006-2026 上海顶想信息科技有限公司 (TopThink)
+   Licensed under the Apache License, Version 2.0.
+   本发行版基于 ThinkPHP 应用骨架构建，相关骨架文件版权归 ThinkPHP 所有。
+
+2. WiseAdmin 自有代码（app/、config/、extend/、route/、packages/ 等中由
+   WiseAdmin Development Team 原创的部分）
+   Copyright (c) 2024-2026 WiseAdmin Development Team
+   Licensed under the Apache License, Version 2.0，
+   具体以各文件头部声明与对应目录 LICENSE 为准。
+
+3. 第三方依赖组件
+   vendor/ 目录下的全部第三方库均保留其原始版权与许可证声明，
+   详见各依赖包目录内的 LICENSE 文件；
+   public/statics/ 下打包的前端静态资源亦保留各自原始许可证声明。
+
+商标说明
+--------
+WiseAdmin 及附属标识为 WiseAdmin Development Team 拥有的商标（或申请中的商标）。
+本 NOTICE 中的任何内容均不构成对上述商标的使用授权。
+商标使用须遵循本仓库 TRADEMARK.md 中规定的品牌使用政策。
+
+补充说明
+--------
+wiseadmin/wise-* 系列组件为可独立分发的 Composer 包，与主项目一致，均采用
+Apache License 2.0 发布，许可以各包 composer.json 及包内 LICENSE 文件为准。
+
+本文件依据 Apache License 2.0 第 4.4 条提供。

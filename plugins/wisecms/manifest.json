@@ -1,0 +1,881 @@
+{
+    "name": "wisecms",
+    "title": "CMS内容管理",
+    "version": "2.6.0",
+    "description": "企业级内容管理系统，支持动态模型、多栏目、SEO优化、AI辅助生成",
+    "author": "WiseAdmin",
+    "dependencies": {},
+    "packages": {
+        "wiseadmin/wise-member": {
+            "constraint": "*",
+            "required": false
+        }
+    },
+    "service_provider": "plugin\\wisecms\\BootServiceProvider",
+    "develop": false,
+    "menu": {
+        "title": "CMS内容管理",
+        "icon": "bi bi-journal-text",
+        "sort": 20
+    },
+    "menus": [
+        {
+            "name": "数据看板",
+            "icon": "bi bi-speedometer2",
+            "path": "/plugin/wisecms/dashboard/index",
+            "sort": 5,
+            "type": "menu",
+            "status": 1
+        },
+        {
+            "name": "内容管理",
+            "icon": "bi bi-journal-text",
+            "path": "",
+            "sort": 10,
+            "type": "dir",
+            "status": 1,
+            "children": [
+                {
+                    "name": "栏目管理",
+                    "path": "/plugin/wisecms/category/index",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "内容管理",
+                    "path": "/plugin/wisecms/content/index",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "发布日历",
+                    "path": "/plugin/wisecms/schedule/calendar",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "回收站",
+                    "path": "/plugin/wisecms/recycle/index",
+                    "type": "menu",
+                    "status": 1
+                }
+            ]
+        },
+        {
+            "name": "内容模型",
+            "icon": "bi bi-diagram-3",
+            "path": "",
+            "sort": 20,
+            "type": "dir",
+            "status": 1,
+            "children": [
+                {
+                    "name": "模型管理",
+                    "path": "/plugin/wisecms/model/index",
+                    "type": "menu",
+                    "status": 1
+                }
+            ]
+        },
+        {
+            "name": "扩展管理",
+            "icon": "bi bi-puzzle",
+            "path": "",
+            "sort": 30,
+            "type": "dir",
+            "status": 1,
+            "children": [
+                {
+                    "name": "标签管理",
+                    "path": "/plugin/wisecms/tag/index",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "单页管理",
+                    "path": "/plugin/wisecms/page/index",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "内容模板",
+                    "path": "/plugin/wisecms/template/index",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "搜索日志",
+                    "path": "/plugin/wisecms/searchLog/index",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "评论管理",
+                    "path": "/plugin/wisecms/comment/index",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "URL规则",
+                    "path": "/plugin/wisecms/urlRule/index",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "友情链接",
+                    "path": "/plugin/wisecms/friendLink/index",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "SEO 总览",
+                    "path": "/plugin/wisecms/seo/index",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "内链管理",
+                    "path": "/plugin/wisecms/internalLink/index",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "广告管理",
+                    "path": "/plugin/wisecms/ad/index",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "内容采集",
+                    "path": "/plugin/wisecms/spider/index",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "Webhook",
+                    "path": "/plugin/wisecms/webhook/index",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "邮件订阅",
+                    "path": "/plugin/wisecms/newsletter/index",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "重定向",
+                    "path": "/plugin/wisecms/redirect/index",
+                    "type": "menu",
+                    "status": 1
+                }
+            ]
+        },
+        {
+            "name": "站点管理",
+            "icon": "bi bi-globe2",
+            "path": "/plugin/wisecms/site/index",
+            "sort": 89,
+            "type": "menu",
+            "status": 1
+        },
+        {
+            "name": "CMS配置",
+            "icon": "bi bi-gear",
+            "path": "/admin/plugin/configIndex/name/wisecms",
+            "sort": 90,
+            "type": "menu",
+            "status": 1
+        },
+        {
+            "name": "系统工具",
+            "icon": "bi bi-tools",
+            "path": "/plugin/wisecms/system/index",
+            "sort": 91,
+            "type": "menu",
+            "status": 1
+        },
+        {
+            "name": "AI生成",
+            "icon": "bi bi-robot",
+            "path": "",
+            "sort": 50,
+            "type": "dir",
+            "status": 1,
+            "children": [
+                {
+                    "name": "生成工作台",
+                    "path": "/plugin/wisecms/generation/index",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "自然语言生成",
+                    "path": "/plugin/wisecms/generation/natural",
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "批量生成",
+                    "path": "/plugin/wisecms/generation/batch",
+                    "type": "menu",
+                    "status": 1
+                }
+            ]
+        }
+    ],
+    "permissions": [
+        {
+            "ident": "plugin.wisecms.action.category",
+            "name": "CMS·栏目管理",
+            "type": "route",
+            "route": "/plugin/wisecms/category/*",
+            "method": "*",
+            "status": 1,
+            "description": "栏目增删改与状态切换（含批量）"
+        },
+        {
+            "ident": "plugin.wisecms.action.content",
+            "name": "CMS·内容管理",
+            "type": "route",
+            "route": "/plugin/wisecms/content/*",
+            "method": "*",
+            "status": 1,
+            "description": "内容增删改、批量操作、状态切换、版本回滚、预览令牌签发"
+        },
+        {
+            "ident": "plugin.wisecms.action.recycle",
+            "name": "CMS·回收站",
+            "type": "route",
+            "route": "/plugin/wisecms/recycle/*",
+            "method": "*",
+            "status": 1,
+            "description": "回收站恢复、彻底删除与清空（高危）"
+        },
+        {
+            "ident": "plugin.wisecms.action.model",
+            "name": "CMS·内容模型",
+            "type": "route",
+            "route": "/plugin/wisecms/model/*",
+            "method": "*",
+            "status": 1,
+            "description": "内容模型增删改、导入导出（涉及 DDL）"
+        },
+        {
+            "ident": "plugin.wisecms.action.modelField",
+            "name": "CMS·模型字段",
+            "type": "route",
+            "route": "/plugin/wisecms/modelField/*",
+            "method": "*",
+            "status": 1,
+            "description": "动态字段增删改（涉及 DDL）"
+        },
+        {
+            "ident": "plugin.wisecms.action.tag",
+            "name": "CMS·标签管理",
+            "type": "route",
+            "route": "/plugin/wisecms/tag/*",
+            "method": "*",
+            "status": 1,
+            "description": "标签增删改"
+        },
+        {
+            "ident": "plugin.wisecms.action.page",
+            "name": "CMS·单页管理",
+            "type": "route",
+            "route": "/plugin/wisecms/page/*",
+            "method": "*",
+            "status": 1,
+            "description": "单页增删改"
+        },
+        {
+            "ident": "plugin.wisecms.action.template",
+            "name": "CMS·内容模板",
+            "type": "route",
+            "route": "/plugin/wisecms/template/*",
+            "method": "*",
+            "status": 1,
+            "description": "内容模板增删改与默认模板安装"
+        },
+        {
+            "ident": "plugin.wisecms.action.searchLog",
+            "name": "CMS·搜索日志",
+            "type": "route",
+            "route": "/plugin/wisecms/searchLog/*",
+            "method": "*",
+            "status": 1,
+            "description": "搜索日志与热搜词查看（只读）"
+        },
+        {
+            "ident": "plugin.wisecms.action.comment",
+            "name": "CMS·评论管理",
+            "type": "route",
+            "route": "/plugin/wisecms/comment/*",
+            "method": "*",
+            "status": 1,
+            "description": "评论审核、驳回与删除"
+        },
+        {
+            "ident": "plugin.wisecms.action.friendLink",
+            "name": "CMS·友情链接",
+            "type": "route",
+            "route": "/plugin/wisecms/friendLink/*",
+            "method": "*",
+            "status": 1,
+            "description": "友链增删改、排序与上下架"
+        },
+        {
+            "ident": "plugin.wisecms.action.urlRule",
+            "name": "CMS·URL规则",
+            "type": "route",
+            "route": "/plugin/wisecms/urlRule/*",
+            "method": "*",
+            "status": 1,
+            "description": "伪静态规则增删改与全站别名重建"
+        },
+        {
+            "ident": "plugin.wisecms.action.generation",
+            "name": "CMS·AI生成",
+            "type": "route",
+            "route": "/plugin/wisecms/generation/*",
+            "method": "*",
+            "status": 1,
+            "description": "AI 内容生成工作台、自然语言与批量生成、任务取消"
+        },
+        {
+            "ident": "plugin.wisecms.action.schedule",
+            "name": "CMS·定时排期",
+            "type": "route",
+            "route": "/plugin/wisecms/schedule/*",
+            "method": "*",
+            "status": 1,
+            "description": "发布日历、批量排期与推荐时段"
+        },
+        {
+            "ident": "plugin.wisecms.action.workflow",
+            "name": "CMS·内容工作流",
+            "type": "route",
+            "route": "/plugin/wisecms/workflow/*",
+            "method": "*",
+            "status": 1,
+            "description": "内容状态流转与可用动作查询"
+        },
+        {
+            "ident": "plugin.wisecms.action.site",
+            "name": "CMS·多站点",
+            "type": "route",
+            "route": "/plugin/wisecms/site/*",
+            "method": "*",
+            "status": 1,
+            "description": "站点增删改（高危：删除会影响全站数据隔离）"
+        },
+        {
+            "ident": "plugin.wisecms.action.site.context",
+            "name": "CMS·切换站点上下文",
+            "type": "route",
+            "route": "/plugin/wisecms/site/switch",
+            "method": "*",
+            "status": 1,
+            "description": "后台站点选择器：只切换会话内的当前站点，不修改任何业务数据（可单独授予内容编辑者，无需授予「多站点」管理权）"
+        },
+        {
+            "ident": "plugin.wisecms.action.site.option",
+            "name": "CMS·站点下拉数据",
+            "type": "route",
+            "route": "/plugin/wisecms/site/options",
+            "method": "*",
+            "status": 1,
+            "description": "后台站点选择器数据源（启用站点列表 + 当前站点）"
+        },
+        {
+            "ident": "plugin.wisecms.action.ad",
+            "name": "CMS·广告管理",
+            "type": "route",
+            "route": "/plugin/wisecms/ad/*",
+            "method": "*",
+            "status": 1,
+            "description": "广告位增删改"
+        },
+        {
+            "ident": "plugin.wisecms.action.spider",
+            "name": "CMS·内容采集",
+            "type": "route",
+            "route": "/plugin/wisecms/spider/*",
+            "method": "*",
+            "status": 1,
+            "description": "采集任务增删改与执行（会发起外部请求）"
+        },
+        {
+            "ident": "plugin.wisecms.action.seo",
+            "name": "CMS·SEO 总览",
+            "type": "route",
+            "route": "/plugin/wisecms/seo/*",
+            "method": "*",
+            "status": 1,
+            "description": "SEO 健康分 / 内容审查 / 搜索引擎推送（推送会发起外部请求）"
+        },
+        {
+            "ident": "plugin.wisecms.action.internalLink",
+            "name": "CMS·内链管理",
+            "type": "route",
+            "route": "/plugin/wisecms/internalLink/*",
+            "method": "*",
+            "status": 1,
+            "description": "内链规则的列表 / 新增 / 删除 / 从内容库重建"
+        },
+        {
+            "ident": "plugin.wisecms.action.webhook",
+            "name": "CMS·Webhook",
+            "type": "route",
+            "route": "/plugin/wisecms/webhook/*",
+            "method": "*",
+            "status": 1,
+            "description": "Webhook 订阅注册与删除（含密钥）"
+        },
+        {
+            "ident": "plugin.wisecms.action.newsletter",
+            "name": "CMS·邮件订阅",
+            "type": "route",
+            "route": "/plugin/wisecms/newsletter/*",
+            "method": "*",
+            "status": 1,
+            "description": "订阅者列表与删除（个人信息）"
+        },
+        {
+            "ident": "plugin.wisecms.action.redirect",
+            "name": "CMS·重定向",
+            "type": "route",
+            "route": "/plugin/wisecms/redirect/*",
+            "method": "*",
+            "status": 1,
+            "description": "301/302 规则、CSV 导入与死链检测（会发起外部请求）"
+        },
+        {
+            "ident": "plugin.wisecms.action.dashboard",
+            "name": "CMS·数据看板",
+            "type": "route",
+            "route": "/plugin/wisecms/dashboard/*",
+            "method": "*",
+            "status": 1,
+            "description": "内容统计、趋势与 TOP 排行"
+        },
+        {
+            "ident": "plugin.wisecms.action.system",
+            "name": "CMS·系统工具",
+            "type": "route",
+            "route": "/plugin/wisecms/system/*",
+            "method": "*",
+            "status": 1,
+            "description": "插件级维护：刷新 CMS 缓存（只清本插件缓存家族，不动数据）"
+        }
+    ],
+    "config": {
+        "site_name": {
+            "type": "string",
+            "title": "站点名称",
+            "value": "我的网站",
+            "group": "basic",
+            "tab": "basic"
+        },
+        "content_check": {
+            "type": "select",
+            "title": "内容审核模式",
+            "value": "1",
+            "options": {
+                "0": "无需审核",
+                "1": "先审后发",
+                "2": "先发后审"
+            },
+            "group": "content",
+            "tab": "basic"
+        },
+        "auto_description": {
+            "type": "boolean",
+            "title": "自动生成摘要",
+            "value": true,
+            "group": "content",
+            "tab": "basic"
+        },
+        "auto_thumb": {
+            "type": "boolean",
+            "title": "自动提取缩略图",
+            "value": true,
+            "group": "content",
+            "tab": "basic"
+        },
+        "save_remote_image": {
+            "type": "boolean",
+            "title": "正文远程图片本地化",
+            "value": false,
+            "group": "content",
+            "tab": "basic"
+        },
+        "list_rows": {
+            "type": "number",
+            "title": "默认每页条数",
+            "value": 15,
+            "group": "basic",
+            "tab": "basic"
+        },
+        "max_title_length": {
+            "type": "number",
+            "title": "标题最大长度",
+            "value": 200,
+            "group": "basic",
+            "tab": "basic"
+        },
+        "image_max_size": {
+            "type": "number",
+            "title": "图片最大尺寸(KB)",
+            "value": 2048,
+            "group": "content",
+            "tab": "basic"
+        },
+        "comment_check": {
+            "type": "select",
+            "title": "评论审核模式",
+            "value": "1",
+            "options": {
+                "0": "无需审核",
+                "1": "先审后发",
+                "2": "先发后审"
+            },
+            "group": "content",
+            "tab": "basic"
+        },
+        "editor_mode": {
+            "type": "select",
+            "title": "默认编辑器",
+            "value": "html",
+            "options": {
+                "html": "富文本编辑器",
+                "markdown": "Markdown编辑器"
+            },
+            "group": "basic",
+            "tab": "basic"
+        },
+        "url_rewrite": {
+            "type": "select",
+            "title": "URL伪静态",
+            "value": "0",
+            "options": {
+                "0": "关闭（查询串 /cms/content/detail?id=N）",
+                "1": "开启（按 URL 规则生成伪静态）"
+            },
+            "group": "basic",
+            "tab": "basic"
+        },
+        "version_keep": {
+            "type": "number",
+            "title": "内容版本保留条数（0=不限制，建议>=2）",
+            "value": 20,
+            "group": "content",
+            "tab": "basic"
+        },
+        "diff_max_lines": {
+            "type": "number",
+            "title": "版本对比最大行数（超出降级为整体替换）",
+            "value": 2000,
+            "group": "content",
+            "tab": "basic"
+        },
+        "feed_enable": {
+            "type": "boolean",
+            "title": "开启 RSS/Atom 订阅",
+            "value": true,
+            "group": "feed",
+            "tab": "api"
+        },
+        "feed_format": {
+            "type": "select",
+            "title": "默认订阅格式",
+            "value": "rss",
+            "options": {
+                "rss": "RSS 2.0",
+                "atom": "Atom 1.0"
+            },
+            "group": "feed",
+            "tab": "api"
+        },
+        "feed_limit": {
+            "type": "number",
+            "title": "订阅条目数(1-100)",
+            "value": 20,
+            "group": "feed",
+            "tab": "api"
+        },
+        "feed_scope": {
+            "type": "select",
+            "title": "订阅内容范围",
+            "value": "full",
+            "options": {
+                "full": "全文（含 content:encoded）",
+                "summary": "仅摘要"
+            },
+            "group": "feed",
+            "tab": "api"
+        },
+        "feed_ttl": {
+            "type": "number",
+            "title": "订阅缓存秒数",
+            "value": 900,
+            "group": "feed",
+            "tab": "api"
+        },
+        "feed_title": {
+            "type": "string",
+            "title": "订阅频道标题（留空使用站点名称）",
+            "value": "",
+            "group": "feed",
+            "tab": "api"
+        },
+        "feed_description": {
+            "type": "string",
+            "title": "订阅频道描述（留空自动生成）",
+            "value": "",
+            "group": "feed",
+            "tab": "api"
+        },
+        "feed_copyright": {
+            "type": "string",
+            "title": "订阅版权信息（可选）",
+            "value": "",
+            "group": "feed",
+            "tab": "api"
+        },
+        "recommend_enable": {
+            "type": "boolean",
+            "title": "开启推荐位（相关阅读/热门/编辑推荐）",
+            "value": true,
+            "group": "recommend",
+            "tab": "extend"
+        },
+        "recommend_related_limit": {
+            "type": "number",
+            "title": "相关文章条数(1-20)",
+            "value": 8,
+            "group": "recommend",
+            "tab": "extend"
+        },
+        "recommend_hot_limit": {
+            "type": "number",
+            "title": "热门文章条数(1-20)",
+            "value": 8,
+            "group": "recommend",
+            "tab": "extend"
+        },
+        "recommend_picked_limit": {
+            "type": "number",
+            "title": "编辑推荐条数(1-20)",
+            "value": 8,
+            "group": "recommend",
+            "tab": "extend"
+        },
+        "recommend_hot_days": {
+            "type": "number",
+            "title": "热门时间窗口(天，0=不限)",
+            "value": 0,
+            "group": "recommend",
+            "tab": "extend"
+        },
+        "recommend_cache_ttl": {
+            "type": "number",
+            "title": "推荐缓存秒数",
+            "value": 1800,
+            "group": "recommend",
+            "tab": "extend"
+        },
+        "recommend_cache_limit": {
+            "type": "number",
+            "title": "推荐缓存条数上限(1-100)",
+            "value": 20,
+            "group": "recommend",
+            "tab": "extend"
+        },
+        "recommend_fill": {
+            "type": "boolean",
+            "title": "结果不足时用同栏目热门补足",
+            "value": false,
+            "group": "recommend",
+            "tab": "extend"
+        },
+        "tag_enable": {
+            "type": "boolean",
+            "title": "开启模板标签库（{cms:*}）",
+            "value": true,
+            "group": "tag",
+            "tab": "content"
+        },
+        "tag_cache_ttl": {
+            "type": "number",
+            "title": "标签数据缓存秒数",
+            "value": 900,
+            "group": "tag",
+            "tab": "content"
+        },
+        "tag_arclist_limit_max": {
+            "type": "number",
+            "title": "列表标签最大条数(1-50)",
+            "value": 50,
+            "group": "tag",
+            "tab": "content"
+        },
+        "tag_default_limit": {
+            "type": "number",
+            "title": "标签默认条数",
+            "value": 10,
+            "group": "tag",
+            "tab": "content"
+        },
+        "tag_debug": {
+            "type": "boolean",
+            "title": "标签调试输出（HTML 注释）",
+            "value": false,
+            "group": "tag",
+            "tab": "content"
+        },
+        "preview_enable": {
+            "type": "boolean",
+            "title": "开启草稿预览（预览令牌）",
+            "value": true,
+            "group": "preview",
+            "tab": "content"
+        },
+        "preview_ttl": {
+            "type": "number",
+            "title": "预览链接有效期(60-86400秒)",
+            "value": 1800,
+            "group": "preview",
+            "tab": "content"
+        },
+        "preview_secret": {
+            "type": "string",
+            "title": "预览签名密钥（留空回退 APP_KEY）",
+            "value": "",
+            "group": "preview",
+            "tab": "content"
+        },
+        "preview_bind_user": {
+            "type": "boolean",
+            "title": "预览令牌绑定签发用户（仅该用户可打开）",
+            "value": true,
+            "group": "preview",
+            "tab": "content"
+        },
+        "preview_once": {
+            "type": "boolean",
+            "title": "预览令牌一次性（开启后同一链接刷新即失效）",
+            "value": false,
+            "group": "preview",
+            "tab": "content"
+        },
+        "friendlink_enable": {
+            "type": "boolean",
+            "title": "开启友情链接",
+            "value": true,
+            "group": "friendlink",
+            "tab": "extend"
+        },
+        "friendlink_ttl": {
+            "type": "number",
+            "title": "友链列表缓存秒数",
+            "value": 1800,
+            "group": "friendlink",
+            "tab": "extend"
+        },
+        "friendlink_max": {
+            "type": "number",
+            "title": "页脚直出条数上限(0=不限)",
+            "value": 50,
+            "group": "friendlink",
+            "tab": "extend"
+        },
+        "friendlink_nofollow": {
+            "type": "boolean",
+            "title": "友链默认 nofollow（单条可覆盖）",
+            "value": false,
+            "group": "friendlink",
+            "tab": "extend"
+        },
+        "friendlink_show_desc": {
+            "type": "boolean",
+            "title": "独立友链页显示描述",
+            "value": false,
+            "group": "friendlink",
+            "tab": "extend"
+        },
+        "webhook_mode": {
+            "type": "select",
+            "title": "Webhook 投递模式",
+            "value": "auto",
+            "options": {
+                "auto": "跟随 wise-webhook 全局配置",
+                "queue": "强制队列（需部署 queue worker，否则不会投递）",
+                "sync": "强制同步（会阻塞内容保存）"
+            },
+            "group": "webhook",
+            "tab": "api"
+        },
+        "webhook_timeout": {
+            "type": "number",
+            "title": "同步投递单次超时(秒)",
+            "value": 5,
+            "group": "webhook",
+            "tab": "api"
+        }
+    },
+    "config_tabs": {
+        "basic": {
+            "title": "站点设置",
+            "sort": 10
+        },
+        "content": {
+            "title": "内容呈现",
+            "sort": 20
+        },
+        "extend": {
+            "title": "扩展功能",
+            "sort": 30
+        },
+        "api": {
+            "title": "接口输出",
+            "sort": 40
+        }
+    },
+    "config_groups": {
+        "basic": {
+            "title": "基础设置",
+            "sort": 10
+        },
+        "content": {
+            "title": "内容与评论",
+            "sort": 20
+        },
+        "tag": {
+            "title": "标签聚合",
+            "sort": 30
+        },
+        "preview": {
+            "title": "内容预览",
+            "sort": 40
+        },
+        "recommend": {
+            "title": "推荐位",
+            "sort": 50
+        },
+        "friendlink": {
+            "title": "友情链接",
+            "sort": 60
+        },
+        "feed": {
+            "title": "订阅输出",
+            "sort": 70
+        },
+        "webhook": {
+            "title": "Webhook 通知",
+            "sort": 80
+        }
+    },
+    "slots": {},
+    "vendor": {}
+}

@@ -1,0 +1,68 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}执行盘点{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-pencil-square" caption="执行盘点 - {$order.order_no}" buttongroup="" /}
+    <div class="plugin-smartstock">
+        <div class="container-fluid p-3">
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-1"></i>
+                请逐项录入实盘数量，系统将自动计算盘盈 / 盘亏差异。录入完成后点击右下角「提交实盘数据」。
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <strong>盘点仓库：</strong>{$order.warehouse_name|default=''}　
+                            <strong>盘点日期：</strong>{$order.order_date|default=''}　
+                            <strong>状态：</strong>{$order.status_text|default=''}
+                        </div>
+                        <button class="btn btn-primary" id="btn-submit-result"><i class="bi bi-check-lg"></i> 提交实盘数据</button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th width="40">#</th>
+                                    <th>商品</th>
+                                    <th>SKU</th>
+                                    <th>规格</th>
+                                    <th width="120">库位</th>
+                                    <th width="110">系统库存</th>
+                                    <th width="150">实盘数量</th>
+                                    <th width="110">差异</th>
+                                </tr>
+                            </thead>
+                            <tbody id="check-items-tbody">
+                                {foreach $items as $k => $item}
+                                <tr class="item-row" data-product-id="{$item.product_id}">
+                                    <td>{$k+1}</td>
+                                    <td>{$item.product_name|default='-'}</td>
+                                    <td>{$item.sku|default=''}</td>
+                                    <td>{$item.spec_name|default=''}</td>
+                                    <td>{$item.location_code|default=''}</td>
+                                    <td><span class="system-qty">{$item.system_quantity|default=0}</span></td>
+                                    <td>
+                                        <input type="number" min="0" step="1"
+                                               class="form-control form-control-sm input-actual"
+                                               value="{$item.actual_quantity|default=''}"
+                                               placeholder="录入实盘">
+                                    </td>
+                                    <td><span class="diff-qty"></span></td>
+                                </tr>
+                                {/foreach}
+                            </tbody>
+                        </table>
+                    </div>
+                    {if empty($items)}
+                    <div class="text-center text-muted py-4">暂无盘点明细</div>
+                    {/if}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

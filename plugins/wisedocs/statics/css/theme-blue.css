@@ -1,0 +1,28 @@
+/**
+ * WiseDocs 示例主题：blue
+ *
+ * 用法：在「空间管理」中把某空间的「主题」填为 `blue`，
+ * 前台 layout 会自动引入本文件覆盖默认品牌色。
+ *
+ * 说明：新版前台以 CSS 变量驱动（见 docs.css 的「设计令牌」），
+ * 因此主题只需重写 `--wd-c-brand-*` 等变量即可整站换色；
+ * 若需模板级深度定制，可在 view/theme/blue/ 放置完整模板目录。
+ */
+
+:root {
+    --wd-c-brand-1: #1d4ed8;
+    --wd-c-brand-2: #2563eb;
+    --wd-c-brand-3: #3b82f6;
+    --wd-c-brand-soft: rgba(37, 99, 235, .14);
+}
+
+html.dark {
+    --wd-c-brand-1: #93b4ff;
+    --wd-c-brand-2: #3b82f6;
+    --wd-c-brand-3: #2563eb;
+    --wd-c-brand-soft: rgba(59, 130, 246, .18);
+}
+
+.wd-nav__logo {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+}

@@ -1,0 +1,174 @@
+/**
+ * SmartStock 插件全局样式
+ */
+.plugin-smartstock {
+    padding: 0;
+}
+
+.plugin-smartstock .search-bar {
+    background: #fff;
+    padding: 15px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.plugin-smartstock .search-bar .form-label {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.plugin-smartstock .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.plugin-smartstock .toolbar .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+}
+
+.plugin-smartstock .bootstrap-table .fixed-table-container {
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* 表单弹窗 */
+.smartstock-form-modal .modal-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.smartstock-form-modal .form-group {
+    margin-bottom: 15px;
+}
+
+.smartstock-form-modal .form-group label {
+    font-weight: 500;
+    font-size: 13px;
+    color: #333;
+}
+
+/* 状态标签 */
+.smartstock-status {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+.smartstock-status.enabled {
+    background: #d4edda;
+    color: #155724;
+}
+
+.smartstock-status.disabled {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Dashboard 统计卡片 */
+.smartstock-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.smartstock-stats .stat-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.smartstock-stats .stat-card .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: #fff;
+}
+
+.smartstock-stats .stat-card .stat-info .stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    line-height: 1.2;
+}
+
+.smartstock-stats .stat-card .stat-info .stat-label {
+    font-size: 13px;
+    color: #888;
+}
+
+/* 设置表单 */
+.smartstock-config-form .config-group {
+    margin-bottom: 25px;
+}
+
+.smartstock-config-form .config-group-title {
+    font-size: 15px;
+    font-weight: 600;
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.smartstock-config-form .config-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.smartstock-config-form .config-item:last-child {
+    border-bottom: none;
+}
+
+/* ================================================================
+   statCards 通用卡片组件样式
+   ================================================================ */
+
+/* 骨架脉冲 */
+@keyframes statcard-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+.statcard-loading {
+    animation: statcard-pulse 1.2s ease-in-out infinite;
+}
+
+/* Trend 趋势箭头 */
+.statcard-trend-up {
+    color: #dc3545;
+    margin-left: 4px;
+    font-size: 14px;
+}
+.statcard-trend-down {
+    color: #28a745;
+    margin-left: 4px;
+    font-size: 14px;
+}
+.statcard-trend-flat {
+    color: #888;
+    margin-left: 4px;
+    font-size: 14px;
+}
+
+/* 快捷卡片 hover */
+.statcard-quick {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.statcard-quick:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}

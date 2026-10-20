@@ -1,0 +1,32 @@
+<!-- 标签合并 模态框片段（源标签可多选，合并到目标标签） -->
+<div class="modal fade" id="tag-merge-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">合并标签</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+            </div>
+            <form id="tag-merge-form" class="modal-body row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">源标签（可多选，合并后将被删除）</label>
+                    <select id="merge-source-ids" class="form-select" multiple size="8"></select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">目标标签</label>
+                    <select id="merge-target-id" class="form-select" size="8"></select>
+                </div>
+                <div class="col-12">
+                    <div class="alert alert-warning mb-0 py-2 small">
+                        合并后：源标签的文档关联会转移到目标标签，源标签被删除。此操作不可撤销。
+                    </div>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-warning" id="btn-merge-submit">
+                    <i class="bi bi-intersect"></i> 确认合并
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

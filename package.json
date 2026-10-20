@@ -1,0 +1,27 @@
+{
+  "name": "wiseadmin-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "WiseAdmin 前端资源构建：esbuild 打包 ESM 内核模块与 ws-* 组件",
+  "type": "module",
+  "scripts": {
+    "build": "node build/build-js.mjs && node build/build-editor.mjs",
+    "dev": "node build/build-js.mjs --dev",
+    "watch": "node build/build-js.mjs --watch",
+    "build:editor": "node build/build-editor.mjs",
+    "dev:editor": "node build/build-editor.mjs --dev",
+    "verify:editor": "node build/verify-editor.mjs",
+    "serve:editor": "node build/verify-editor.mjs --serve"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.2"
+  },
+  "dependencies": {
+    "@tiptap/core": "3.31.4",
+    "@tiptap/extension-image": "3.31.4",
+    "@tiptap/extension-table": "3.31.4",
+    "@tiptap/extensions": "3.31.4",
+    "@tiptap/pm": "3.31.4",
+    "@tiptap/starter-kit": "3.31.4"
+  }
+}

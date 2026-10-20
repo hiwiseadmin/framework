@@ -1,0 +1,96 @@
+/**
+ * ws-linkage-select.css
+ * WiseAdmin 联动选择组件样式
+ */
+
+/* ========== 三态标准化 ========== */
+
+/* Loading: select 下拉箭头替换为旋转器 */
+.ws-linkage-select[data-ws-state="loading"] {
+    background-image: none;
+    padding-right: 30px;
+}
+
+.ws-linkage-select[data-ws-state="loading"]::after {
+    content: "";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(var(--bs-secondary-rgb, 108, 117, 125), 0.3);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: ws-linkage-spin 0.6s linear infinite;
+    z-index: 2;
+}
+
+@keyframes ws-linkage-spin {
+    to { transform: translateY(-50%) rotate(360deg); }
+}
+
+/* Empty: select 静默占位 */
+.ws-linkage-select[data-ws-state="empty"] {
+    color: var(--bs-secondary-color, #6c757d);
+}
+
+/* Error: 红色边框 */
+.ws-linkage-select[data-ws-state="error"] {
+    border-color: var(--bs-danger, #dc3545) !important;
+    box-shadow: 0 0 0 1px rgba(var(--bs-danger-rgb, 220, 53, 69), 0.2);
+}
+
+/* Error 提示文字 */
+.ws-linkage-error-text {
+    display: none;
+    color: var(--bs-danger, #dc3545);
+    font-size: 11px;
+    margin-top: 4px;
+    line-height: 1.3;
+}
+
+.ws-linkage-select[data-ws-state="error"] ~ .ws-linkage-error-text {
+    display: block;
+}
+
+/* ========== 联动选择组容器 ========== */
+
+.ws-linkage-select-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.ws-linkage-select-group .ws-linkage-select-wrapper {
+    flex: 1;
+    min-width: 140px;
+    position: relative;
+}
+
+.ws-linkage-select-group select {
+    width: 100%;
+}
+
+/* ========== 级联变化提示 ========== */
+
+.ws-linkage-cascade-hint {
+    display: none;
+    font-size: 11px;
+    color: var(--bs-warning, #ffc107);
+    margin-top: 2px;
+}
+
+.ws-linkage-select-wrapper.ws-cascade-changed .ws-linkage-cascade-hint {
+    display: block;
+}
+
+/* ========== 兼容旧类（过渡期） ========== */
+.linked-select-loading {
+    /* 保留用于向后兼容，实际效果由 [data-ws-state] 接管 */
+}
+.linked-select-error {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}

@@ -1,0 +1,84 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}测试工具{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-bug" caption="测试工具（棋盘体检 / 生成预览）" buttongroup="" /}
+    <div class="plugin-match3game">
+        <style>
+            .m3p-grid { line-height: 0; }
+            .m3p-cell { display: inline-block; width: 26px; height: 26px; margin: 1px; border-radius: 5px;
+                        text-align: center; line-height: 26px; font-size: 9px; color: #fff; background: #e9ecef; }
+        </style>
+        <div class="container-fluid p-0">
+
+            <!-- ============ 关卡体检 ============ -->
+            <div class="card mb-3">
+                <div class="card-header"><b>关卡体检</b> <small class="text-muted">确定性棋盘 + 贪心 AI 通关率</small></div>
+                <div class="card-body">
+                    <form class="row g-3 mb-3" id="playtest-form">
+                        <div class="col-md-5">
+                            <label class="form-label">选择关卡</label>
+                            <select name="level_code" id="form-level-code" class="form-select">
+                                {foreach $levels as $l}
+                                <option value="{$l.code}">{$l.code} - {$l.name}（{$l.board_rows}x{$l.board_cols}）</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Seed</label>
+                            <input type="number" name="seed" id="form-seed" class="form-control" value="1" min="1">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">模拟次数</label>
+                            <input type="number" name="tries" id="form-tries" class="form-control" value="20" min="1" max="200">
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end gap-2">
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-play"></i> 生成棋盘</button>
+                            <button type="button" class="btn btn-outline-info" id="btn-simulate"><i class="bi bi-cpu"></i> AI 体检</button>
+                        </div>
+                    </form>
+
+                    <div id="playtest-result"></div>
+                </div>
+            </div>
+
+            <!-- ============ 随机关卡生成预览 ============ -->
+            <div class="card">
+                <div class="card-header"><b>随机关卡生成预览</b> <small class="text-muted">按 generation 配置生成一张关卡（不落库，含通关率体检）</small></div>
+                <div class="card-body">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">generation JSON（02 §7）</label>
+                            <textarea id="gen-config" class="form-control" rows="5" spellcheck="false">{"mode":"generator"}</textarea>
+                            <div class="form-text">
+                                generator 示例：<code>{"mode":"generator"}</code>；
+                                template 示例：<code>{"mode":"template","template":{"terrain":["SSSSSSSSS","ooooooooo"],"slots":[{"rect":[2,1,6,3],"fill":"overlay:ice1","density":0.5}]}}</code>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Seed</label>
+                            <input type="number" id="gen-seed" class="form-control" placeholder="留空=随机">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">难度 D</label>
+                            <input type="number" id="gen-d" class="form-control" step="0.01" placeholder="默认 1.0">
+                        </div>
+                        <div class="col-md-9">
+                            <label class="form-label">节点标识</label>
+                            <input type="text" id="gen-node-id" class="form-control" value="preview">
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="button" class="btn btn-primary w-100" id="btn-generate"><i class="bi bi-shuffle"></i> 生成预览</button>
+                        </div>
+                    </div>
+
+                    <div id="generate-result"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{/block}

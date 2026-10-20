@@ -1,0 +1,78 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}添加内容模板{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-plus-circle" caption="添加内容模板" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <form id="templateForm" method="post" action="{:plugin_url('wisecms/template/create')}">
+                    {:csrf_field()}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-name">模板名称 <span class="text-danger">*</span></label>
+                            <input id="cms-f-name" type="text" name="name" class="form-control" required maxlength="100"
+                                   placeholder="如 产品介绍稿">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-alias">模板标识（站内唯一） <span class="text-danger">*</span></label>
+                            <input id="cms-f-alias" type="text" name="alias" class="form-control" required maxlength="50"
+                                   placeholder="如 product-intro">
+                            <div class="form-text">仅用于程序识别与查重，不参与 URL。</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="cms-f-type">模板类型</label>
+                            <select id="cms-f-type" name="type" class="form-select">
+                                {foreach $typeOptions as $opt}
+                                <option value="{$opt.value}">{$opt.label}</option>
+                                {/foreach}
+                            </select>
+                            <div class="form-text">消费方按类型取用（<code>getList($type)</code>）。</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="cms-f-category">模板分类</label>
+                            <input id="cms-f-category" type="text" name="category" class="form-control" maxlength="30" placeholder="如 文章">
+                            <div class="form-text">仅用于列表分组展示。</div>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label" for="cms-f-sort">排序</label>
+                            <input id="cms-f-sort" type="number" name="sort" class="form-control" value="0">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label" for="cms-f-status">状态</label>
+                            <select id="cms-f-status" name="status" class="form-select">
+                                <option value="1">启用</option>
+                                <option value="0">禁用</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 mb-3">
+                            <label class="form-label" for="cms-f-presets">预设内容（JSON 对象）</label>
+                            <textarea id="cms-f-presets" name="presets" class="form-control" rows="6"
+                                      placeholder='{"title":"","keywords":"","description":""}'></textarea>
+                            <div class="form-text">
+                                生成引擎按「模板」模式生成内容时，用这里的键值作为初始内容
+                                （<code>applyTemplate()</code> 的基底）。
+                            </div>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label" for="cms-f-seo_defaults">SEO 默认值（JSON 对象）</label>
+                            <textarea id="cms-f-seo_defaults" name="seo_defaults" class="form-control" rows="4"
+                                      placeholder='{"focus_keyword":"","meta_description_length":150}'></textarea>
+                            <div class="form-text">仅当预设内容里对应键为空时才回填。</div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                    <!-- 返回与提交均由 js/template.js 的 create() 处理（模板零内联脚本） -->
+                    <button type="button" id="btn-template-back" class="btn btn-outline-secondary btn-sm">返回</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/template.js -->
+{/block}

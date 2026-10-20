@@ -1,0 +1,155 @@
+{extend name="index/layout" /}
+
+{block name="title"}{$content.title} - {$cms.site_name}{/block}
+{block name="meta"}
+{if condition="!empty($isPreview)"}
+<meta name="robots" content="noindex, nofollow, noarchive">
+{/if}
+<meta name="keywords" content="{$content.keywords|default=$cms.seo.keywords}">
+<meta name="description" content="{$content.description|default=$cms.seo.description}">
+{$ogTags|default=''|raw}
+{$structuredData|default=''|raw}
+{/block}
+
+{block name="main"}
+{if condition="!empty($isPreview)"}
+<div class="alert alert-warning d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-eye"></i> 预览模式：此内容尚未发布，不会被搜索引擎收录。</span>
+    {if condition="!empty($previewExpire)"}
+    <span class="small">链接有效期至 {:date('Y-m-d H:i', $previewExpire)}</span>
+    {/if}
+</div>
+{/if}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb small">
+        <li class="breadcrumb-item"><a href="{$cms.home_url}">首页</a></li>
+        {if condition="!empty($content['category'])"}
+        <li class="breadcrumb-item">
+            <a href="{$categoryUrl|default=''}">{$content.category.name}</a>
+        </li>
+        {/if}
+        <li class="breadcrumb-item active">正文</li>
+    </ol>
+</nav>
+
+<article class="cms-card p-4">
+    <h3 class="mb-3">{$content.title}</h3>
+
+    <div class="cms-meta border-bottom pb-2 mb-3">
+        <span>{$content.category.name|default='未分类'}</span>
+        <span class="mx-2">·</span>
+        <span>{:substr($content.create_time, 0, 16)}</span>
+        <span class="mx-2">·</span>
+        <span>{$content.view_count} 次浏览</span>
+        {if condition="!empty($content['username'])"}
+        <span class="mx-2">·</span>
+        <span>{$content.username}</span>
+        {/if}
+    </div>
+
+    <div class="cms-body">
+        {if condition="!empty($content['content'])"}
+        {$content.content|raw}
+        {else /}
+        <p class="text-muted">{$content.description|default='该内容暂无正文。'}</p>
+        {/if}
+    </div>
+
+    {notempty name="customFields"}
+    <div class="mt-4 pt-3 border-top">
+        <h6 class="cms-meta mb-2">详细信息</h6>
+        {foreach $customFields as $cf}
+        <div class="mb-2">
+            <span class="cms-meta fw-bold me-2">{$cf['name']}：</span>
+            {if condition="$cf['form_type'] == 'editor' or $cf['form_type'] == 'markdown'"}
+            {$content[$cf['field']]|raw}
+            {else /}
+            {$content[$cf['field']]}
+            {/if}
+        </div>
+        {/foreach}
+    </div>
+    {/notempty}
+
+    {notempty name="content.tags"}
+    <div class="mt-4 pt-3 border-top">
+        <span class="cms-meta me-2">标签：</span>
+        {foreach $content.tags as $tag}
+        <a class="cms-tag" href="{$tag.url|default=''}">{$tag.name}</a>
+        {/foreach}
+    </div>
+    {/notempty}
+
+    <div class="row mt-4 pt-3 border-top small">
+        <div class="col-6">
+            {if condition="!empty($prev)"}
+            上一篇：<a class="cms-title" href="{$prevUrl|default=''}">{$prev.title|mb_substr=0,30}</a>
+            {else /}
+            <span class="text-muted">上一篇：没有了</span>
+            {/if}
+        </div>
+        <div class="col-6 text-end">
+            {if condition="!empty($next)"}
+            下一篇：<a class="cms-title" href="{$nextUrl|default=''}">{$next.title|mb_substr=0,30}</a>
+            {else /}
+            <span class="text-muted">下一篇：没有了</span>
+            {/if}
+        </div>
+    </div>
+</article>
+
+{notempty name="recommend.related"}
+<div class="cms-card p-3 mt-4">
+    <h6 class="mb-3">相关阅读</h6>
+    {foreach $recommend.related as $item}
+    <div class="d-flex mb-3">
+        {if condition="!empty($item['thumb_url'])"}
+        <img class="cms-thumb me-3" src="{$item.thumb_url}" alt="{$item.title}">
+        {/if}
+        <div>
+            <a class="cms-title fw-bold" href="{$item.url|default=''}">{$item.title}</a>
+            <div class="cms-desc mt-1">{$item.description|mb_substr=0,80}</div>
+            <div class="cms-meta mt-1">{$item.create_time_date|default=''} · {$item.view_count} 次浏览</div>
+        </div>
+    </div>
+    {/foreach}
+</div>
+{/notempty}
+
+{notempty name="recommend.hot"}
+<div class="cms-card p-3 mt-4">
+    <h6 class="mb-3">热门文章</h6>
+    {foreach $recommend.hot as $item}
+    <div class="d-flex mb-3">
+        {if condition="!empty($item['thumb_url'])"}
+        <img class="cms-thumb me-3" src="{$item.thumb_url}" alt="{$item.title}">
+        {/if}
+        <div>
+            <a class="cms-title fw-bold" href="{$item.url|default=''}">{$item.title}</a>
+            <div class="cms-desc mt-1">{$item.description|mb_substr=0,80}</div>
+            <div class="cms-meta mt-1">{$item.create_time_date|default=''} · {$item.view_count} 次浏览</div>
+        </div>
+    </div>
+    {/foreach}
+</div>
+{/notempty}
+
+{notempty name="recommend.picked"}
+<div class="cms-card p-3 mt-4">
+    <h6 class="mb-3">编辑推荐</h6>
+    {foreach $recommend.picked as $item}
+    <div class="d-flex mb-3">
+        {if condition="!empty($item['thumb_url'])"}
+        <img class="cms-thumb me-3" src="{$item.thumb_url}" alt="{$item.title}">
+        {/if}
+        <div>
+            <a class="cms-title fw-bold" href="{$item.url|default=''}">{$item.title}</a>
+            <div class="cms-desc mt-1">{$item.description|mb_substr=0,80}</div>
+            <div class="cms-meta mt-1">{$item.create_time_date|default=''} · {$item.view_count} 次浏览</div>
+        </div>
+    </div>
+    {/foreach}
+</div>
+{/notempty}
+{/block}

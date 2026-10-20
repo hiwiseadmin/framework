@@ -1,0 +1,103 @@
+<!-- 遗物 新增/编辑 模态框（含 patch 试跑） -->
+<style>
+    .m3-patch-text { font-family: Consolas, monospace; font-size: 12px; }
+</style>
+
+<div class="modal fade" id="relic-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="relic-form-title">新增遗物</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+            </div>
+            <form id="relic-form" class="modal-body row g-3">
+                <input type="hidden" name="id" id="relic-form-id" value="0">
+
+                <div class="col-md-3">
+                    <label class="form-label">遗物 ID <span class="text-danger">*</span></label>
+                    <input type="text" name="relic_id" id="relic-form-relic-id" class="form-control" placeholder="r_four_bomb"
+                           data-validation="required|maxLength:50"
+                           data-validation-message-required="请填写遗物 ID"
+                           data-validation-message-maxLength="遗物 ID 不能超过 50 个字符">
+                    <div class="invalid-feedback"><span class="validation-text"></span></div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">名称 <span class="text-danger">*</span></label>
+                    <input type="text" name="name" id="relic-form-name" class="form-control"
+                           data-validation="required|maxLength:50"
+                           data-validation-message-required="请填写遗物名称"
+                           data-validation-message-maxLength="遗物名称不能超过 50 个字符">
+                    <div class="invalid-feedback"><span class="validation-text"></span></div>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">稀有度</label>
+                    <select name="rarity" id="relic-form-rarity" class="form-select">
+                        {foreach $rarities as $r}
+                        <option value="{$r}">{$r}</option>
+                        {/foreach}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">分类</label>
+                    <select name="category" id="relic-form-category" class="form-select">
+                        {foreach $categories as $c}
+                        <option value="{$c}">{$c}</option>
+                        {/foreach}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">图标</label>
+                    <input type="text" name="icon" id="relic-form-icon" class="form-control" placeholder="relic_r_x.png">
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">描述</label>
+                    <input type="text" name="desc" id="relic-form-desc" class="form-control" placeholder="四连也生成炸弹（原为条纹）">
+                </div>
+
+                <div class="col-md-8">
+                    <label class="form-label">patch JSON <span class="text-danger">*</span></label>
+                    <textarea name="patch" id="relic-form-patch" class="form-control m3-patch-text" rows="8" spellcheck="false"
+                              data-validation="required|validJson"
+                              data-validation-message-required="请填写 patch JSON"
+                              data-validation-message-validJson="patch 不是合法的 JSON">[
+  { "op": "replace", "path": "/rules/specials/match4", "value": "bomb" }
+]</textarea>
+                    <div class="invalid-feedback"><span class="validation-text"></span></div>
+                    <div class="form-text">
+                        支持的 op：<code>replace</code> / <code>add</code>（<code>mode:accumulate</code> 累加）/ <code>remove</code> / <code>mul</code>；
+                        路径支持数组选择器 <code>/behaviours/[id=choc]/interval</code>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">试跑对象关卡</label>
+                    <input type="text" id="relic-check-code" class="form-control mb-2" placeholder="留空 = 取第一个已发布关卡">
+                    <button type="button" class="btn btn-outline-info btn-sm" id="btn-relic-check">
+                        <i class="bi bi-play-circle"></i> 试跑 patch
+                    </button>
+                    <div id="relic-check-result" class="mt-2"></div>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">奖池权重</label>
+                    <input type="number" name="weight" id="relic-form-weight" class="form-control" value="100" min="1">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">解锁成本（0=初始进池）</label>
+                    <input type="number" name="unlock_cost" id="relic-form-unlock-cost" class="form-control" value="0" min="0">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">状态</label>
+                    <select name="enabled" id="relic-form-enabled" class="form-select">
+                        <option value="1">启用</option>
+                        <option value="0">停用</option>
+                    </select>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" form="relic-form" class="btn btn-primary"><i class="bi bi-check-lg"></i> 保存</button>
+            </div>
+        </div>
+    </div>
+</div>

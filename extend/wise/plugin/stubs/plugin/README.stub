@@ -1,0 +1,137 @@
+# {$name}
+
+{$description}
+
+| 项 | 值 |
+|:---|:---|
+| 插件标识 | `{$name}` |
+| 版本 | {$version} |
+| 作者 | {$author} |
+| 创建时间 | {$create_time} |
+| 骨架档位 | {$tier_label} |
+
+## 快速开始
+
+```bash
+# 启用插件（框架自动完成：迁移 / 菜单 / 权限 / 静态资源）
+php think plugin:enable {$name}
+```
+
+启用后访问默认页面：`/plugin/{$name}/index`
+
+## 文件契约
+
+`plugin:create` 生成的每个文件都对应 boot 链上的一个读取点。下表说明**加载步骤**与**删掉它会怎样**。
+
+{$contract_table}
+
+> boot 链共 11 步（另含 2b `injectRuntimeConfig` / 2c `mergeGlobalConfig`），实现见 `extend/wise/plugin/WiseBootServiceProvider.php`。
+> 表外的文件（controller / model / service / validate / view / statics）由 PSR-4 自动加载（`plugin\{$name}\` → 本目录）与静态资源复制处理，无读取点约束。
+> 若以 `--minimal` 生成，则只含「必需」档文件，上表其余项需自行创建。
+
+## 目录结构
+
+```
+plugins/{$name}/
+{$file_tree}
+```
+
+## 开发指南
+
+### 后台路由
+
+在 `route/plugin.php` 中注册。**不要写 `Route::group('plugin/...')`** —— 框架在 Step 9 已自动加上 `plugin/{$name}` 前缀。
+
+```php
+Route::get('demo', 'plugin\\{$name}\\controller\\Demo@index');   // → /plugin/{$name}/demo
+```
+
+### 数据表迁移与填充
+
+这两个目录是框架硬编码读取路径，**不可改名**：
+
+- 迁移：`database/migrations/`（`MigrationRunner::migrate()`）
+- 填充：`database/seeds/`（注意不是 `seeders`）
+
+```bash
+php think plugin:migrate:create {$name} CreateExampleTable
+php think plugin:migrate:run {$name}
+
+php think plugin:seed:create {$name} ExampleSeeder
+php think plugin:seed:run {$name}
+```
+
+### 配置
+
+主配置**必须命名为 `config/app.php`**，其内容会被平铺到插件配置域根：
+
+```php
+config('{$name}.info.name');      // 平铺写法（推荐）
+config('{$name}.app.info.name');  // 子键写法（等价）
+```
+
+其他配置文件（如 `config/console.php`）只产生子键：`config('{$name}.console.commands')`。
+
+#### 向全局配置域贡献配置（可选）
+
+若插件需要写入**框架全局配置域**（如 `view` 的 `taglib_pre_load`），**不要**直接 `Config::set()`，而是把配置写进 `config/{域名}.php`，再在 `BootServiceProvider` 声明白名单：
+
+```php
+// config/view.php
+return ['taglib_pre_load' => 'plugin\\{$name}\\taglib\\Cms'];
+```
+
+```php
+// BootServiceProvider.php
+protected array $globalConfigMap = ['view' => ['taglib_pre_load']];
+```
+
+boot 链 Step 2c 会把白名单内的域名并入全局域；白名单值声明为「逗号并集键」时多插件共存取并集，不互相覆盖。
+
+> ⚠️ 仅适用于「boot 之后才被读取」的域：`view` ✅ / `lang` ❌
+> —— `lang.extend_list` 在 `App::initialize()` 阶段即被消费并冻结，此处写入无效；插件语言包请放 `lang/` 目录由 LangPack 自动发现。
+
+### 静态资源
+
+`statics/` 在 debug 模式下自动同步到 `public/statics/plugins/{$name}/`（Step 1）。
+引用方式：`/statics/plugins/{$name}/css/app.css`
+
+### 公共函数
+
+`common.php` 中的函数命名以 `{$name}_` 为前缀，并需用 `function_exists()` 包裹（防止 Swoole 常驻下重复定义）。
+
+### 后台页面视图
+
+视图放在**插件内**：`view/{控制器}/{方法}.html`，控制器用 **scope 语法**引用：
+
+```php
+return View::fetch('{$name}@article/index');
+// → plugins/{$name}/view/article/index.html
+```
+
+这样做的意义：宿主若需定制某个页面，只需新建 `app/view/{$name}/article/index.html`
+放同名文件即可**覆盖**，插件本身无需改动；反之插件升级时视图随插件走，
+不会被宿主残留的旧视图卡住。
+
+> 解析顺序（`ViewScope`）：宿主覆盖层 `app/{app}/view/...` 优先 → 未命中才落到插件内视图。
+> 两者都不存在才抛 `TemplateNotFoundException`。
+
+### 扩展点速查
+
+| 想做什么 | 改哪个文件 |
+|:---|:---|
+| 加后台路由 | `route/plugin.php` |
+| 加后台页面视图 | `view/{控制器}/{方法}.html` + `View::fetch('{$name}@{控制器}/{方法}')` |
+| 加事件监听 | `event.php` |
+| 加全局中间件 | `middleware.php`（**插件根目录**） |
+| 注册 CLI 命令 | `config/console.php` |
+| 绑定 DI 实现 | `provider.php` |
+| 注册子服务提供者 | `service.php` |
+| 定义公共函数 | `common.php` |
+| 定义默认配置 | `config/app.php` |
+| 并入全局配置域（`view` 等） | `config/{域名}.php` + `BootServiceProvider::$globalConfigMap` |
+| 安装 / 卸载钩子 | `Plugin.php`（需 `--with-plugin` 生成） |
+
+## 许可证
+
+MIT License

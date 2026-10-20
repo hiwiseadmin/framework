@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创建订单 - 工作流演示</title>
+    <link href="__CSS__/bootstrap.min.css" rel="stylesheet">
+    <link href="__CSS__/adminlte.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0"><?php echo $order ? '编辑订单' : '创建订单'; ?></h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="<?php echo plugin_url('workflowdemo/order/index'); ?>">订单列表</a></li>
+                    <li class="breadcrumb-item active"><?php echo $order ? '编辑订单' : '创建订单'; ?></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">订单信息</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="order-form">
+                            <?php /* 后台写操作需 CSRF 令牌：本页为独立 HTML（未继承插件统一布局），故显式输出隐藏域 */ ?>
+                            <?php echo csrf_field(); ?>
+                            <div class="form-group">
+                                <label for="title">订单标题 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="title" name="title" 
+                                       value="<?php echo $order ? htmlspecialchars($order['title']) : ''; ?>"
+                                       placeholder="请输入订单标题" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="description">订单描述</label>
+                                <textarea class="form-control" id="description" name="description" rows="4"
+                                          placeholder="请输入订单描述"><?php echo $order ? htmlspecialchars($order['description']) : ''; ?></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="amount">订单金额 <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">¥</span>
+                                    </div>
+                                    <input type="number" class="form-control" id="amount" name="amount" 
+                                           value="<?php echo $order ? $order['amount'] : ''; ?>"
+                                           step="0.01" min="0" placeholder="0.00" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary" id="submit-btn">
+                                    <i class="fas fa-save"></i> 保存
+                                </button>
+                                <a href="<?php echo plugin_url('workflowdemo/order/index'); ?>" class="btn btn-default">
+                                    返回
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">工作流说明</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>保存后将自动创建订单并初始化工作流，初始状态为 <span class="badge bg-secondary">草稿</span>。</p>
+                        <p>工作流流程：</p>
+                        <ol>
+                            <li><strong>草稿</strong> → 提交审核</li>
+                            <li><strong>已提交</strong> → 分配审核员</li>
+                            <li><strong>审核中</strong> → 审核通过 / 审核拒绝</li>
+                            <li><strong>已拒绝</strong> → 可重新提交</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="__JS__/jquery.min.js"></script>
+<script src="__JS__/bootstrap.bundle.min.js"></script>
+<script>
+$(function() {
+    $('#order-form').submit(function(e) {
+        e.preventDefault();
+
+        var $btn = $('#submit-btn');
+        $btn.prop('disabled', true).text('保存中...');
+
+        $.post('<?php echo plugin_url("workflowdemo/order/save"); ?>', $(this).serialize(), function(res) {
+            if (res.code === 1) {
+                alert('保存成功');
+                location.href = '<?php echo plugin_url("workflowdemo/order/index"); ?>';
+            } else {
+                alert(res.msg || '保存失败');
+                $btn.prop('disabled', false).text('保存');
+            }
+        }, 'json').fail(function() {
+            alert('请求失败，请重试');
+            $btn.prop('disabled', false).text('保存');
+        });
+    });
+});
+</script>
+</body>
+</html>

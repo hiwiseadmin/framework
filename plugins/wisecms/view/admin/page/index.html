@@ -1,0 +1,41 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}单页管理{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-file-earmark" caption="单页管理" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <!-- 筛选条：条件变化由 js/page.js 局部刷新表格，不整页跳转 -->
+                <div class="row g-2 align-items-center mb-3">
+                    <div class="col-auto">
+                        <input type="text" class="form-control form-control-sm" id="filter-keyword"
+                               placeholder="搜索标题" style="width:220px" autocomplete="off">
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-sm btn-primary" id="btn-search-page">
+                            <i class="bi bi-search"></i> 搜索
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-reset-page">重置</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-trash-page">
+                            <i class="bi bi-trash3 me-1"></i>回收站
+                        </button>
+                    </div>
+                    <div class="col-auto ms-auto">
+                        <span class="text-muted small">单页按「当前站点」隔离；别名站点内唯一（删除期间仍占用别名）</span>
+                    </div>
+                </div>
+
+                <!-- 表格：仅挂载点（列表无批量接口，故不开勾选） -->
+                <div id="toolbar" class="toolbar"></div>
+                <table id="table"></table>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/page.js（由 wsconfig.js 自动加载） -->
+{/block}

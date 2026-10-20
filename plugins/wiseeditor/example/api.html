@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN" data-bs-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WiseEditor 示例 · 实例 API（EditorInstance 契约）</title>
+    <link rel="stylesheet" href="/statics/libs/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="/statics/plugins/wiseeditor/css/wiseeditor.css">
+    <link rel="stylesheet" href="./example.css">
+</head>
+<body>
+    <header class="ex-head">
+        <h1>WiseEditor 示例</h1>
+        <nav class="ex-nav">
+            <a href="./index.html">富文本</a>
+            <a href="./markdown.html">Markdown</a>
+            <a href="./api.html" aria-current="page">实例 API</a>
+        </nav>
+    </header>
+
+    <p class="hint">
+        页面拿到的实例统一遵守 <code>EditorInstance</code> 契约，与具体引擎无关：<br>
+        <code>getContent()</code> · <code>setContent(html)</code> · <code>isDirty()</code> ·
+        <code>focus()</code> · <code>onUpdate(fn)</code> · <code>destroy()</code><br>
+        取实例：<code>window.WiseEditor.get('容器 id')</code>；
+        销毁后该 id 会从实例表移除，需刷新页面重建。
+    </p>
+
+    <div class="field">
+        <label>契约演示容器</label>
+        <div id="editor_content" class="wiseeditor-container" style="height:240px"
+             data-editor="wiseeditor" data-editor-type="tiptap" data-mode="richtext"
+             data-name="content" data-upload-url="/admin/attachment/upload"
+             data-placeholder="随便改点什么，然后点 isDirty() 看看"></div>
+        <input type="hidden" name="content" id="editor_content_input"
+               value="&lt;p&gt;初始内容&lt;/p&gt;">
+    </div>
+
+    <div class="ex-actions">
+        <button type="button" id="btnGet">getContent()</button>
+        <button type="button" id="btnSet">setContent() 写入表格</button>
+        <button type="button" id="btnDirty">isDirty()</button>
+        <button type="button" id="btnFocus">focus()</button>
+        <button type="button" id="btnDestroy">destroy()</button>
+    </div>
+
+    <pre id="out">等待初始化…</pre>
+
+    <script type="module" src="/statics/plugins/wiseeditor/js/wiseeditor-init.js"></script>
+    <script type="module" src="./api.js"></script>
+</body>
+</html>

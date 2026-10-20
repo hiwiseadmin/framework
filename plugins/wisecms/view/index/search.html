@@ -1,0 +1,49 @@
+{extend name="index/layout" /}
+
+{block name="title"}{if condition="$keyword neq ''"}"{$keyword}" 搜索结果{else /}内容搜索{/if} - {$cms.site_name}{/block}
+
+{block name="main"}
+<div class="cms-card p-4 mb-4">
+    <form class="row g-2" method="get" action="{$cms.search_url}">
+        <div class="col-sm-9">
+            <input type="search" name="keyword" class="form-control" value="{$keyword}"
+                   placeholder="请输入关键词">
+        </div>
+        <div class="col-sm-3">
+            <button type="submit" class="btn btn-primary w-100">搜索</button>
+        </div>
+    </form>
+
+    {notempty name="hot"}
+    <div class="mt-3">
+        <span class="cms-meta me-2">热搜：</span>
+        {foreach $hot as $word}
+        <a class="cms-tag" href="{$cms.search_url}?keyword={$word.keyword|urlencode}">{$word.keyword}</a>
+        {/foreach}
+    </div>
+    {/notempty}
+</div>
+
+<div class="cms-card p-3">
+    {if condition="$keyword neq ''"}
+    <div class="cms-meta mb-3">共找到 <strong>{$total}</strong> 条与 “{$keyword}” 相关的内容</div>
+    {/if}
+
+    {empty name="list"}
+    <p class="text-muted py-4 text-center mb-0">
+        {if condition="$keyword neq ''"}没有找到相关内容，换个关键词试试。{else /}请输入关键词开始搜索。{/if}
+    </p>
+    {else /}
+    {foreach $list as $item}
+    <div class="py-3 border-bottom">
+        <a class="cms-title fw-bold d-block mb-1"
+           href="{$item.url|default=''}">{$item.title|default=''|raw}</a>
+        <div class="cms-desc mb-2">{$item.description|default=''|mb_substr=0,100|raw}</div>
+        <div class="cms-meta">{:substr($item.create_time, 0, 10)}</div>
+    </div>
+    {/foreach}
+    {/empty}
+
+    {include file="index/pager" /}
+</div>
+{/block}

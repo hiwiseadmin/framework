@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-bs-theme="{$wssite['theme']|default='dark'}" data-color-scheme="{$wssite['scheme']|default=''}" data-ws-sidebar="{$wssite['sidebar']|default='dark'}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark" />
+    <meta name="site-subframe" content="{:session('isSubframe')=='1' ? 'true' : 'false'}" />
+    <meta name="theme-color" content="#007bff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
+{if isset($__csrf__)}
+    <meta name="csrf-token" content="{$__csrf__}">
+{else}
+    {:csrf_meta()}
+{/if}
+{/* 主题防闪烁引导：必须在所有样式表之前同步执行，首帧即应用正确主题（详见 common.php:theme_bootstrap_script） */}
+{:theme_bootstrap_script($csp_nonce)}
+    <title>{$wssite['name']} - {block name="title"}{/block}</title>
+{if (config('app.debug'))}
+    <link rel="stylesheet" href="/statics/libs/adminlte4/css/adminelte.css">
+    <!-- <link rel="stylesheet" href="/statics/libs/bootstrap/css/bootstrap-ui.css"> -->
+    <link rel="stylesheet" href="/statics/libs/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="/statics/libs/bootstrap-table/bootstrap-table-bundle.min.css">
+    <link rel="stylesheet" href="/statics/css/base.css">
+    <link rel="stylesheet" href="/statics/css/ws-state.css">
+    <link rel="stylesheet" href="/statics/css/wise-slot.css">
+    <link rel="stylesheet" href="/statics/css/theme/theme.css">
+{else}
+    <link rel="stylesheet" href="/statics/libs/adminlte4/css/adminelte.min.css">
+    <!-- <link rel="stylesheet" href="/statics/libs/bootstrap/css/bootstrap-ui.css"> -->
+    <link rel="stylesheet" href="/statics/libs/bootstrap-icons/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/statics/libs/bootstrap-table/bootstrap-table-bundle.min.css">
+    <link rel="stylesheet" href="/statics/css/base.css">
+    <link rel="stylesheet" href="/statics/css/ws-state.css">
+    <link rel="stylesheet" href="/statics/css/wise-slot.css">
+    <link rel="stylesheet" href="/statics/css/theme/theme.css">
+{/if}
+<!-- ================================================================
+     WiseAdmin JS 基础库 v1.0
+     defer 加载：并行下载，文档序执行（jQuery→Bootstrap→plugins→ws-*→ESM）
+     ================================================================ -->
+
+<!-- Layer 1: 第三方库（非 ESM，挂 window） -->
+<script src="/statics/js/jquery/jquery.min.js"></script>
+<script defer src="/statics/js/jquery-ui/jquery-ui-1.14.1/jquery-ui.min.js"></script>
+<script defer src="/statics/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+{if (config('app.debug'))}
+<script defer src="/statics/libs/adminlte4/js/adminelte.js"></script>
+{else}
+<script defer src="/statics/libs/adminlte4/js/adminelte.min.js"></script>
+{/if}
+
+<!-- Layer 2: bootstrap-table 合集（核心 + locale + 13 扩展，按需打包） -->
+<script defer src="/statics/js/jquery-treegrid/js/jquery.treegrid.min.js"></script>
+<script defer src="/statics/libs/sortablejs/sortable.js"></script>
+<script defer src="/statics/libs/bootstrap-table/bootstrap-table-bundle.min.js"></script>
+
+<!-- Layer 3: 其他全局工具
+     ws-* 组件已 ESM 化，改由 statics/modules/ws/index.js 随 wise-bundle.js 统一加载，
+     不再需要在此逐个引入（详见下方 ESM 入口）。 -->
+<script defer src="/statics/js/hotkey/hotkey.js"></script>
+<script defer src="/statics/js/broadcast/broadcast.js"></script>
+<script defer src="/statics/js/cookie/cookie.js"></script>
+<script defer src="/statics/js/clipboard/clipboard.js"></script>
+
+<!-- Layer 4: EnhancedTable -->
+<script defer src="/statics/modules/enhanced-table.js"></script>
+
+<!-- PHP 配置注入（内联，无 defer，立即执行） -->
+<script nonce="{$csp_nonce|default=''}">var site = {:json_encode($wssite, JSON_UNESCAPED_UNICODE)}</script>
+<script nonce="{$csp_nonce|default=''}">window.__WS_CONFIG__ = {:json_encode($wsconfig, JSON_UNESCAPED_UNICODE)}</script>
+<script nonce="{$csp_nonce|default=''}">window.__WS_SLOTS__ = {:json_encode($wsslots ?? [], JSON_UNESCAPED_UNICODE)}</script>
+{if isset($wsFeatureModules) && $wsFeatureModules}
+<script nonce="{$csp_nonce|default=''}">window.__WS_FEATURE_MODULES__ = {:json_encode($wsFeatureModules, JSON_UNESCAPED_UNICODE)};</script>
+{/if}
+
+{if (config('app.debug'))}
+<link rel="stylesheet" href="/statics/css/wise-bundle.css">
+<script type="module" src="/statics/modules/wise-bundle.js"></script>
+{else}
+<link rel="stylesheet" href="/statics/css/wise-bundle.min.css">
+<script type="module" src="/statics/modules/wise-bundle.min.js"></script>
+{/if}
+
+{block name="head"}{/block}
+{block name="css"}{/block}
+{block name="style"}{/block}
+</head>
+<body class="{block name='bodyclass'}{/block}">
+{block name="content"}{/block}
+
+{include file="public/loading" /}
+{block name="js"}{/block}
+</body>
+</html>

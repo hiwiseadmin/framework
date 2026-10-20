@@ -1,0 +1,69 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}编辑广告{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-pencil-square" caption="编辑广告" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <form id="adForm" method="post" action="{:plugin_url('wisecms/ad/edit')}">
+                    {:csrf_field()}
+                    <input id="cms-f-id" type="hidden" name="id" value="{$ad.id}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-space_name">广告位标识 <span class="text-danger">*</span></label>
+                            <input id="cms-f-space_name" type="text" name="space_name" class="form-control" required maxlength="50" value="{$ad.space_name}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-name">广告名称 <span class="text-danger">*</span></label>
+                            <input id="cms-f-name" type="text" name="name" class="form-control" required maxlength="100" value="{$ad.name}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-type">广告类型</label>
+                            <select id="cms-f-type" name="type" class="form-select">
+                                <option value="image" {if $ad.type == 'image'}selected{/if}>图片</option>
+                                <option value="html" {if $ad.type == 'html'}selected{/if}>HTML</option>
+                                <option value="code" {if $ad.type == 'code'}selected{/if}>代码</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-link">跳转链接</label>
+                            <input id="cms-f-link" type="text" name="link" class="form-control" maxlength="500" value="{$ad.link}">
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label" for="cms-f-content">广告内容</label>
+                            <textarea id="cms-f-content" name="content" class="form-control" rows="5">{$ad.content}</textarea>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label" for="cms-f-start_time">开始时间</label>
+                            <input id="cms-f-start_time" type="datetime-local" name="start_time" class="form-control"
+                                   value="{:substr(str_replace(' ', 'T', (string) ($ad['start_time'] ?? '')), 0, 16)}">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label" for="cms-f-end_time">结束时间</label>
+                            <input id="cms-f-end_time" type="datetime-local" name="end_time" class="form-control"
+                                   value="{:substr(str_replace(' ', 'T', (string) ($ad['end_time'] ?? '')), 0, 16)}">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label" for="cms-f-sort">排序</label>
+                            <input id="cms-f-sort" type="number" name="sort" class="form-control" value="{$ad.sort|default=0}">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label" for="cms-f-status">状态</label>
+                            <select id="cms-f-status" name="status" class="form-select">
+                                <option value="1" {if $ad.status == 1}selected{/if}>启用</option>
+                                <option value="0" {if $ad.status == 0}selected{/if}>禁用</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                    <!-- 返回与提交均由 js/ad.js 的 edit() 处理（模板零内联脚本） -->
+                    <button type="button" id="btn-ad-back" class="btn btn-outline-secondary btn-sm">返回</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

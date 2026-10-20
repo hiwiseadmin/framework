@@ -1,0 +1,65 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}内容管理{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-file-earmark-text" caption="内容管理" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="row g-3">
+            <!-- 左侧栏目树：数据源 category/tree（含禁用栏目），由 js/content.js 渲染 -->
+            <div class="col-12 col-lg-3 col-xl-2">
+                <div class="card">
+                    <div class="card-header py-2 d-flex align-items-center">
+                        <i class="bi bi-diagram-3 me-1"></i><span class="small">栏目导航</span>
+                    </div>
+                    <div class="card-body p-2" id="cmsCategoryTree" style="max-height:62vh;overflow:auto"></div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-9 col-xl-10">
+                <div class="card">
+                    <div class="card-body">
+                        <!-- P1-09：上游上下文 chip（当前栏目筛选 + 清除回到全量） -->
+                        <div id="cms-context-chip" class="mb-2" style="display:none"></div>
+
+                        <!-- 筛选条：条件变化后由页面控制器局部刷新表格，不再整页跳转 -->
+                        <div class="row g-2 align-items-center mb-3">
+                            <div class="col-auto">
+                                <select class="form-select form-select-sm" id="filter-status" style="width:130px">
+                                    <option value="">全部状态</option>
+                                    <option value="0">草稿</option>
+                                    <option value="1">待审核</option>
+                                    <option value="2">已发布</option>
+                                    <option value="3">已归档</option>
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <input type="text" class="form-control form-control-sm" id="filter-keyword"
+                                       placeholder="搜索标题 / 关键词" style="width:220px" autocomplete="off">
+                            </div>
+                            <div class="col-auto">
+                                <button type="button" class="btn btn-sm btn-primary" id="btn-search-content">
+                                    <i class="bi bi-search"></i> 搜索
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-reset-content">
+                                    重置
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 表格：仅提供挂载点；列/分页/空态/加载态由 cmsTable() 渲染。
+                             导出按钮暂不提供 —— content/export 尚未实现（UIUX-P1-22），
+                             不放点了没反应的按钮。 -->
+                        <div id="toolbar" class="toolbar"></div>
+                        <table id="table"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/content.js（由 wsconfig.js 自动加载） -->
+{/block}

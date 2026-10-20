@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>增强版多功能下拉选择组件演示</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="/statics/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="/statics/libs/bootstrap-icons/bootstrap-icons.min.css">
+</head>
+<body>
+    <div class="container my-5">
+        <h1 class="mb-4 text-center">增强版多功能下拉选择组件演示</h1>
+        
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">基础功能演示</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">基本选择器</label>
+                                    <div id="basicSelect"></div>
+                                    <div class="form-text">基础单选功能，支持图标、主字段和辅助字段显示</div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">多选模式</label>
+                                    <div id="wsSelect"></div>
+                                    <div class="form-text">支持选择多个选项，显示为标签形式</div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">带搜索功能</label>
+                                    <div id="searchableSelect"></div>
+                                    <div class="form-text">可通过输入关键词筛选选项</div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">分组模式</label>
+                                    <div id="groupedSelect"></div>
+                                    <div class="form-text">选项按类别分组显示</div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">不同尺寸</label>
+                                    <div id="sizedSelect"></div>
+                                    <div class="form-text">支持小、中、大三种尺寸</div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">禁用状态</label>
+                                    <div id="disabledSelect"></div>
+                                    <div class="form-text">组件禁用状态示例</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">高级功能演示</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">远程数据搜索</label>
+                                    <div id="remoteSelect"></div>
+                                    <div class="form-text">模拟远程数据搜索（输入关键词搜索）</div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">自定义字段映射</label>
+                                    <div id="customFieldSelect"></div>
+                                    <div class="form-text">使用自定义字段映射的远程数据</div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">动态模式切换</label>
+                                    <div id="dynamicSelect"></div>
+                                    <div class="form-text">
+                                        <button id="toggleMode" class="btn btn-sm btn-outline-primary mt-2">切换单选/多选</button>
+                                        <button id="toggleDisplay" class="btn btn-sm btn-outline-secondary mt-2">切换显示模式</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">远程数据分组</label>
+                                    <div id="remoteGroupSelect"></div>
+                                    <div class="form-text">远程数据分组显示</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">分页功能演示</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">本地数据分页</label>
+                                    <div id="localPaginationSelect" class="paginationSelect"></div>
+                                    <div class="form-text">本地数据支持分页展示</div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">远程数据分页</label>
+                                    <div id="remotePaginationSelect" class="paginationSelect"></div>
+                                    <div class="form-text">远程数据支持分页加载</div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">自定义分页配置</label>
+                                    <div id="customPaginationSelect"></div>
+                                    <div class="form-text">自定义每页显示数量和分页字段映射</div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">分页控制按钮</label>
+                                    <div class="mt-3">
+                                        <button id="goToPage2" class="btn btn-sm btn-outline-primary">跳转到第2页</button>
+                                        <button id="changePageSize" class="btn btn-sm btn-outline-secondary">改为50条数据</button>
+                                        <button id="paginationSelect" class="btn btn-sm btn-outline-secondary">类控制多个</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">树形结构演示</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">基础树形结构</label>
+                                    <div id="basicTreeSelect"></div>
+                                    <div class="form-text">树形结构，支持展开/折叠，单选</div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">树形多选模式</label>
+                                    <div id="multiTreeSelect"></div>
+                                    <div class="form-text">树形结构，支持多选</div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">最后一级横向排列</label>
+                                    <div id="horizontalTreeSelect"></div>
+                                    <div class="form-text">树形结构，最后一级横向排列</div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">树形控制按钮</label>
+                                    <div class="mt-3">
+                                        <button id="expandAll" class="btn btn-sm btn-outline-primary">展开所有节点</button>
+                                        <button id="collapseAll" class="btn btn-sm btn-outline-secondary">折叠所有节点</button>
+                                        <button id="toggleLayout" class="btn btn-sm btn-outline-info">切换最后一级布局</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">混合功能演示</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">树形+搜索</label>
+                                    <div id="searchTreeSelect"></div>
+                                    <div class="form-text">树形结构支持搜索功能</div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">自动初始化示例</label>
+                                    <div data-role="wsselect" 
+                                         data-tree-mode="true"
+                                         data-options='[{"value":"auto1","label":"自动初始化1"},{"value":"auto2","label":"自动初始化2"}]'
+                                         data-placeholder="自动初始化示例">
+                                    </div>
+                                    <div class="form-text">通过 data 属性自动初始化</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 在演示文件中添加严格模式和非严格模式的对比示例 -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">树形选择严格模式对比</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">非严格模式（默认）</label>
+                                    <div id="nonStrictTreeSelect"></div>
+                                    <div class="form-text">
+                                        父子节点关联选择：<br>
+                                        1. 勾选父节点自动勾选所有子节点<br>
+                                        2. 子节点影响父节点状态<br>
+                                        3. 显示半选状态
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">严格模式</label>
+                                    <div id="strictTreeSelect"></div>
+                                    <div class="form-text">
+                                        父子节点独立选择：<br>
+                                        1. 父子节点选择状态完全独立<br>
+                                        2. 无关联逻辑<br>
+                                        3. 无半选状态
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <button id="toggleStrictMode" class="btn btn-sm btn-outline-primary">切换严格模式</button>
+                                <button id="getCheckedValues" class="btn btn-sm btn-outline-secondary">获取选中值</button>
+                                <pre id="checkedValuesDisplay" class="bg-body-secondary p-3 rounded mt-3" style="display: none;"></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">动态控制</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <button id="getValuesBtn" class="btn btn-primary w-100">获取所有值</button>
+                            </div>
+                            <div class="col-md-3">
+                                <button id="setValuesBtn" class="btn btn-success w-100">设置多选值为[1,3,5]</button>
+                            </div>
+                            <div class="col-md-3">
+                                <button id="toggleDisabledBtn" class="btn btn-warning w-100">切换禁用状态</button>
+                            </div>
+                            <div class="col-md-3">
+                                <button id="reloadRemoteBtn" class="btn btn-info w-100">重新加载远程数据</button>
+                            </div>
+                            <div class="col-md-3">
+                                <button id="toggleTreeMode" class="btn btn-warning w-100">切换树形模式</button>
+                            </div>
+                            <div class="col-md-3">
+                                <button id="togglePagination" class="btn btn-info w-100">切换分页模式</button>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <h6>选中的值：</h6>
+                                <pre id="selectedValues" class="bg-body-secondary p-3 rounded"></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">API 使用示例</h5>
+                    </div>
+                    <div class="card-body">
+                        <pre><code>
+// 初始化选择器
+$('#mySelect').wsSelect({
+    options: [
+        { value: '1', label: '选项1', secondary: '描述1', icon: 'bi bi-app' },
+        { value: '2', label: '选项2', secondary: '描述2', icon: 'bi bi-android' }
+    ],
+    multiple: false,
+    searchable: true,
+    placeholder: '请选择',
+    onChange: function(value, option) {
+        console.log('选中值:', value);
+    }
+});
+
+// 远程数据配置
+$('#remoteSelect').wsSelect({
+    remoteUrl: '/api/search',
+    fieldMapping: {
+        value: 'id',
+        label: 'name',
+        secondary: 'description',
+        icon: 'icon_class',
+        group: 'category'
+    },
+    displayMode: 'group',
+    multiple: true,
+    remoteDelay: 500,
+    minSearchLength: 2
+});
+
+// 获取值
+var value = $('#mySelect').wsSelect('getValue');
+
+// 设置值
+$('#mySelect').wsSelect('setValue', '1');
+
+// 更新选项
+$('#mySelect').wsSelect('updateOptions', newOptions);
+
+// 启用/禁用
+$('#mySelect').wsSelect('enable');
+$('#mySelect').wsSelect('disable');
+
+// 设置显示模式
+$('#mySelect').wsSelect('setDisplayMode', 'group');
+
+// 设置选择模式
+$('#mySelect').wsSelect('setMultiple', true);
+
+// 重新加载远程数据
+$('#mySelect').wsSelect('reloadRemoteData', '搜索词');
+
+// 初始化带分页的选择器
+$('#mySelect').wsSelect({
+    options: [...],
+    pagination: true,
+    pageSize: 10,
+    pageSizeOptions: [10, 20, 50],
+    showTotal: true,
+    showSizeChanger: true
+});
+
+// 初始化树形选择器
+$('#treeSelect').wsSelect({
+    treeMode: true,
+    treeExpandAll: false,
+    lastLevelLayout: 'horizontal', // 'vertical' or 'horizontal'
+    treeCheckable: true,
+    multiple: true
+});
+
+// 分页控制
+$('#mySelect').wsSelect('goToPage', 2);
+$('#mySelect').wsSelect('reloadRemoteData');
+
+// 树形控制
+$('#treeSelect').wsSelect('expandAll');
+$('#treeSelect').wsSelect('collapseAll');
+$('#treeSelect').wsSelect('setLastLevelLayout', 'horizontal');
+
+// 动态切换模式
+$('#mySelect').wsSelect('setTreeMode', true);
+$('#mySelect').wsSelect('setMultiple', true);
+                        </code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">表单集成示例</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="demoForm" class="needs-validation" novalidate>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-4">
+                                        <label for="singleSelect" class="form-label fw-bold">单选选择器（自动集成）</label>
+                                        <div data-role="wsselect" 
+                                             data-name="single_select"
+                                             data-options='[{"value":"1","label":"选项1"},{"value":"2","label":"选项2"},{"value":"3","label":"选项3"}]'
+                                             data-placeholder="请选择"
+                                             data-required="true">
+                                        </div>
+                                        <div class="form-text">通过data-name自动创建隐藏input，name为"single_select"</div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="wsSelect" class="form-label fw-bold">多选选择器</label>
+                                        <div data-role="wsselect" 
+                                             data-name="multi_select"
+                                             data-multiple="true"
+                                             data-options='[{"value":"a","label":"多选A"},{"value":"b","label":"多选B"},{"value":"c","label":"多选C"}]'
+                                             data-placeholder="请选择多个"
+                                             data-value-separator=",">
+                                        </div>
+                                        <div class="form-text">多选值以逗号分隔存储在隐藏input中</div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="jsonwsSelect" class="form-label fw-bold">JSON格式多选</label>
+                                        <div data-role="wsselect" 
+                                             data-name="json_multi_select"
+                                             data-multiple="true"
+                                             data-use-json-value="true"
+                                             data-options='[{"value":"x","label":"JSON X"},{"value":"y","label":"JSON Y"},{"value":"z","label":"JSON Z"}]'
+                                             data-placeholder="JSON格式存储">
+                                        </div>
+                                        <div class="form-text">多选值以JSON数组格式存储在隐藏input中</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="mb-4">
+                                        <label for="treeSelect" class="form-label fw-bold">树形选择器（表单集成）</label>
+                                        <div id="treeSelectForm" data-role="wsselect"
+                                             data-name="tree_select"
+                                             data-tree-mode="true"
+                                             data-tree-checkable="true"
+                                             data-multiple="true"
+                                             data-placeholder="选择树节点">
+                                        </div>
+                                        <div class="form-text">树形选择器也支持表单集成</div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="originalSelect" class="form-label fw-bold">自动转换原生select</label>
+                                        <select id="originalSelect" name="original_select" class="form-select" data-convert-to-wsSelect>
+                                            <option value="">请选择</option>
+                                            <option value="1">原生选项1</option>
+                                            <option value="2">原生选项2</option>
+                                            <option value="3">原生选项3</option>
+                                            <option value="4">原生选项4</option>
+                                        </select>
+                                        <div class="form-text">原生select通过data-convert-to-wsSelect自动转换</div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="remoteSelect" class="form-label fw-bold">远程数据选择器</label>
+                                        <div id="remoteSelectForm" data-role="wsselect"
+                                             data-name="remote_select"
+                                             data-searchable="true"
+                                             data-placeholder="搜索远程数据">
+                                        </div>
+                                        <div class="form-text">远程数据选择器也支持表单集成</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary">提交表单</button>
+                                    <button type="button" id="getFormData" class="btn btn-secondary">获取表单数据</button>
+                                    <button type="button" id="resetForm" class="btn btn-outline-secondary">重置表单</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">表单数据处理</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <button id="showHiddenInputs" class="btn btn-info w-100">查看隐藏Input</button>
+                            </div>
+                            <div class="col-md-4">
+                                <button id="setValuesProgrammatically" class="btn btn-success w-100">编程设置值</button>
+                            </div>
+                            <div class="col-md-4">
+                                <button id="getAllValues" class="btn btn-primary w-100">获取所有值</button>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-12">
+                                <h6>隐藏Input的值：</h6>
+                                <pre id="hiddenInputValues" class="bg-body-secondary p-3 rounded" style="display: none;"></pre>
+                                
+                                <h6 class="mt-3">表单序列化数据：</h6>
+                                <pre id="formSerializedData" class="bg-body-secondary p-3 rounded" style="display: none;"></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">代码示例</h5>
+                    </div>
+                    <div class="card-body">
+                        <pre><code>
+// HTML 使用示例
+&lt;div data-role="wsselect"
+     data-name="user_role"
+     data-multiple="true"
+     data-options='[{"value":"admin","label":"管理员"},{"value":"editor","label":"编辑"}]'
+     data-placeholder="选择角色"&gt;
+&lt;/div&gt;
+
+// JavaScript 编程示例
+// 获取组件实例
+var wsSelect = $('#mySelect').data('wsSelect');
+
+// 获取隐藏input的值
+var hiddenValue = wsSelect.getHiddenInputValue();
+
+// 获取隐藏input的DOM元素
+var hiddenInput = wsSelect.getHiddenInput();
+
+// 设置值（自动更新隐藏input）
+$('#mySelect').wsSelect('setValue', ['1', '2', '3']);
+
+// 同步到原始select元素
+wsSelect.syncToOriginalSelect();
+
+// 表单提交时自动包含隐藏input的值
+$('form').on('submit', function(e) {
+    e.preventDefault();
+    var formData = $(this).serialize();
+    console.log('表单数据:', formData);
+});
+
+// 自动转换原生select
+&lt;select name="category" data-convert-to-wsSelect&gt;
+    &lt;option value=""&gt;请选择&lt;/option&gt;
+    &lt;option value="1"&gt;分类1&lt;/option&gt;
+&lt;/select&gt;
+                        </code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="/statics/js/jquery/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="/statics/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- 多功能下拉选择组件 -->
+    <!-- 组件为原生 ESM，可直接加载源码：改完组件刷新即可，无需任何构建。
+         样式必须单独 link —— 组件刻意不 import CSS，否则浏览器会因 MIME 类型
+         是 text/css 而拒绝加载整个模块。 -->
+    <link rel="stylesheet" href="ws-select.css">
+    <script type="module" src="ws-select.js"></script>
+    <script src="/statics/js/theme.js"></script>
+
+    <script>
+        // 示例数据
+        const sampleOptions = [
+            { value: '1', label: '微信', secondary: '社交应用', icon: 'bi bi-wechat', group: '社交' },
+            { value: '2',  label: '支付宝', secondary: '支付应用', icon: 'bi bi-alipay', group: '金融' },
+            { value: '3', label: '抖音', secondary: '短视频平台', icon: 'bi bi-tiktok', group: '娱乐' },
+            { value: '4', label: '淘宝', secondary: '购物平台', icon: 'bi bi-bag', group: '购物' },
+            { value: '5', label: '百度', secondary: '搜索引擎', icon: 'bi bi-search', group: '工具' },
+            { value: '6', label: '高德地图', secondary: '导航应用', icon: 'bi bi-geo-alt', group: '工具' },
+            { value: '7', label: '网易云音乐', secondary: '音乐平台', icon: 'bi bi-music-note-beamed', group: '娱乐' },
+            { value: '8', label: '钉钉', secondary: '办公应用', icon: 'bi bi-chat-dots', group: '办公' },
+            { value: '9', label: '美团', secondary: '生活服务', icon: 'bi bi-bicycle', group: '生活' },
+            { value: '10', label: '拼多多', secondary: '团购平台', icon: 'bi bi-cart', group: '购物' }
+        ];
+
+        // 模拟远程数据
+        function mockRemoteData(search) {
+            return new Promise(function(resolve) {
+                setTimeout(function() {
+                    var data = [
+                        { id: 101, name: '搜索结果1', desc: '描述1', type: '类型A', cat: '分类1' },
+                        { id: 102, name: '搜索结果2', desc: '描述2', type: '类型B', cat: '分类1' },
+                        { id: 103, name: '搜索结果3', desc: '描述3', type: '类型A', cat: '分类2' },
+                        { id: 104, name: '搜索结果4', desc: '描述4', type: '类型C', cat: '分类2' },
+                        { id: 105, name: '搜索结果5', desc: '描述5', type: '类型B', cat: '分类3' }
+                    ];
+                    
+                    // 模拟搜索过滤
+                    if (search) {
+                        data = data.filter(function(item) {
+                            return item.name.includes(search) || item.desc.includes(search);
+                        });
+                    }
+                    
+                    resolve({ data: data });
+                }, 800);
+            });
+        }
+
+        // 模拟分组远程数据
+        function mockGroupRemoteData(search) {
+            return new Promise(function(resolve) {
+                setTimeout(function() {
+                    var data = [
+                        { id: 201, name: '产品A', description: '产品A描述', category: '软件', icon: 'bi bi-laptop' },
+                        { id: 202, name: '产品B', description: '产品B描述', category: '软件', icon: 'bi bi-laptop' },
+                        { id: 203, name: '服务A', description: '服务A描述', category: '服务', icon: 'bi bi-gear' },
+                        { id: 204, name: '服务B', description: '服务B描述', category: '服务', icon: 'bi bi-gear' },
+                        { id: 205, name: '硬件A', description: '硬件A描述', category: '硬件', icon: 'bi bi-cpu' }
+                    ];
+                    
+                    // 模拟搜索过滤
+                    if (search) {
+                        data = data.filter(function(item) {
+                            return item.name.includes(search) || item.description.includes(search);
+                        });
+                    }
+                    
+                    resolve({ data: data });
+                }, 800);
+            });
+        }
+
+        // 生成大量数据用于分页演示
+        function generateLargeData(count) {
+            var data = [];
+            for (var i = 1; i <= count; i++) {
+                data.push({
+                    value: 'item' + i,
+                    label: '选项 ' + i,
+                    secondary: '描述 ' + i,
+                    icon: 'bi bi-app',
+                    group: i % 3 === 0 ? '分组A' : (i % 3 === 1 ? '分组B' : '分组C')
+                });
+            }
+            return data;
+        }
+        
+        // 生成树形数据
+        function generateTreeData() {
+            return [
+                {
+                    value: 'root1',
+                    label: '根节点1',
+                    icon: 'bi bi-folder',
+                    secondary: '根节点',
+                    children: [
+                        {
+                            value: 'child1-1',
+                            label: '子节点1-1',
+                            icon: 'bi bi-folder',
+                            secondary: '一级子节点',
+                            children: [
+                                { value: 'leaf1-1-1', label: '叶子节点1-1-1', icon: 'bi bi-file-earmark', secondary: '最后一级' },
+                                { value: 'leaf1-1-2', label: '叶子节点1-1-2', icon: 'bi bi-file-earmark', secondary: '最后一级' },
+                                { value: 'leaf1-1-3', label: '叶子节点1-1-3', icon: 'bi bi-file-earmark', secondary: '最后一级' }
+                            ]
+                        },
+                        {
+                            value: 'child1-2',
+                            label: '子节点1-2',
+                            icon: 'bi bi-folder',
+                            secondary: '一级子节点',
+                            children: [
+                                { value: 'leaf1-2-1', label: '叶子节点1-2-1', icon: 'bi bi-file-earmark', secondary: '最后一级' },
+                                { value: 'leaf1-2-2', label: '叶子节点1-2-2', icon: 'bi bi-file-earmark', secondary: '最后一级' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    value: 'root2',
+                    label: '根节点2',
+                    icon: 'bi bi-folder',
+                    secondary: '根节点',
+                    children: [
+                        {
+                            value: 'child2-1',
+                            label: '子节点2-1',
+                            icon: 'bi bi-folder',
+                            secondary: '一级子节点',
+                            children: [
+                                { value: 'leaf2-1-1', label: '叶子节点2-1-1', icon: 'bi bi-file-earmark', secondary: '最后一级' },
+                                { value: 'leaf2-1-2', label: '叶子节点2-1-2', icon: 'bi bi-file-earmark', secondary: '最后一级' },
+                                { value: 'leaf2-1-3', label: '叶子节点2-1-3', icon: 'bi bi-file-earmark', secondary: '最后一级' },
+                                { value: 'leaf2-1-4', label: '叶子节点2-1-4', icon: 'bi bi-file-earmark', secondary: '最后一级' }
+                            ]
+                        }
+                    ]
+                }
+            ];
+        }
+        
+        // 模拟远程分页数据
+        function mockRemotePagination(search, page, pageSize) {
+            return new Promise(function(resolve) {
+                setTimeout(function() {
+                    var allData = generateLargeData(100);
+                    
+                    // 模拟搜索过滤
+                    if (search) {
+                        allData = allData.filter(function(item) {
+                            return item.label.includes(search) || item.secondary.includes(search);
+                        });
+                    }
+                    
+                    // 计算分页
+                    var start = (page - 1) * pageSize;
+                    var end = start + pageSize;
+                    var data = allData.slice(start, end);
+                    
+                    resolve({
+                        data: data,
+                        total: allData.length,
+                        page: page,
+                        pageSize: pageSize
+                    });
+                }, 500);
+            });
+        }
+
+        // 初始化示例
+        $(document).ready(function() {
+            // 基本选择器
+            $('#basicSelect').wsSelect({
+                options: sampleOptions,
+                placeholder: '请选择一个应用',
+                onChange: function(value, option) {
+                    updateSelectedValues();
+                }
+            });
+            
+            // 多选模式
+            $('#wsSelect').wsSelect({
+                options: sampleOptions,
+                multiple: true,
+                placeholder: '请选择多个应用',
+                onChange: function(value, option) {
+                    updateSelectedValues();
+                }
+            });
+            
+            // 带搜索功能
+            $('#searchableSelect').wsSelect({
+                options: sampleOptions,
+                searchable: true,
+                placeholder: '搜索并选择一个应用',
+                onChange: function(value, option) {
+                    updateSelectedValues();
+                }
+            });
+            
+            // 分组模式
+            $('#groupedSelect').wsSelect({
+                options: sampleOptions,
+                displayMode: 'group',
+                placeholder: '从分组中选择应用',
+                onChange: function(value, option) {
+                    updateSelectedValues();
+                }
+            });
+            
+            // 不同尺寸
+            $('#sizedSelect').wsSelect({
+                options: sampleOptions.slice(0, 5),
+                size: 'lg',
+                placeholder: '大尺寸选择器',
+                onChange: function(value, option) {
+                    updateSelectedValues();
+                }
+            });
+            
+            // 禁用状态
+            $('#disabledSelect').wsSelect({
+                options: sampleOptions,
+                disabled: true,
+                placeholder: '禁用状态的选择器',
+                value: '1'
+            });
+            
+            // 远程数据搜索
+            $('#remoteSelect').wsSelect({
+                remoteMethod: mockRemoteData,
+                searchable: true,
+                fieldMapping: {
+                    value: 'id',
+                    label: 'name',
+                    secondary: 'desc',
+                    group: 'cat'
+                },
+                placeholder: '输入关键词搜索远程数据',
+                multiple: true,
+                remoteDelay: 500,
+                minSearchLength: 1
+            });
+            
+            // 自定义字段映射
+            $('#customFieldSelect').wsSelect({
+                remoteMethod: mockRemoteData,
+                fieldMapping: {
+                    value: 'id',
+                    label: 'name',
+                    secondary: 'desc',
+                    icon: 'type'
+                },
+                placeholder: '自定义字段映射示例',
+                onChange: function(value, option) {
+                    updateSelectedValues();
+                }
+            });
+            
+            // 动态模式切换
+            $('#dynamicSelect').wsSelect({
+                options: sampleOptions,
+                placeholder: '动态模式切换示例',
+                onChange: function(value, option) {
+                    updateSelectedValues();
+                }
+            });
+            
+            // 远程数据分组
+            $('#remoteGroupSelect').wsSelect({
+                remoteMethod: mockGroupRemoteData,
+                fieldMapping: {
+                    value: 'id',
+                    label: 'name',
+                    secondary: 'description',
+                    icon: 'icon',
+                    group: 'category'
+                },
+                displayMode: 'group',
+                placeholder: '远程数据分组显示',
+                onChange: function(value, option) {
+                    updateSelectedValues();
+                }
+            });
+            
+            // 获取所有值按钮
+            $('#getValuesBtn').on('click', function() {
+                updateSelectedValues();
+            });
+            
+            // 设置多选值按钮
+            $('#setValuesBtn').on('click', function() {
+                $('#wsSelect').wsSelect('setValue', ['1', '3', '5']);
+                updateSelectedValues();
+            });
+            
+            // 切换禁用状态按钮
+            let isDisabled = false;
+            $('#toggleDisabledBtn').on('click', function() {
+                isDisabled = !isDisabled;
+                if (isDisabled) {
+                    $('#basicSelect').wsSelect('disable');
+                    $(this).text('启用选择器');
+                } else {
+                    $('#basicSelect').wsSelect('enable');
+                    $(this).text('禁用选择器');
+                }
+            });
+            
+            // 重新加载远程数据
+            $('#reloadRemoteBtn').on('click', function() {
+                $('#remoteSelect').wsSelect('reloadRemoteData');
+            });
+            
+            // 切换单选/多选模式
+            let isMultiple = false;
+            $('#toggleMode').on('click', function() {
+                isMultiple = !isMultiple;
+                $('#dynamicSelect').wsSelect('setMultiple', isMultiple);
+                $(this).text(isMultiple ? '切换为单选' : '切换为多选');
+            });
+            
+            // 切换显示模式
+            let isGroupMode = false;
+            $('#toggleDisplay').on('click', function() {
+                isGroupMode = !isGroupMode;
+                $('#dynamicSelect').wsSelect('setDisplayMode', isGroupMode ? 'group' : 'default');
+                $(this).text(isGroupMode ? '切换为默认模式' : '切换为分组模式');
+            });
+            
+            // 本地数据分页
+            $('#localPaginationSelect').wsSelect({
+                options: generateLargeData(100),
+                pagination: true,
+                pageSize: 10,
+                showTotal: true,
+                showSizeChanger: true,
+                placeholder: '本地数据分页示例',
+                onChange: function(value, option) {
+                    updateSelectedValues();
+                }
+            });
+            
+            // 远程数据分页
+            $('#remotePaginationSelect').wsSelect({
+                remoteMethod: mockRemotePagination,
+                pagination: true,
+                pageSize: 10,
+                pageSizeOptions: [5, 10, 20, 50],
+                showTotal: true,
+                showSizeChanger: true,
+                placeholder: '远程数据分页示例',
+                onChange: function(value, option) {
+                    updateSelectedValues();
+                }
+            });
+            
+            // 自定义分页配置
+            $('#customPaginationSelect').wsSelect({
+                options: generateLargeData(150),
+                pagination: true,
+                pageSize: 15,
+                pageSizeOptions: [5, 15, 30, 100],
+                showTotal: true,
+                showSizeChanger: true,
+                placeholder: '自定义分页配置',
+                onChange: function(value, option) {
+                    updateSelectedValues();
+                }
+            });
+
+            // 基础树形结构
+            $('#basicTreeSelect').wsSelect({
+                treeMode: true,
+                options: generateTreeData(),
+                placeholder: '请选择节点',
+                treeExpandAll: true,
+                onChange: function(value, option) {
+                    updateSelectedValues();
+                }
+            });
+            
+            // 树形多选模式
+            $('#multiTreeSelect').wsSelect({
+                treeMode: true,
+                treeCheckable: true,
+                multiple: true,
+                options: generateTreeData(),
+                placeholder: '请选择多个节点',
+                treeExpandAll: false,
+                onChange: function(value, option) {
+                    updateSelectedValues();
+                }
+            });
+            
+            // 最后一级横向排列
+            $('#horizontalTreeSelect').wsSelect({
+                treeMode: true,
+                lastLevelLayout: 'horizontal',
+                options: generateTreeData(),
+                placeholder: '最后一级横向排列',
+                treeExpandAll: true,
+                onChange: function(value, option) {
+                    updateSelectedValues();
+                }
+            });
+            
+            // 树形+搜索
+            $('#searchTreeSelect').wsSelect({
+                treeMode: true,
+                searchable: true,
+                options: generateTreeData(),
+                placeholder: '搜索树节点',
+                treeExpandAll: false,
+                onChange: function(value, option) {
+                    updateSelectedValues();
+                }
+            });
+            
+            // 获取所有值按钮
+            $('#getValuesBtn').on('click', function() {
+                updateSelectedValues();
+            });
+            
+            // 重新加载远程数据
+            $('#reloadBtn').on('click', function() {
+                $('#remotePaginationSelect').wsSelect('reloadRemoteData');
+            });
+            
+            // 跳转到第2页
+            $('#goToPage2').on('click', function() {
+                $('#localPaginationSelect').wsSelect('goToPage', 2);
+            });
+            
+            // 改为50条数据
+            $('#changePageSize').on('click', function() {
+                $('#localPaginationSelect').wsSelect('updateOptions', generateLargeData(50));
+            });
+
+            // 类控制多个分页选择器
+            $('#paginationSelect').on('click', function() {
+                $('.paginationSelect:first').wsSelect('goToPage', 2).wsSelect('updateOptions', generateLargeData(50));
+            });
+            
+            // 展开所有节点
+            $('#expandAll').on('click', function() {
+                $('#basicTreeSelect').wsSelect('expandAll');
+                $('#multiTreeSelect').wsSelect('expandAll');
+                $('#horizontalTreeSelect').wsSelect('expandAll');
+            });
+            
+            // 折叠所有节点
+            $('#collapseAll').on('click', function() {
+                $('#basicTreeSelect').wsSelect('collapseAll');
+                $('#multiTreeSelect').wsSelect('collapseAll');
+                $('#horizontalTreeSelect').wsSelect('collapseAll');
+            });
+            
+            // 切换最后一级布局
+            var isHorizontal = true;
+            $('#toggleLayout').on('click', function() {
+                isHorizontal = !isHorizontal;
+                var layout = isHorizontal ? 'horizontal' : 'vertical';
+                $('#horizontalTreeSelect').wsSelect('setLastLevelLayout', layout);
+                $(this).text(isHorizontal ? '切换为纵向排列' : '切换为横向排列');
+            });
+            
+            // 切换树形模式
+            var isTreeMode = false;
+            $('#toggleTreeMode').on('click', function() {
+                isTreeMode = !isTreeMode;
+                var target = $('#localPaginationSelect');
+                target.wsSelect('setTreeMode', isTreeMode);
+                if (isTreeMode) {
+                    target.wsSelect('updateOptions', generateTreeData());
+                    $(this).text('切换为普通模式');
+                } else {
+                    target.wsSelect('updateOptions', generateLargeData(50));
+                    $(this).text('切换为树形模式');
+                }
+            });
+            
+            // 切换分页模式
+            var hasPagination = true;
+            $('#togglePagination').on('click', function() {
+                // 注意：这里只是演示，实际中需要在初始化时配置
+                alert('分页模式需要在初始化时配置，不能动态切换');
+            });
+            
+            // 非严格模式树形选择器
+            $('#nonStrictTreeSelect').wsSelect ({
+                treeMode: true,
+                treeCheckable: true,
+                treeCheckStrictly: false,
+                multiple: true,
+                options: generateTreeData(),
+                placeholder: '非严格模式示例',
+                onChange: function(value, option) {
+                    updateSelectedValues();
+                }
+            });
+            
+            // 严格模式树形选择器
+            $('#strictTreeSelect').wsSelect ({
+                treeMode: true,
+                treeCheckable: true,
+                treeCheckStrictly: true,
+                multiple: true,
+                options: generateTreeData(),
+                placeholder: '严格模式示例',
+                onChange: function(value, option) {
+                    updateSelectedValues();
+                }
+            });
+            
+            // 切换严格模式按钮
+            var isStrict = false;
+            $('#toggleStrictMode').on('click', function() {
+                isStrict = !isStrict;
+                var treeSelect = $('#nonStrictTreeSelect');
+                treeSelect.wsSelect ('destroy');
+                treeSelect.wsSelect ({
+                    treeMode: true,
+                    treeCheckable: true,
+                    treeCheckStrictly: isStrict,
+                    multiple: true,
+                    options: generateTreeData(),
+                    placeholder: isStrict ? '已切换为严格模式' : '已切换为非严格模式',
+                    onChange: function(value, option) {
+                        updateSelectedValues();
+                    }
+                });
+                $(this).text(isStrict ? '切换为非严格模式' : '切换为严格模式');
+            });
+            
+            // 获取选中值按钮
+            $('#getCheckedValues').on('click', function() {
+                var nonStrictValues = $('#nonStrictTreeSelect').wsSelect ('getValue');
+                var strictValues = $('#strictTreeSelect').wsSelect ('getValue');
+                
+                $('#checkedValuesDisplay').html(
+                    '<strong>非严格模式选中的值：</strong><br>' + 
+                    JSON.stringify(nonStrictValues, null, 2) +
+                    '<br><br><strong>严格模式选中的值：</strong><br>' +
+                    JSON.stringify(strictValues, null, 2)
+                ).show();
+            });
+                
+            // 更新显示选中的值
+            function updateSelectedValues() {
+                const values = {
+                    basic: $('#basicSelect').wsSelect('getValue'),
+                    multi: $('#wsSelect').wsSelect('getValue'),
+                    searchable: $('#searchableSelect').wsSelect('getValue'),
+                    grouped: $('#groupedSelect').wsSelect('getValue'),
+                    sized: $('#sizedSelect').wsSelect('getValue'),
+                    remote: $('#remoteSelect').wsSelect('getValue'),
+                    customField: $('#customFieldSelect').wsSelect('getValue'),
+                    dynamic: $('#dynamicSelect').wsSelect('getValue'),
+                    remoteGroup: $('#remoteGroupSelect').wsSelect('getValue'),
+                    localPagination: $('#localPaginationSelect').wsSelect('getValue'),
+                    remotePagination: $('#remotePaginationSelect').wsSelect('getValue'),
+                    customPagination: $('#customPaginationSelect').wsSelect('getValue'),
+                    basicTree: $('#basicTreeSelect').wsSelect('getValue'),
+                    multiTree: $('#multiTreeSelect').wsSelect('getValue'),
+                    horizontalTree: $('#horizontalTreeSelect').wsSelect('getValue'),
+                    searchTree: $('#searchTreeSelect').wsSelect('getValue')
+                };
+               
+                $('#selectedValues').text(JSON.stringify(values, null, 2));
+            }
+            
+            // 初始显示
+            updateSelectedValues();
+        });
+    
+    </script>
+    <script>
+        // 生成树形数据
+        function generateTreeData1() {
+            return [
+                {
+                    value: 'org',
+                    label: '组织架构',
+                    children: [
+                        {
+                            value: 'dept1',
+                            label: '技术部',
+                            children: [
+                                { value: 'user1', label: '张三' },
+                                { value: 'user2', label: '李四' }
+                            ]
+                        },
+                        {
+                            value: 'dept2',
+                            label: '市场部',
+                            children: [
+                                { value: 'user3', label: '王五' },
+                                { value: 'user4', label: '赵六' }
+                            ]
+                        }
+                    ]
+                }
+            ];
+        }
+        
+        // 模拟远程数据
+        function mockRemoteData(search) {
+            return new Promise(function(resolve) {
+                setTimeout(function() {
+                    var data = [
+                        { value: 'remote1', label: '远程数据1', secondary: '描述1' },
+                        { value: 'remote2', label: '远程数据2', secondary: '描述2' },
+                        { value: 'remote3', label: '远程数据3', secondary: '描述3' },
+                        { value: 'remote4', label: '远程数据4', secondary: '描述4' }
+                    ];
+                    
+                    if (search) {
+                        data = data.filter(function(item) {
+                            return item.label.includes(search) || item.secondary.includes(search);
+                        });
+                    }
+                    
+                    resolve({ data: data });
+                }, 500);
+            });
+        }
+
+        // 初始化示例
+        $(document).ready(function() {
+            // 手动为树形选择器设置数据
+            setTimeout(function() {
+                var treeSelect = $('#treeSelectForm');
+                if (treeSelect.data('wsSelect')) {
+                    treeSelect.wsSelect('updateOptions', generateTreeData());
+                }
+            }, 100);
+            
+            // 手动为远程选择器设置远程方法
+            setTimeout(function() {
+                var remoteSelect = $('#remoteSelectForm');
+                if (remoteSelect.data('wsSelect')) {
+                    remoteSelect.wsSelect('reconfigure', {
+                        remoteMethod: mockRemoteData,
+                        fieldMapping: {
+                            value: 'value',
+                            label: 'label',
+                            secondary: 'secondary'
+                        }
+                    });
+                }
+            }, 100);
+            
+            // 表单提交
+            $('#demoForm').on('submit', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // 表单验证
+                if (this.checkValidity()) {
+                    var formData = $(this).serialize();
+                    var formDataArray = $(this).serializeArray();
+                    
+                    alert('表单提交成功！\n\n表单数据：\n' + formData + 
+                          '\n\nJSON格式：\n' + JSON.stringify(formDataArray, null, 2));
+                    
+                    // 这里可以发送AJAX请求
+                    // $.post('/api/submit', $(this).serialize(), function(response) {
+                    //     console.log('提交成功', response);
+                    // });
+                } else {
+                    $(this).addClass('was-validated');
+                }
+            });
+            
+            // 获取表单数据按钮
+            $('#getFormData').on('click', function() {
+                var formData = $('#demoForm').serialize();
+                var formDataArray = $('#demoForm').serializeArray();
+                
+                $('#formSerializedData').html(
+                    '<strong>URL编码格式：</strong>\n' + formData + 
+                    '\n\n<strong>JSON数组格式：</strong>\n' + JSON.stringify(formDataArray, null, 2)
+                ).show();
+            });
+            
+            // 重置表单
+            $('#resetForm').on('click', function() {
+                $('#demoForm')[0].reset();
+                $('#demoForm').removeClass('was-validated');
+                
+                // 重置所有选择器
+                $('[data-role="wsselect"]').each(function() {
+                    var instance = $(this).data('wsSelect');
+                    if (instance) {
+                        instance.wsSelect('clear');
+                    }
+                });
+                
+                $('#formSerializedData').hide();
+                $('#hiddenInputValues').hide();
+            });
+            
+            // 查看隐藏Input按钮
+            $('#showHiddenInputs').on('click', function() {
+                var hiddenInputs = {};
+                
+                $('[data-role="wsselect"]').each(function(index) {
+                    var instance = $(this).data('wsSelect');
+                    if (instance) {
+                        var hiddenInput = instance.wsSelect('getHiddenInput');
+                        if (hiddenInput) {
+                            hiddenInputs[hiddenInput.name || ('input_' + index)] = {
+                                value: hiddenInput.value,
+                                name: hiddenInput.name,
+                                id: hiddenInput.id,
+                                type: hiddenInput.type
+                            };
+                        }
+                    }
+                });
+                
+                $('#hiddenInputValues').html(JSON.stringify(hiddenInputs, null, 2)).show();
+            });
+            
+            // 编程设置值
+            $('#setValuesProgrammatically').on('click', function() {
+                // 设置单选选择器
+                $('[data-role="wsselect"][data-name="single_select"]').wsSelect('setValue', '2');
+                
+                // 设置多选选择器
+                $('[data-role="wsselect"][data-name="multi_select"]').wsSelect('setValue', ['a', 'c']);
+                
+                // 设置JSON多选选择器
+                $('[data-role="wsselect"][data-name="json_multi_select"]').wsSelect('setValue', ['x', 'z']);
+                
+                // 设置树形选择器
+                $('[data-role="wsselect"][data-name="tree_select"]').wsSelect('setValue', ['user1', 'user3']);
+                
+                // 设置原生select转换的选择器
+                $('select[data-convert-to-wsSelect]').parent().wsSelect('setValue', '3');
+                
+                // 设置远程选择器
+                $('[data-role="wsselect"][data-name="remote_select"]').wsSelect('setValue', 'remote2');
+                
+                alert('已编程设置所有选择器的值');
+            });
+            
+            // 获取所有值
+            $('#getAllValues').on('click', function() {
+                var allValues = {};
+                
+                $('[data-role="wsselect"]').each(function(index) {
+                    var instance = $(this).data('wsSelect');
+                    if (instance) {
+                        allValues['select_' + index] = {
+                            selectedValues: instance.getValue(),
+                            hiddenInputValue: instance.getHiddenInputValue(),
+                            name: instance.settings.name || instance.settings.inputName
+                        };
+                    }
+                });
+                
+                $('#formSerializedData').html(
+                    '<strong>所有选择器的值：</strong>\n' + JSON.stringify(allValues, null, 2)
+                ).show();
+            });
+            
+            // 监听所有隐藏input的变化
+            $(document).on('change', '.custom-select-hidden-input', function() {
+                console.log('隐藏input值变化:', $(this).attr('name'), '=', $(this).val());
+            });
+        });
+    </script>
+    
+    <script>
+        // 表单验证样式
+        (function() {
+            'use strict';
+            var forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms).forEach(function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>
+</body>
+</html>

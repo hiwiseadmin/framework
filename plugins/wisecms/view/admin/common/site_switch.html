@@ -1,0 +1,165 @@
+<!--
+  插件后台公共 JS 助手（**兼容垫片**）+ 站点上下文条（UIUX-P0-06）
+
+  本文件过去是「站点选择器 + 6 个公共助手」的唯一实现，P0-05/P0-06 起拆分为：
+
+    · 站点上下文条 → 搬到 admin/common/cms_context_bar（P0-05），此处仅 include，
+      让存量 20+ 个页面的引入路径零改动；
+    · 助手实现     → 全部转调内核 window.Wise.*（内核能力优先，见 skill
+      wiseadmin-admin-ui「统一入口」一节），本文件只保留同名函数作为**兼容垫片**。
+
+  ⚠️ 新页面请直接调用 window.Wise.ui.* / window.Wise.util.http，
+     不要再使用下列垫片函数 —— 它们只为存量页面保留，后续逐个页面重构时会消失。
+
+  垫片语义（必须与旧实现一致，否则存量页面静默失效）：
+    · ajaxPost(url, data, onSuccess)  —— **仅在 code === 0 时**回调 onSuccess；
+      失败已由内核统一 toast，因此调用方里的 `else` 分支是死代码；
+    · confirmAction(message, onOk)    —— 二次确认（内核 dialog → Layer → 原生 confirm）；
+    · openLayer(url, title, area)     —— iframe 弹层打开表单页（内核 dialog → Layer → 整页跳转）；
+    · cmsToast(message, type)         —— 一句话反馈（内核 toast → Layer → 原生 alert）；
+    · cmsInfo(html, title)            —— 需停留阅读的长内容（内核 dialog → Layer → 原生 alert）；
+    · cmsEscape(str)                  —— HTML 转义（cmsInfo 拼 DOM 前必须转义）。
+
+  注意（历史踩坑，勿改）：本注释内**不可**书写带花括号的 include 示例 ——
+  think-template 的 parseInclude() 先于注释剥离执行，会把注释里的 include 当真并
+  递归引入本文件，导致无限递归 + 内存耗尽（实测 128M/256M 均被吃光）；
+  花括号 + 斜杠星号 的「模板注释」写法在本引擎下同样不成立（花括号会被当分隔符吃掉，
+  内部文本残留到页面输出）。本文件一律用 HTML 注释，且不用模板字符串。
+-->
+{include file="admin/common/cms_context_bar" /}
+<script>
+function cmsEscape(str) {
+    return String(str == null ? '' : str).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+}
+
+function cmsToast(message, type) {
+    var w = window.Wise;
+    if (w && w.ui && w.ui.toast) {
+        var fn = w.ui.toast[type] || w.ui.toast.info;
+        fn.call(w.ui.toast, message);
+        return;
+    }
+    if (window.Layer && typeof Layer.toast === 'function') {
+        Layer.toast({ content: message, type: type || 'success' });
+        return;
+    }
+    window.alert(message);
+}
+
+// 长内容展示：与 cmsToast 的分工不变（toast 用于一句话反馈，本函数用于长内容）
+function cmsInfo(html, title) {
+    var body = '<pre style="text-align:left;max-height:60vh;overflow:auto;margin:0;white-space:pre-wrap;">'
+        + cmsEscape(html) + '</pre>';
+
+    var w = window.Wise;
+    if (w && w.ui && w.ui.dialog) {
+        w.ui.dialog.open(body, title || '详情', { area: ['720px', '60%'], shadeClose: true });
+        return;
+    }
+    if (window.Layer && typeof Layer.open === 'function') {
+        Layer.open({
+            type: 1,
+            title: title || '详情',
+            content: body,
+            area: ['720px', '60%'],
+            shade: true,
+            shadeClose: true,
+            btn: ['关闭'],
+            yes: function (index) { Layer.close(index); }
+        });
+        return;
+    }
+    window.alert(html);
+}
+
+function confirmAction(message, onOk) {
+    var run = function (ok) { if (ok && typeof onOk === 'function') { onOk(); } };
+
+    var w = window.Wise;
+    if (w && w.ui && w.ui.dialog) {
+        w.ui.dialog.confirm(message, { title: '操作确认' }).then(run);
+        return;
+    }
+    if (window.Layer && typeof Layer.confirm === 'function') {
+        Layer.confirm(message, { title: '操作确认', icon: 3, btn: ['确定', '取消'] }, function () { run(true); });
+        return;
+    }
+    run(window.confirm(message));
+}
+
+// iframe 弹层打开表单页（列表页「添加 / 编辑」统一入口）。
+// 表单页自行负责提交、成功后关闭弹层并刷新父页。
+function openLayer(url, title, area) {
+    var w = window.Wise;
+    if (w && w.ui && w.ui.dialog) {
+        return w.ui.dialog.open(url, title || '', { area: area || ['900px', '680px'], resize: true });
+    }
+    var L = window.Layer || window.wsLayer;
+    if (L && typeof L.open === 'function') {
+        return L.open({ type: 2, title: title || '', content: url, area: area || ['900px', '680px'], resize: true });
+    }
+    // 兜底：无弹层库时整页跳转
+    window.location.href = url;
+}
+
+// 兼容历史调用：多个存量页面把 `$form.serialize()` 的**查询串**直接传进来
+// （旧实现用 `$.post`，jQuery 原样发 urlencoded，所以一直能用）。
+// 内核 `Wise.util.http` 会把 body 做 `JSON.stringify`——直接传字符串会被包成
+// JSON 字符串（`"\"a=1\""`），ThinkPHP 解析后 `post('a')` 取不到值 → 表单**静默提交空数据**。
+// 这里把查询串统一解析成对象，两条路径都正确（对象原样返回）。
+function cmsParseQuery(data) {
+    if (data === null || data === undefined) { return {}; }
+    if (typeof data !== 'string') { return data; }
+
+    var out = {};
+    new URLSearchParams(data).forEach(function (value, key) {
+        if (key.slice(-2) === '[]') {
+            var k = key.slice(0, -2);
+            if (!out[k]) { out[k] = []; }
+            out[k].push(value);
+            return;
+        }
+        out[key] = value;
+    });
+    return out;
+}
+
+// 统一 POST。CSRF 由内核 http / wise-framework 的 ajaxSend 自动注入，此处不处理。
+// 语义保持：**仅在 code === 0 时**回调 onSuccess；否则由内核统一 toast。
+function ajaxPost(url, data, onSuccess) {
+    var cb = function (res) {
+        if (typeof onSuccess === 'function') { onSuccess(res); }
+        return res;
+    };
+
+    var w = window.Wise;
+    if (w && w.util && w.util.http) {
+        // ⚠️ 必须显式传 `interceptor: false`。
+        //
+        // 内核 http 的默认值是 `interceptor: true`（wise-util.js:253），此时成功回调拿到的是
+        // **信封里的 `data`**（`resolve(body[dataKey])`），而**不是** `{code,msg,data}`。
+        // 存量调用点几乎都写成 `if (res.code === 0) { 刷新 }` —— 直接把 data 透传过去，
+        // `res.code` 永远 undefined，且 `data` 常为 null 时会抛 TypeError →
+        // 表现为「保存/删除明明成功了，但页面一动不动」。旧实现用 `$.post` 拿的正是完整信封，
+        // 所以这里传 `interceptor: false` 才是**语义等价**的还原。
+        return w.util.http.post(url, cmsParseQuery(data), { interceptor: false })
+            .then(function (body) {
+                if (body && body.code === 0) { return cb(body); }
+                cmsToast((body && body.msg) ? body.msg : '操作失败', 'error');
+                return body;
+            })
+            .catch(function (err) { /* 网络层异常：内核已提示 */ return err; });
+    }
+
+    return $.post(url, data || {}).done(function (res) {
+        if (res && res.code === 0) { cb(res); return; }
+        cmsToast((res && res.msg) ? res.msg : '操作失败', 'error');
+    }).fail(function (xhr) {
+        var res = xhr ? xhr.responseJSON : null;
+        var msg = (res && res.msg) ? res.msg : ('请求失败（HTTP ' + (xhr ? xhr.status : 0) + '）');
+        cmsToast(msg, 'error');
+    });
+}
+</script>

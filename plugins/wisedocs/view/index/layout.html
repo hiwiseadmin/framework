@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {:csrf_meta()}
+    <title>{block name="title"}{$title|default='帮助中心'}{/block} · {$space.name|default='文档中心'}</title>
+
+    <!-- 第三方基础样式（前台沿用 Bootstrap，供弹层 / 下拉等交互组件使用） -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <!-- WiseDocs 主题（设计令牌 + 组件） -->
+    <link rel="stylesheet" href="/statics/plugins/wisedocs/css/docs.css">
+    {if !empty($space.theme) && $space.theme != 'default'}
+    <!-- 空间主题覆盖（仅重写品牌色变量；文件缺失时浏览器忽略） -->
+    <link rel="stylesheet" href="/statics/plugins/wisedocs/css/theme-{$space.theme}.css">
+    {/if}
+    {block name="css"}{/block}
+
+    <!-- 明暗主题引导：同步执行，保证首帧即为正确主题（无闪烁） -->
+    <script src="/statics/plugins/wisedocs/js/theme-init.js"></script>
+</head>
+<body>
+
+<!-- ===================== 顶栏 ===================== -->
+<header class="wd-nav">
+    <div class="wd-nav__inner">
+        <button class="wd-nav__hamburger" type="button" id="wd-drawer-toggle"
+                aria-label="打开文档导航" aria-controls="wd-sidebar" aria-expanded="false">
+            <i class="bi bi-list"></i>
+        </button>
+
+        <a class="wd-nav__brand" href="/plugin/wisedocs/index/index">
+            <span class="wd-nav__logo"><i class="bi bi-journal-text"></i></span>
+            <span class="wd-nav__titles">
+                <span class="wd-nav__name">{$space.name|default='文档中心'}</span>
+                {if !empty($space.description)}
+                <span class="wd-nav__tagline">{$space.description}</span>
+                {/if}
+            </span>
+        </a>
+
+        <nav class="wd-nav__menu" aria-label="站点导航">
+            <a class="wd-nav__link" href="/plugin/wisedocs/index/index">
+                <i class="bi bi-house-door"></i> 首页
+            </a>
+            <a class="wd-nav__link" href="/plugin/wisedocs/api/index">
+                <i class="bi bi-code-square"></i> API 文档
+            </a>
+
+            {notempty name="spaces"}
+            {if count($spaces) > 1}
+            <div class="dropdown">
+                <button class="wd-nav__link dropdown-toggle" type="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-collection"></i> 切换空间
+                </button>
+                <ul class="dropdown-menu">
+                    {volist name="spaces" id="sp"}
+                    <li>
+                        <a class="dropdown-item{if isset($space.id) && $space.id == $sp.id} active{/if}"
+                           href="/plugin/wisedocs/index/index?project={$sp.id}">{$sp.name}</a>
+                    </li>
+                    {/volist}
+                </ul>
+            </div>
+            {/if}
+            {/notempty}
+        </nav>
+
+        <div class="wd-nav__actions">
+            <button class="wd-search-btn" type="button" id="wd-search-open" aria-label="搜索文档">
+                <i class="bi bi-search"></i>
+                <span class="wd-search-btn__text">搜索文档</span>
+                <kbd>Ctrl K</kbd>
+            </button>
+
+            <button class="wd-icon-btn wd-theme-toggle" type="button" id="wd-theme-toggle"
+                    aria-label="切换明暗主题" title="切换明暗主题">
+                <i class="bi bi-sun"></i>
+                <i class="bi bi-moon-stars"></i>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- ===================== 三栏布局 ===================== -->
+<div class="wd-layout">
+    <aside class="wd-sidebar" id="wd-sidebar" aria-label="文档导航">
+        {block name="sidebar"}{include file="index/_sidebar" /}{/block}
+    </aside>
+
+    <main class="wd-main" id="docs-main">
+        <div class="wd-main__inner {$mainClass|default=''}">
+            {block name="content"}{/block}
+        </div>
+    </main>
+
+    {block name="outline"}{/block}
+</div>
+
+<footer class="wd-footer">
+    &copy; {:date('Y')} {$space.name|default='文档中心'} · Powered by WiseDocs
+</footer>
+
+<!-- 移动端抽屉遮罩 -->
+<div class="wd-backdrop" id="wd-backdrop" hidden></div>
+
+<!-- ===================== 搜索面板 ===================== -->
+<div class="wd-search" id="wd-search" role="dialog" aria-modal="true" aria-label="搜索文档">
+    <div class="wd-search__panel">
+        <div class="wd-search__head">
+            <i class="bi bi-search"></i>
+            <input class="wd-search__input" id="wd-search-input" type="search"
+                   placeholder="搜索文档标题、摘要、正文..." autocomplete="off"
+                   aria-label="搜索关键词" value="{$keyword|default=''}">
+            <kbd>Esc</kbd>
+        </div>
+        <div class="wd-search__body">
+            <p class="wd-search__hint">输入关键词后按 <b>Enter</b> 查看完整搜索结果。</p>
+            {notempty name="hotSearches"}
+            <div class="wd-chips" style="margin-top:16px">
+                <i class="bi bi-fire"></i> 热门搜索：
+                {volist name="hotSearches" id="item"}
+                <a class="wd-tag" href="/plugin/wisedocs/index/search?keyword={$item.keyword}">{$item.keyword}</a>
+                {/volist}
+            </div>
+            {/notempty}
+        </div>
+        <div class="wd-search__foot">按 <kbd>Ctrl</kbd> + <kbd>K</kbd> 随时唤起，<kbd>Esc</kbd> 关闭</div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module" src="/statics/plugins/wisedocs/js/frontend.js"></script>
+{block name="js"}{/block}
+</body>
+</html>

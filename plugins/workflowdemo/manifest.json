@@ -1,0 +1,112 @@
+{
+    "name": "workflowdemo",
+    "title": "工作流演示插件",
+    "version": "1.0.0",
+    "description": "WiseAdmin 工作流引擎演示插件，展示如何在插件中集成和使用工作流引擎",
+    "author": "WiseAdmin",
+    "dependencies": {
+        "wiseadmin/framework": ">=1.0.0"
+    },
+    "service_provider": "plugin\\workflowdemo\\BootServiceProvider",
+    "develop": true,
+    "menus": [
+        {
+            "name": "工作流演示",
+            "icon": "bi bi-diagram-3",
+            "path": "/plugin/workflowdemo/order/index",
+            "component": "",
+            "sort": 0,
+            "type": "menu",
+            "status": 1,
+            "children": [
+                {
+                    "name": "订单列表",
+                    "icon": "",
+                    "path": "/plugin/workflowdemo/order/index",
+                    "component": "",
+                    "sort": 0,
+                    "type": "button",
+                    "status": 1
+                },
+                {
+                    "name": "创建订单",
+                    "icon": "",
+                    "path": "/plugin/workflowdemo/order/create",
+                    "component": "",
+                    "sort": 1,
+                    "type": "button",
+                    "status": 1
+                },
+                {
+                    "name": "工作流监控",
+                    "icon": "",
+                    "path": "/plugin/workflowdemo/order/workflow",
+                    "component": "",
+                    "sort": 2,
+                    "type": "button",
+                    "status": 1
+                }
+            ]
+        }
+    ],
+    "permissions": [
+        {
+            "name": "提交审核",
+            "ident": "workflow.order.submit",
+            "method": "POST",
+            "type": "custom",
+            "description": "提交订单到审核流程"
+        },
+        {
+            "name": "分配审核员",
+            "ident": "workflow.order.assign",
+            "method": "POST",
+            "type": "custom",
+            "description": "分配审核员处理订单"
+        },
+        {
+            "name": "审核通过",
+            "ident": "workflow.order.approve",
+            "method": "POST",
+            "type": "custom",
+            "description": "审核通过订单"
+        },
+        {
+            "name": "审核拒绝",
+            "ident": "workflow.order.reject",
+            "method": "POST",
+            "type": "custom",
+            "description": "审核拒绝订单"
+        },
+        {
+            "name": "重新提交",
+            "ident": "workflow.order.resubmit",
+            "method": "POST",
+            "type": "custom",
+            "description": "重新提交被拒绝的订单"
+        },
+        {
+            "name": "取消订单",
+            "ident": "workflow.order.cancel",
+            "method": "POST",
+            "type": "custom",
+            "description": "取消订单"
+        }
+    ],
+    "config": {
+        "auto_approve": {
+            "type": "boolean",
+            "title": "自动审核",
+            "value": false,
+            "tips": "开启后金额小于1000的订单自动通过审核"
+        },
+        "max_order_amount": {
+            "type": "number",
+            "title": "最大订单金额",
+            "value": 100000,
+            "tips": "超过此金额的订单需要双重审核"
+        }
+    },
+    "slots": {},
+    "vendor": {}
+}

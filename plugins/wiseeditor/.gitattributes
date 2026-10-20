@@ -1,0 +1,26 @@
+# ============================================================
+# composer dist / git archive 打包时排除的内容
+# ============================================================
+# 为什么是这里而不是 composer.json：
+#   Packagist 的 dist zip 由 GitHub 的 git archive 生成，
+#   因此「composer 安装时忽略」真正生效的是本文件的 export-ignore。
+#   composer.json 的 archive.exclude 只在手工执行 composer archive 时起作用，
+#   对使用者 composer require 的常规链路无效。
+#
+# 边界（务必知道）：
+#   只对「分发包」生效。composer install --prefer-source（= git clone）
+#   以及 path 类型仓库拿到的都是完整仓库，被排除的内容照样在。
+#
+# 本目录下的模式相对本文件所在目录匹配。
+# 与 src/packages/wiseadmin/* 的惯例保持一致（那边统一排除
+# /.gitattributes /.gitignore /.github/ /tests/ /docs/ 等开发期资产）。
+# ============================================================
+
+# 换行策略：统一入库为 LF，避免 dist 中出现 CRLF
+* text=auto
+
+*.php diff=php
+
+# 开发期资产
+/.gitattributes      export-ignore
+/example/            export-ignore

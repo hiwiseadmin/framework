@@ -1,0 +1,40 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}出入库报表{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-clipboard-data" caption="出入库报表" buttongroup="" /}
+    <div class="plugin-smartstock">
+        <div class="container-fluid p-0">
+            <form class="row g-2 mb-3" id="search-form">
+                <div class="col-md-3">
+                    <input type="date" class="form-control form-control-sm" id="search-start-date">
+                </div>
+                <div class="col-md-3">
+                    <input type="date" class="form-control form-control-sm" id="search-end-date">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select form-select-sm" id="search-warehouse">
+                        <option value="">全部仓库</option>
+                        {foreach $warehouses as $w}
+                        <option value="{$w.id}">{$w.name}</option>
+                        {/foreach}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm" id="btn-search"><i class="bi bi-search"></i> 查询</button>
+                </div>
+            </form>
+
+            <div class="alert alert-light border small mb-3">
+                <span class="me-3">入库：<b id="summary-in-count">0</b> 笔 / <b id="summary-in-qty">0</b> 件 / ¥<b id="summary-in-amt">0.00</b></span>
+                <span>出库：<b id="summary-out-count">0</b> 笔 / <b id="summary-out-qty">0</b> 件 / ¥<b id="summary-out-amt">0.00</b></span>
+            </div>
+
+            <div id="toolbar" class="toolbar mb-2"></div>
+            <table id="table"></table>
+        </div>
+    </div>
+</div>
+{/block}

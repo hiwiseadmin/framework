@@ -1,0 +1,38 @@
+{/* 分页组件：适配控制器返回的分页数组（total / per_page / current_page / last_page / data）
+    注意：控制器传的是 toArray() 结果（数组），不能调用 render()，
+    否则会编译成数组下标调用并抛出 "Value of type null is not callable"。 */}
+{if isset($list.last_page) && $list.last_page > 1}
+<nav class="mt-3" aria-label="分页">
+    <ul class="pagination pagination-sm mb-0">
+        <li class="page-item{if $list.current_page <= 1} disabled{/if}">
+            <a class="page-link" href="javascript:void(0);" data-page="{$list.current_page - 1}">上一页</a>
+        </li>
+        <li class="page-item disabled">
+            <span class="page-link">第 {$list.current_page} / {$list.last_page} 页 · 共 {$list.total} 条</span>
+        </li>
+        <li class="page-item{if $list.current_page >= $list.last_page} disabled{/if}">
+            <a class="page-link" href="javascript:void(0);" data-page="{$list.current_page + 1}">下一页</a>
+        </li>
+    </ul>
+</nav>
+<script>
+window.cmsGotoPage = window.cmsGotoPage || function (page) {
+    if (page < 1) { return; }
+    var url = new URL(window.location.href);
+    url.searchParams.set('page', page);
+    window.location.href = url.toString();
+};
+
+// 事件委托替代内联 onclick（CSP script-src 'self' 下内联事件处理器会被拦截）。
+// 分页链接带 data-page，由委托统一处理；window 守卫保证同一页面只绑一次。
+if (!window.__cmsPagerBound) {
+    window.__cmsPagerBound = true;
+    document.addEventListener('click', function (e) {
+        var link = e.target && e.target.closest ? e.target.closest('a[data-page]') : null;
+        if (!link) { return; }
+        e.preventDefault();
+        cmsGotoPage(parseInt(link.getAttribute('data-page'), 10) || 1);
+    });
+}
+</script>
+{/if}

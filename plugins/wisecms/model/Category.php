@@ -1,0 +1,79 @@
+<?php
+namespace plugin\wisecms\model;
+
+use plugin\BaseModel;
+use think\model\concern\SoftDelete;
+
+class Category extends BaseModel
+{
+    use SoftDelete;
+
+    protected $name = 'wisecms_category';
+    protected $autoWriteTimestamp = true;
+    protected $createTime = 'create_time';
+    protected $updateTime = 'update_time';
+    protected $deleteTime = 'delete_time';
+
+    /**
+     * 关联父栏目
+     */
+    public function parent()
+    {
+        return $this->belongsTo(Category::class, 'parent_id', 'id');
+    }
+
+    /**
+     * 关联子栏目
+     */
+    public function children()
+    {
+        return $this->hasMany(Category::class, 'parent_id', 'id')
+            ->where('status', 1)
+            ->order('sort', 'asc');
+    }
+
+    /**
+     * 关联内容模型
+     */
+    public function model()
+    {
+        return $this->belongsTo(Model::class, 'model_id', 'id');
+    }
+
+    /**
+     * 关联内容
+     */
+    public function contents()
+    {
+        return $this->hasMany(Content::class, 'catid', 'id');
+    }
+
+    /**
+     * 获取栏目树（使用 Tree 库，一次查询 + 内存构建，避免 N+1）
+     */
+    public static function getTree(int $siteId = 1, int $parentId = 0): array
+    {
+        // 一次查询获取所有栏目
+        $allCategories = static::where('site_id', $siteId)
+            ->where('status', 1)
+            ->order('sort', 'asc')
+            ->select()
+            ->toArray();
+
+        if (empty($allCategories)) {
+            return [];
+        }
+
+        // 使用 Tree 库在内存中构建树结构
+        $treeLib = new \wise\support\tools\Tree([
+            'pidname' => 'parent_id',
+            'idname'  => 'id',
+            'childKey' => 'children',
+            'sortfield' => 'sort',
+            'auto_sort' => false, // 已由数据库排序
+        ]);
+        $treeLib->init($allCategories);
+
+        return $treeLib->getTreeArray($parentId);
+    }
+}

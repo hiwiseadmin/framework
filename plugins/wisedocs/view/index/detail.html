@@ -1,0 +1,233 @@
+{extend name="index/layout"}
+
+{block name="title"}{$document.title}{/block}
+
+{block name="css"}
+{if !empty($document.content_format) && $document.content_format == 'markdown' && empty($document.content_html)}
+<!-- 旧数据（无 content_html）降级走前端 ws-markdown 渲染，需其样式 -->
+<link rel="stylesheet" href="/statics/libs/ws-markdown/ws-markdown.css">
+{/if}
+<!-- 语法高亮（自托管 highlight.js；浅色主题，深色用下方覆盖） -->
+<link rel="stylesheet" href="/statics/js/highlight/styles/github.css">
+<style>
+.hljs { background: transparent; padding: 0; }
+html.dark .hljs { color: #c9d1d9; }
+html.dark .hljs-keyword, html.dark .hljs-selector-tag, html.dark .hljs-tag { color: #ff7b72; }
+html.dark .hljs-string, html.dark .hljs-attr, html.dark .hljs-template-variable { color: #a5d6ff; }
+html.dark .hljs-title, html.dark .hljs-section { color: #d2a8ff; }
+html.dark .hljs-comment, html.dark .hljs-quote { color: #8b949e; }
+html.dark .hljs-number, html.dark .hljs-literal { color: #79c0ff; }
+html.dark .hljs-built_in, html.dark .hljs-type { color: #ffa657; }
+</style>
+{/block}
+
+{block name="content"}
+<nav class="wd-breadcrumb" aria-label="面包屑">
+    <a href="/plugin/wisedocs/index/index">{$space.name|default='文档中心'}</a>
+    {if !empty($category)}
+    <span class="wd-breadcrumb__sep">/</span>
+    <a href="/plugin/wisedocs/index/index?category_id={$category.id}">{$category.name}</a>
+    {/if}
+    <span class="wd-breadcrumb__sep">/</span>
+    <span>{$document.title}</span>
+</nav>
+
+<h1 class="wd-page-title">{$document.title}</h1>
+
+<div class="wd-meta">
+    <span><i class="bi bi-eye"></i>{$document.view_count}</span>
+    {if !empty($document.published_at)}
+    <span><i class="bi bi-calendar3"></i>{$document.published_at}</span>
+    {/if}
+    {if $document.content_type == 2 && !empty($document.code_language)}
+    <span class="wd-badge wd-badge--brand">{$document.code_language}</span>
+    {/if}
+</div>
+
+<div class="wd-divider"></div>
+
+<!-- ===================== 正文 ===================== -->
+<article class="wd-doc" id="docs-content">
+    {if !empty($document.content_html)}
+    <!-- 双保存：后端已渲染为 HTML，直接输出（SEO 友好，无 JS 也可见） -->
+    {$document.content_html|raw}
+    {elseif $document.content_type == 2}
+    <pre><code class="language-{$document.code_language|default='text'}">{$document.content|htmlspecialchars}</code></pre>
+    {elseif condition="$document.content_format == 'markdown'" /}
+    <!-- 旧数据降级：由框架 ws-markdown 渲染（先转义再解析，无 XSS 面）。
+         块内先输出原文，作为「无 JS / 脚本失败」时的降级内容，前端渲染后整块替换。 -->
+    <div class="wd-md" id="docs-md"><pre class="wd-md-fallback">{$document.content|htmlspecialchars}</pre></div>
+    {else /}
+    {$document.content|raw}
+    {/if}
+</article>
+
+{if $document.content_type == 3}
+<!-- 组件型（D4）：在线运行演示，沙箱 iframe 隔离 -->
+<div class="wd-aside-card" style="margin-top:24px">
+    <div class="wd-aside-card__header">
+        <i class="bi bi-play-circle"></i> 在线演示
+        <span class="wd-badge wd-badge--muted">沙箱隔离</span>
+        {if !empty($previewUrl)}
+        <a class="wd-btn wd-btn--ghost" style="margin-left:auto" href="{$previewUrl}"
+           target="_blank" rel="noopener noreferrer">
+            <i class="bi bi-box-arrow-up-right"></i> 新窗口打开
+        </a>
+        {/if}
+    </div>
+
+    {if !empty($previewUrl)}
+    <iframe class="wd-demo-frame" style="height:{$demo.height|default=320}px"
+            src="{$previewUrl}" title="{$document.title} 在线演示（沙箱）"
+            sandbox="allow-scripts allow-popups"
+            referrerpolicy="no-referrer" loading="lazy"></iframe>
+    {else /}
+    <p class="wd-search__hint">该组件文档尚未配置示例代码。</p>
+    {/if}
+
+    <p class="wd-search__hint" style="margin-top:12px">
+        示例在独立源的沙箱 iframe 中运行：无法读取本站 Cookie / 存储，也禁止跨站请求。
+    </p>
+</div>
+
+{if $demo.html || $demo.css || $demo.js}
+<div style="margin-top:24px">
+    <h2 class="wd-section__title"><i class="bi bi-code-slash"></i> 示例源码</h2>
+    <div class="wd-tabs" role="tablist">
+        <button class="wd-tabs__btn active" type="button" role="tab"
+                data-tab-target="demo-pane-html">HTML</button>
+        {if !empty($demo.css)}
+        <button class="wd-tabs__btn" type="button" role="tab"
+                data-tab-target="demo-pane-css">CSS</button>
+        {/if}
+        {if !empty($demo.js)}
+        <button class="wd-tabs__btn" type="button" role="tab"
+                data-tab-target="demo-pane-js">JavaScript</button>
+        {/if}
+    </div>
+    <div>
+        <div class="wd-tab-panel active" id="demo-pane-html" role="tabpanel">
+            <pre><code class="language-html">{$demo.html}</code></pre>
+        </div>
+        {if !empty($demo.css)}
+        <div class="wd-tab-panel" id="demo-pane-css" role="tabpanel">
+            <pre><code class="language-css">{$demo.css}</code></pre>
+        </div>
+        {/if}
+        {if !empty($demo.js)}
+        <div class="wd-tab-panel" id="demo-pane-js" role="tabpanel">
+            <pre><code class="language-javascript">{$demo.js}</code></pre>
+        </div>
+        {/if}
+    </div>
+</div>
+{/if}
+{/if}
+
+<!-- ===================== 标签 ===================== -->
+{if !empty($tags)}
+<div class="wd-tags">
+    <i class="bi bi-tags"></i>
+    {volist name="tags" id="tag"}
+    <a class="wd-tag" href="/plugin/wisedocs/index/search?keyword={$tag.name}">{$tag.name}</a>
+    {/volist}
+</div>
+{/if}
+
+<!-- ===================== 反馈 ===================== -->
+<div class="wd-feedback">
+    <span class="wd-feedback__label">这篇文档对您有帮助吗？</span>
+    <button type="button" class="wd-btn wd-btn--outline wd-btn--sm js-feedback"
+            data-type="1" data-id="{$document.id}">
+        <i class="bi bi-hand-thumbs-up"></i> 有帮助
+        <span class="js-helpful-count">{$document.helpful_count}</span>
+    </button>
+    <button type="button" class="wd-btn wd-btn--outline wd-btn--sm js-feedback"
+            data-type="0" data-id="{$document.id}">
+        <i class="bi bi-hand-thumbs-down"></i> 没帮助
+        <span class="js-unhelpful-count">{$document.unhelpful_count}</span>
+    </button>
+    <button type="button" class="wd-btn wd-btn--ghost js-feedback-suggest" data-id="{$document.id}">
+        <i class="bi bi-chat-left-text"></i> 我要反馈
+    </button>
+</div>
+
+<!-- ===================== 上/下一篇 ===================== -->
+{if !empty($prev) || !empty($next)}
+<div class="wd-pager">
+    {if !empty($prev)}
+    <a class="wd-pager__item" href="/plugin/wisedocs/index/detail?slug={$prev.slug}">
+        <span class="wd-pager__label"><i class="bi bi-arrow-left"></i> 上一篇</span>
+        <span class="wd-pager__title">{$prev.title}</span>
+    </a>
+    {/if}
+    {if !empty($next)}
+    <a class="wd-pager__item wd-pager__item--next" href="/plugin/wisedocs/index/detail?slug={$next.slug}">
+        <span class="wd-pager__label">下一篇 <i class="bi bi-arrow-right"></i></span>
+        <span class="wd-pager__title">{$next.title}</span>
+    </a>
+    {/if}
+</div>
+{/if}
+
+<!-- ===================== 相关文档 ===================== -->
+{if !empty($related)}
+<section class="wd-section" style="margin-top:40px">
+    <h2 class="wd-section__title"><i class="bi bi-link-45deg"></i> 相关文档</h2>
+    <ul class="wd-list">
+        {volist name="related" id="doc"}
+        <li>
+            <a class="wd-list__item" href="/plugin/wisedocs/index/detail?slug={$doc.slug}">
+                <div class="wd-list__top">
+                    <span class="wd-list__title">{$doc.title}</span>
+                    <span class="wd-list__meta"><i class="bi bi-eye"></i> {$doc.view_count|default=0}</span>
+                </div>
+            </a>
+        </li>
+        {/volist}
+    </ul>
+</section>
+{/if}
+
+<!-- 建议反馈模态框 -->
+<div class="modal fade" id="suggest-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">问题反馈</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+            </div>
+            <div class="modal-body">
+                <label class="form-label small text-muted" for="suggest-comment">
+                    请描述您遇到的问题或建议（纯文本）
+                </label>
+                <textarea id="suggest-comment" class="form-control" rows="4"
+                          placeholder="例如：某步骤无法完成、内容有误、需要补充的内容等..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary js-feedback"
+                        data-type="2" data-id="{$document.id}" data-comment-source="#suggest-comment"
+                        data-dismiss-modal="#suggest-modal">提交反馈</button>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="outline"}
+<aside class="wd-outline" id="docs-right" aria-label="本页目录">
+    <p class="wd-outline__title">本页目录</p>
+    <ul class="wd-outline__list" id="docs-toc-list"></ul>
+    <p class="wd-search__hint" id="docs-toc-empty" style="display:none">本页暂无目录</p>
+    <div class="wd-outline__foot">
+        <button type="button" class="wd-backtop js-backtop">
+            <i class="bi bi-arrow-up-circle"></i> 回到顶部
+        </button>
+    </div>
+</aside>
+{/block}
+
+{block name="js"}
+<script src="/statics/js/highlight/js/highlight.min.js"></script>
+{/block}

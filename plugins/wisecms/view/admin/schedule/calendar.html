@@ -1,0 +1,58 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}发布日历{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-calendar3" caption="发布日历" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid" id="scheduleCalendar">
+        <div class="card">
+            <div class="card-body">
+                <div class="alert alert-light border py-2 mb-3 small">
+                    <i class="bi bi-info-circle me-1"></i>
+                    拖拽日历上的条目可改期（同一内容只保留一条待发布排期）；
+                    右侧「推荐时段」按历史发布时段推算，标红的时段表示附近已有排期（冲突）。
+                    <div class="text-muted mt-1">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        当前日历数据按<b>站点 1</b>展示（后端 `schedule/calendar` 尚未按站点过滤）。
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-9">
+                        <div class="d-flex align-items-center mb-3">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="schedule-prev">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <span class="fw-bold mx-3" id="schedule-month-label"></span>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="schedule-next">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary ms-2" id="schedule-today">今天</button>
+                        </div>
+                        <div id="schedule-grid"></div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="card card-outline mb-3">
+                            <div class="card-header"><h6 class="card-title mb-0">当日待发</h6></div>
+                            <div class="card-body py-2">
+                                <div class="small text-muted mb-2" id="schedule-day-label"></div>
+                                <div id="schedule-day-list"></div>
+                            </div>
+                        </div>
+                        <div class="card card-outline">
+                            <div class="card-header"><h6 class="card-title mb-0">推荐时段</h6></div>
+                            <div class="card-body py-2" id="schedule-suggest">
+                                <div class="text-muted small">加载中…</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/schedule.js（由 wsconfig.js 自动加载） -->
+{/block}

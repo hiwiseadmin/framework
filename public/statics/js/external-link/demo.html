@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>外部链接安全处理</title>
+  <link rel="stylesheet" href="/static/libs/bootstrap/css/bootstrap.min.css">
+</head>
+<body>
+  <h1>测试页面</h1>
+  
+  <!-- 容器1 -->
+  <div id="container1">
+    <h2>容器1</h2>
+    <a href="https://external-site.com">外部链接1</a>
+    <a href="https://trusted.com">信任的网站</a>
+  </div>
+  
+  <!-- 容器2 -->
+  <div id="container2">
+    <h2>容器2</h2>
+    <a href="https://another-external.com">外部链接2</a>
+  </div>
+  
+  <!-- 全局链接 -->
+  <a href="https://global-external.com">全局外部链接</a>
+  
+  <!-- 引入jQuery -->
+  <script src="/static/js/jquery/jquery-3.6.0.min.js"></script>
+  <!-- 引入组件 -->
+  <script src="/static/libs/ws-layer/ws-layer.js"></script>
+  <script src="external-link.js"></script>
+  
+  <script>
+    // 1. 普通使用（监听整个文档）
+    const handler = ExternalLinkHandler.create({
+      whitelist: ['trusted.com'],
+      blacklist: ['dangerous-site.com'],
+      confirmMessage: '确定要离开吗？'
+    });
+    
+    // 2. 监听指定容器
+    const containerHandler = ExternalLinkHandler.create({
+      rootElement: '#container1',
+      confirmMessage: '离开容器1的外部链接'
+    });
+    
+    // 3. 使用jQuery方式
+    $(document).ready(function() {
+      // 监听整个文档
+    //   $(document).externalLinkHandler({
+    //     whitelist: ['trusted.com']
+    //   });
+      
+      // 监听指定容器
+      $('#container2').externalLinkHandler({
+        confirmMessage: '离开容器2的外部链接'
+      });
+      
+      // 动态添加链接
+      setTimeout(() => {
+        $('#container1').append('<a href="https://dynamic-link.com">动态链接</a>');
+      }, 1000);
+      
+      // 操作实例
+      // $('#container2').externalLinkHandler('addToWhitelist', 'safe-domain.com');
+      // $('#container2').externalLinkHandler('destroy');
+    });
+  </script>
+</body>
+</html>

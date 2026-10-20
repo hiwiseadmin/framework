@@ -1,0 +1,35 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}库存仪表盘{/block}
+
+{block name="content"}
+<!-- ECharts 需在任何模块脚本之前加载（wise-bootstrap 为 defer，经典脚本会先执行） -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-speedometer2" caption="库存仪表盘" buttongroup="" /}
+    <div class="plugin-smartstock">
+        <div class="container-fluid p-0">
+            <div id="statcards"></div>
+
+            <div class="row g-3 mt-1">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header"><h6 class="mb-0"><i class="bi bi-graph-up me-2"></i>出入库趋势（近30天）</h6></div>
+                        <div class="card-body">
+                            <div id="chart-trend" style="height: 320px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header"><h6 class="mb-0"><i class="bi bi-pie-chart me-2"></i>仓库库存分布</h6></div>
+                        <div class="card-body">
+                            <div id="chart-warehouse" style="height: 320px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

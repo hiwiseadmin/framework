@@ -1,0 +1,23 @@
+{extend name="public/base" /}
+
+{block name="title"}{$crudTitle}{/block}
+
+{block name="content"}
+<body>
+<div class="container">
+    <form id="wsForm" class="ws-form needs-validation" novalidate method="post" action="{$formAction|raw}">
+        {if $isEdit}<input type="hidden" name="id" value="{$rowId}">{/if}
+        <div class="row">
+            {/*
+              表单字段由 wise-form-schema 的 HtmlRenderer 在运行时渲染，
+              见 app\common\controller\traits\CrudSchemaTrait::renderCrudForm()。
+
+              要自定义本页：复制本文件到 {模块}/form.html 并覆盖 add()/edit() 的 fetch 目标，
+              该模块即退出运行时渲染（4 层逃生通道的 L2/L4）。
+            */}
+            {$schemaHtml|raw}
+        </div>
+        {include file="public/submit" /}
+    </form>
+</div>
+{/block}

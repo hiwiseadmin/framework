@@ -1,0 +1,42 @@
+/*
+ * demo 插件 · 会员页样式（P3-4 示例）
+ *
+ * 发布链路：
+ *   plugins/demo/statics/css/achievements.css
+ *     →（安装/启用时 AssetManager::copyAssets()）
+ *   public/statics/plugins/demo/css/achievements.css
+ * 模板引用（插件模板内）：
+ *   <link rel="stylesheet" href="__PLUGIN_ASSET__/css/achievements.css">
+ *
+ * 与主题资源的分工：
+ *   __THEME__        → /statics/member/themes/{主题}/   主题的通用样式（宿主提供）
+ *   __PLUGIN_ASSET__ → /statics/plugins/{插件标识}/     插件自带样式（本文件）
+ * 插件页面应把自己的样式放这里，不去改主题目录（主题随包发布、会被升级覆盖）。
+ */
+
+.achievements-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.achievements-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px dashed #eceef1;
+}
+
+.achievements-list li:last-child {
+    border-bottom: 0;
+}
+
+.achievements-list .done {
+    color: #059669;
+    font-weight: 600;
+}
+
+.achievements-list .todo {
+    color: #8a919f;
+}

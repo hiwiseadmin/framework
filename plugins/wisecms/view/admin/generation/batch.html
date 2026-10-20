@@ -1,0 +1,54 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}批量生成{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-collection" caption="批量生成" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <div class="alert alert-light border py-2 mb-3 small">
+                    <i class="bi bi-info-circle me-1"></i>
+                    批量生成为<b>同步执行</b>：提交后等待全部关键词逐个生成完成才返回，
+                    期间页面显示加载遮罩、无进度条（后端无进度端点）。生成结果返回后逐条展示成功 / 失败明细。
+                </div>
+
+                <form id="batchForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-keywords">关键词列表 <span class="text-danger">*</span></label>
+                            <textarea id="cms-f-keywords" name="keywords" class="form-control" rows="10" required placeholder="每行一个关键词，如：&#10;夏季防晒&#10;敏感肌护理"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="cms-f-catid">所属栏目</label>
+                                <select id="cms-f-catid" name="catid" class="form-select">
+                                    <option value="0">不指定</option>
+                                    {foreach $categoryOptions as $opt}
+                                    <option value="{$opt.id}">{$opt.name}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="cms-f-daily_limit">每次最多生成</label>
+                                <input id="cms-f-daily_limit" type="number" name="daily_limit" class="form-control" value="10" min="1" max="100">
+                            </div>
+                            <div class="form-check mb-3">
+                                <input type="checkbox" name="auto_publish" value="1" class="form-check-input" id="autoPublish">
+                                <label class="form-check-label" for="autoPublish">生成后直接发布（仍受全局审核规则约束）</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-sm">开始批量生成</button>
+                    <a href="{:plugin_url('wisecms/generation/index')}" class="btn btn-outline-secondary btn-sm">返回</a>
+                </form>
+                <div id="resultBox" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/generation.js（由 wsconfig.js 自动加载） -->
+{/block}

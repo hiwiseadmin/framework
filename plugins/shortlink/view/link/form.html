@@ -1,0 +1,85 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="title"}短链接编辑 - ShortLink{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-link-45deg" caption="短链接管理" buttongroup="" /}
+    <div class="plugin-shortlink">
+        <div class="container-fluid p-0">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">{if $link && $link.id}编辑短链接{else}新增短链接{/if}</h3>
+                </div>
+                <div class="card-body">
+                    <form id="link-form" class="row g-3">
+                        <input type="hidden" name="id" value="{$link.id|default=0}">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label class="form-label">标题</label>
+                                <input type="text" name="title" class="form-control" value="{$link.title|default=''}" maxlength="100">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">原链接 <span class="text-danger">*</span></label>
+                                <input type="url" name="long_url" class="form-control" value="{$link.long_url|default=''}" placeholder="https://..."
+                                       data-validation="required|url"
+                                       data-validation-message-required="请填写原链接"
+                                       data-validation-message-url="请填写合法的 http(s) 链接">
+                                <div class="invalid-feedback"><span class="validation-text"></span></div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">自定义短码</label>
+                                <input type="text" name="code" class="form-control" value="{$link.code|default=''}" placeholder="留空自动生成">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">所属分组</label>
+                                <select name="group_id" class="form-select">
+                                    <option value="0">无分组</option>
+                                    {foreach $groups as $g}
+                                    <option value="{$g.id}" {if isset($link.group_id) && $link.group_id == $g.id}selected{/if}>{$g.name}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">状态</label>
+                                <select name="status" class="form-select">
+                                    <option value="1" {if isset($link.status) && $link.status == 1}selected{/if}>启用</option>
+                                    <option value="0" {if isset($link.status) && $link.status == 0}selected{/if}>禁用</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">过期时间</label>
+                                <input type="datetime-local" name="expire_time" class="form-control" value="{$link.expire_time|default=''}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">最大访问次数</label>
+                                <input type="number" name="max_visits" class="form-control" value="{$link.max_visits|default=0}" min="0">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">访问密码</label>
+                                <input type="password" name="password" class="form-control" placeholder="留空不设密码">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg"></i> 保存
+                            </button>
+                            <a href="{:url('/plugin/shortlink/link/index')}" class="btn btn-outline-secondary">返回</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<script type="module">
+import api from '/statics/plugins/shortlink/js/common/api.js';
+import module from '/statics/plugins/shortlink/js/link/form.js';
+
+        $(function() {
+            module.form();
+        });
+</script>
+{/block}

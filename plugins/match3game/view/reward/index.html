@@ -1,0 +1,74 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}道具发放 / 流水审计{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-gift" caption="道具发放（GM）" buttongroup="" /}
+    <div class="plugin-match3game">
+        <div class="container-fluid p-0">
+
+            <div class="alert alert-secondary py-2 small">
+                所有发放都走 <code>InventoryService</code> → 写入 <code>inventory_log</code>（<b>reason 可审计</b>）。
+                发放原因只允许选 <code>RewardReason</code> 的<b>发放类</b>常量，避免流水里出现拼错的"孤儿 reason"。
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <form class="row g-3" id="reward-form">
+                        <div class="col-md-3">
+                            <label class="form-label">用户ID <span class="text-danger">*</span></label>
+                            <input type="number" name="user_id" id="form-user-id" class="form-control" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">发放资源 <span class="text-danger">*</span></label>
+                            <select name="item_id" id="form-item-id" class="form-select"></select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">数量 <span class="text-danger">*</span></label>
+                            <input type="number" name="count" id="form-count" class="form-control" value="1" min="1" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">发放原因</label>
+                            <select name="reason" id="form-reason" class="form-select">
+                                {foreach $gainReasons as $k => $v}
+                                <option value="{$k}" {if $k == $defaultReason}selected{/if}>{$v}（{$k}）</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-gift"></i> 确认发放</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <i class="bi bi-journal-text"></i> 背包流水审计（inventory_log）
+                </div>
+                <div class="card-body">
+                    <form class="row g-2 mb-3" id="log-search-form">
+                        <div class="col-md-3">
+                            <input type="number" class="form-control form-control-sm" id="log-user-id" placeholder="用户ID（必填）">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select form-select-sm" id="log-item-id">
+                                <option value="">全部物品</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm" id="btn-log-search">
+                                <i class="bi bi-search"></i> 查询
+                            </button>
+                        </div>
+                    </form>
+
+                    <div id="log-toolbar" class="toolbar mb-2"></div>
+                    <table id="log-table"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

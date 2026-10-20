@@ -1,0 +1,38 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}回收站{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-trash" caption="回收站" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <!-- 筛选条：条件变化由 js/recycle.js 局部刷新表格，不整页跳转 -->
+                <div class="row g-2 align-items-center mb-3">
+                    <div class="col-auto">
+                        <input type="text" class="form-control form-control-sm" id="filter-keyword"
+                               placeholder="搜索标题" style="width:220px" autocomplete="off">
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-sm btn-primary" id="btn-search-recycle">
+                            <i class="bi bi-search"></i> 搜索
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-reset-recycle">重置</button>
+                    </div>
+                    <div class="col-auto ms-auto">
+                        <span class="text-muted small">回收站按「当前站点」隔离；恢复可逆，彻底删除与清空需逐字确认</span>
+                    </div>
+                </div>
+
+                <!-- 表格：仅挂载点。本页不开勾选 —— 后端没有批量恢复/批量彻底删除接口 -->
+                <div id="toolbar" class="toolbar"></div>
+                <table id="table"></table>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/recycle.js（由 wsconfig.js 自动加载） -->
+{/block}

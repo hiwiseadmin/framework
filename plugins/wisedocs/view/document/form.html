@@ -1,0 +1,272 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}编辑文档{/block}
+
+{block name="css"}
+<link rel="stylesheet" href="/statics/plugins/wisedocs/css/admin.css">
+{$editorCss|raw}
+{/block}
+
+{block name="content"}
+<!--
+  文档 新增 / 编辑（独立页面）
+
+  由列表页以 ws-layer iframe 方式打开（Wise.ui.dialog.open），因此本页：
+    - 不继承列表页任何 DOM，布局可自由排布（左侧正文、右侧发布设置）；
+    - 提交成功后回调父页 window.wisedocsDocumentSaved() 关闭弹层并刷新表格；
+    - 正文仍接入 wiseeditor（Markdown / 富文本双容器），未安装时自动降级为 textarea。
+-->
+<div class="app-main container-fluid docs-form-page">
+    <form id="document-form" novalidate>
+        <input type="hidden" name="id" id="form-id" value="{$id|default=0}">
+
+        <div class="docs-form__bar">
+            <span class="docs-form__heading" id="form-title">新增文档</span>
+            <span class="docs-hint" id="form-draft-hint"></span>
+            <div class="docs-form__actions">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-cancel">
+                    <i class="bi bi-x-lg"></i> 取消
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="btn-save-draft">
+                    <i class="bi bi-save"></i> 保存
+                </button>
+                <button type="button" class="btn btn-sm btn-primary" id="btn-save-publish">
+                    <i class="bi bi-send-check"></i> 保存并发布
+                </button>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <!-- ================= 主内容区 ================= -->
+            <div class="col-lg-8">
+                <div class="docs-form__card">
+                    <div class="docs-form__card-head"><i class="bi bi-card-heading"></i> 基本信息</div>
+                    <div class="docs-form__card-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label" for="form-title-input">标题 <span class="text-danger">*</span></label>
+                                <input type="text" name="title" id="form-title-input" class="form-control"
+                                       placeholder="请输入文档标题"
+                                       data-validation="required|maxLength:200"
+                                       data-validation-message-required="请填写标题"
+                                       data-validation-message-maxLength="标题不能超过 200 个字符">
+                                <div class="invalid-feedback"><span class="validation-text"></span></div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label" for="form-slug">URL 标识（slug）</label>
+                                <input type="text" name="slug" id="form-slug" class="form-control"
+                                       placeholder="留空自动生成，仅支持字母 / 数字 / 中划线">
+                                <div class="form-text">前台详情页地址：/plugin/wisedocs/index/detail?slug=当前值</div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label" for="form-excerpt">摘要</label>
+                                <textarea name="excerpt" id="form-excerpt" class="form-control" rows="2"
+                                          placeholder="留空自动截取正文前 200 字"></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label" for="form-cover">封面图地址</label>
+                                <input type="text" name="cover" id="form-cover" class="form-control" placeholder="https://...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="docs-form__card">
+                    <div class="docs-form__card-head">
+                        <i class="bi bi-pencil-square"></i>
+                        <span id="label-content">正文 <span class="text-danger">*</span></span>
+                        <div class="ms-auto docs-editor-format">
+                            <select name="content_format" id="form-content-format"
+                                    class="form-select form-select-sm" aria-label="正文格式">
+                                <option value="markdown">Markdown</option>
+                                <option value="html">富文本</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="docs-form__card-body">
+                        <div class="docs-editor-slot" id="slot-content-md">{$editorMarkdown|raw}</div>
+                        <div class="docs-editor-slot d-none" id="slot-content-rt">{$editorRichtext|raw}</div>
+                        <!-- 代码型专用：纯文本，不走富文本 / Markdown 解析 -->
+                        <div class="docs-editor-slot d-none" id="slot-content-code">
+                            <textarea name="content" id="editor_content_code_textarea"
+                                      class="form-control font-monospace" style="height:480px"
+                                      placeholder="粘贴代码内容…"></textarea>
+                        </div>
+
+                        <div class="invalid-feedback" id="content-feedback"><span class="validation-text"></span></div>
+                        <div class="form-text" id="hint-content">
+                            Markdown 语法，可预览。当前版本不支持内嵌图片（图片语法会显示为链接）。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 组件型专属（D4）：示例代码在沙箱 iframe 中隔离执行，仅超管可保存 -->
+                <div class="docs-form__card d-none" id="group-component">
+                    <div class="docs-form__card-head"><i class="bi bi-window-stack"></i> 组件示例</div>
+                    <div class="docs-form__card-body">
+                        <div class="alert alert-warning py-2 mb-3 small">
+                            <i class="bi bi-shield-exclamation"></i>
+                            组件示例代码<b>不做净化</b>（净化后无法运行），改由<b>独立源的沙箱 iframe</b> 隔离执行：
+                            读不到后台 Cookie / 存储，且禁止跨站请求。<b>仅超级管理员可保存组件型文档。</b>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label" for="form-demo-html">示例 HTML 结构 <span class="text-danger">*</span></label>
+                                <textarea name="demo_html" id="form-demo-html" class="form-control font-monospace" rows="6"
+                                          placeholder="&lt;div class=&quot;demo-box&quot;&gt;Hello&lt;/div&gt;"></textarea>
+                                <div class="invalid-feedback"><span class="validation-text"></span></div>
+                                <div class="form-text">组件型文档必填。示例代码不做净化，由沙箱 iframe 隔离执行。</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="form-demo-css">示例 CSS</label>
+                                <textarea name="demo_css" id="form-demo-css" class="form-control font-monospace" rows="6"
+                                          placeholder=".demo-box { color: #0d6efd; }"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="form-demo-js">示例 JavaScript</label>
+                                <textarea name="demo_js" id="form-demo-js" class="form-control font-monospace" rows="6"
+                                          placeholder="console.log('demo');"></textarea>
+                            </div>
+                        </div>
+                        <div class="row g-2 align-items-end mt-1">
+                            <div class="col-md-3">
+                                <label class="form-label" for="form-demo-height">演示区域高度（px）</label>
+                                <input type="number" name="demo_height" id="form-demo-height" class="form-control"
+                                       value="320" min="120" max="1200" step="10">
+                            </div>
+                            <div class="col-md-9">
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="btn-demo-preview">
+                                    <i class="bi bi-play-circle"></i> 预览示例（沙箱）
+                                </button>
+                                <span class="form-text ms-2">本地组装预览，不会提交或保存。</span>
+                            </div>
+                        </div>
+                        <div class="mt-2 d-none" id="demo-preview-wrap">
+                            <iframe id="demo-preview-frame" class="w-100 border rounded bg-white" style="height:320px"
+                                    sandbox="allow-scripts allow-popups" referrerpolicy="no-referrer"
+                                    title="组件示例预览（沙箱）"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= 右侧设置区 ================= -->
+            <div class="col-lg-4">
+                <div class="docs-form__aside">
+                    <div class="docs-form__card">
+                        <div class="docs-form__card-head"><i class="bi bi-sliders"></i> 发布设置</div>
+                        <div class="docs-form__card-body">
+                            <div class="mb-3">
+                                <label class="form-label" for="form-project-id">所属空间</label>
+                                <select name="project_id" id="form-project-id" class="form-select">
+                                    <option value="0">默认空间</option>
+                                    {volist name="spaces" id="space"}
+                                    <option value="{$space.id}">{$space.name}</option>
+                                    {/volist}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="form-category-id">分类 <span class="text-danger">*</span></label>
+                                <select name="category_id" id="form-category-id" class="form-select"
+                                        data-validation="required"
+                                        data-validation-message-required="请选择分类">
+                                    <option value="">请选择分类</option>
+                                    {volist name="categoryOptions" id="opt"}
+                                    <option value="{$opt.id}">{$opt.prefix}{$opt.name}</option>
+                                    {/volist}
+                                </select>
+                                <div class="invalid-feedback"><span class="validation-text"></span></div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="form-content-type">内容类型 <span class="text-danger">*</span></label>
+                                <select name="content_type" id="form-content-type" class="form-select">
+                                    <option value="1">文章</option>
+                                    <option value="2">代码</option>
+                                    <option value="3">组件</option>
+                                    <option value="4">API</option>
+                                </select>
+                            </div>
+
+                            <!-- 代码型专属 -->
+                            <div class="mb-3 d-none" id="group-code-language">
+                                <label class="form-label" for="form-code-language">代码语言</label>
+                                <input type="text" name="code_language" id="form-code-language" class="form-control"
+                                       placeholder="如 php / javascript">
+                            </div>
+
+                            <!-- API 型专属 -->
+                            <div class="row g-2 mb-3 d-none" id="group-api-method">
+                                <div class="col-5">
+                                    <label class="form-label" for="form-api-method">请求方法</label>
+                                    <select name="api_method" id="form-api-method" class="form-select">
+                                        <option value="GET">GET</option>
+                                        <option value="POST">POST</option>
+                                        <option value="PUT">PUT</option>
+                                        <option value="DELETE">DELETE</option>
+                                        <option value="PATCH">PATCH</option>
+                                    </select>
+                                </div>
+                                <div class="col-7" id="group-api-endpoint">
+                                    <label class="form-label" for="form-api-endpoint">API 端点</label>
+                                    <input type="text" name="api_endpoint" id="form-api-endpoint" class="form-control"
+                                           placeholder="如 /api/v1/users">
+                                </div>
+                            </div>
+
+                            <div class="docs-form__divider"></div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="form-status">状态</label>
+                                <select name="status" id="form-status" class="form-select">
+                                    <option value="0" selected>草稿</option>
+                                    <option value="1">已发布</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="form-published-at">定时发布</label>
+                                <input type="datetime-local" name="published_at" id="form-published-at" class="form-control">
+                                <div class="form-text">留空即时生效；设为未来时间且状态为草稿时，到点自动发布。</div>
+                            </div>
+                            <div>
+                                <label class="form-label" for="form-sort">排序</label>
+                                <input type="number" name="sort_order" id="form-sort" class="form-control" value="0">
+                                <div class="form-text">数值越大越靠前。</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="docs-form__card">
+                        <div class="docs-form__card-head"><i class="bi bi-tags"></i> 标签与标记</div>
+                        <div class="docs-form__card-body">
+                            <div class="mb-3">
+                                <label class="form-label" for="form-tag-ids">标签（可多选）</label>
+                                <select name="tag_ids" id="form-tag-ids" class="form-select" multiple size="6">
+                                    {volist name="tagOptions" id="tag"}
+                                    <option value="{$tag.id}">{$tag.name}</option>
+                                    {/volist}
+                                </select>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="is_top" id="form-is-top" value="1">
+                                <label class="form-check-label" for="form-is-top">置顶</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="is_featured" id="form-is-featured" value="1">
+                                <label class="form-check-label" for="form-is-featured">推荐</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="docs-hint px-1">
+                        提示：「保存」只暂存改动（已发布文档不会立刻改动线上内容）；「保存并发布」会合并改动、上线并记录发布快照。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{/block}
+
+{block name="js"}
+{$editorJs|raw}
+{/block}

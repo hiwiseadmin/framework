@@ -1,0 +1,29 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}URL 重定向{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-signpost-split" caption="URL 重定向" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <div class="alert alert-light border py-2 mb-3 small">
+                    <i class="bi bi-info-circle me-1"></i>
+                    重定向按「当前站点」隔离（唯一键 = 站点 + 来源路径），列表只显示本站规则；
+                    规则<b>不提供编辑</b>（后端无 `edit`/`toggleStatus`）—— 要改目标地址请删除后重建。
+                </div>
+
+                <!-- CSV 导入的隐藏文件输入：由工具栏「导入 CSV」按钮触发（模板零内联脚本） -->
+                <input type="file" id="redirect-import-file" class="d-none" accept=".csv">
+
+                <div id="toolbar" class="toolbar"></div>
+                <table id="table"></table>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/redirect.js（由 wsconfig.js 自动加载） -->
+{/block}

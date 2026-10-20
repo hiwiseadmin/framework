@@ -1,0 +1,37 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}标签管理{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-tags" caption="标签管理" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <!-- 筛选条：条件变化后由页面控制器 cmsRefresh(list) 局部刷新，不再整页跳转 -->
+                <div class="row g-2 align-items-center mb-3">
+                    <div class="col-auto">
+                        <input type="text" class="form-control form-control-sm" id="filter-keyword"
+                               placeholder="搜索标签名" style="width:220px" autocomplete="off">
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-sm btn-primary" id="btn-search">
+                            <i class="bi bi-search"></i> 搜索
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-reset">
+                            重置
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 表格：仅提供挂载点，列/分页/空态/加载态全部由 cmsTable() 渲染 -->
+                <div id="toolbar" class="toolbar"></div>
+                <table id="table"></table>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/tag.js（由 wsconfig.js 自动加载） -->
+{/block}

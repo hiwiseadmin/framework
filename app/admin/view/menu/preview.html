@@ -1,0 +1,69 @@
+{extend name="public/base" /}
+
+{block name="title"}菜单预览{/block}
+
+{block name="content"}
+<body>
+<div class="container p-4">
+        <!-- 上级菜单 -->
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">上级菜单</div>
+            <div class="col p-2">{$menu.parent_name}</div>
+        </div>
+
+        <!-- 菜单名称 -->
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">菜单名称</div>
+            <div class="col p-2">{$menu.name|default=''}</div>
+        </div>
+
+        <!-- 菜单类型 -->
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">菜单类型</div>
+            <div class="col p-2">{$menu.type_text|default=''}</div>
+        </div>
+            
+        <!-- 菜单图标 -->
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">菜单图标</div>
+            <div class="col p-2"><i class="{$menu.icon|default='bi bi-circle'}"></i></div>
+        </div>
+           
+        <!-- 路由地址 -->
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">路由地址</div>
+            <div class="col p-2">{$menu.path|default=''}</div>
+        </div>
+
+        <!-- 前端组件路径 -->
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">前端组件路径</div>
+            <div class="col p-2">{$menu.component|default=''}</div>
+        </div>
+
+        <!-- 菜单状态 -->
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">菜单状态</div>
+            <div class="col p-2">{$menu.status_text|default=''}</div>
+        </div>
+
+        <!-- 排序号 -->
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">排序号</div>
+            <div class="col p-2">{$menu.sort|default=0}</div>
+        </div>
+
+        <!-- 备注 -->
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">备注</div>
+            <div class="col p-2">{$menu.remark|default=''}</div>
+        </div>
+
+        <!-- 创建时间 -->
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">创建时间</div>
+            <div class="col p-2">{$menu.create_time|default=''}</div>
+        </div>
+    </div>
+</div>
+{/block}

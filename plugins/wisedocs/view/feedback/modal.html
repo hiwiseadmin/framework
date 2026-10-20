@@ -1,0 +1,35 @@
+<!-- 反馈处理 模态框 -->
+<div class="modal fade" id="feedback-process-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered docs-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">处理反馈</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+            </div>
+            <form id="feedback-process-form" class="modal-body row g-3">
+                <input type="hidden" name="id" id="process-id" value="0">
+                <div class="col-12">
+                    <label class="form-label">反馈内容</label>
+                    <div class="border rounded p-2 bg-light small" id="process-comment" style="max-height:160px;overflow:auto;"></div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">处理结果</label>
+                    <select name="status" id="process-status" class="form-select">
+                        <option value="1">标记为已处理</option>
+                        <option value="2">忽略</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">处理备注</label>
+                    <input type="text" name="remark" id="process-remark" class="form-control" placeholder="可选">
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" form="feedback-process-form" class="btn btn-primary">
+                    <i class="bi bi-check-lg"></i> 提交处理
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

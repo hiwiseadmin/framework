@@ -1,0 +1,83 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}盘点管理{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-clipboard-check" caption="盘点管理" buttongroup="" /}
+    <div class="plugin-smartstock">
+        <div class="container-fluid p-0">
+            <div class="card">
+                <div class="card-body">
+                    <form class="row g-2 mb-3" id="search-form">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control form-control-sm" id="search-order-no" placeholder="盘点单号">
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select form-select-sm" id="search-warehouse">
+                                <option value="">全部仓库</option>
+                                {foreach $warehouses as $w}
+                                <option value="{$w.id}">{$w.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select form-select-sm" id="search-status">
+                                <option value="">全部状态</option>
+                                <option value="0">计划中</option>
+                                <option value="1">盘点中</option>
+                                <option value="2">已完成</option>
+                                <option value="3">已处理差异</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm" id="btn-search"><i class="bi bi-search"></i> 搜索</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-reset"><i class="bi bi-arrow-clockwise"></i> 重置</button>
+                        </div>
+                    </form>
+
+                    <div id="toolbar" class="toolbar mb-2"></div>
+                    <table id="table"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 新建盘点计划 模态框 -->
+<div class="modal fade" id="check-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="form-title">新建盘点计划</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+            </div>
+            <form id="check-form" class="modal-body row g-3">
+                <input type="hidden" name="id" id="form-id" value="0">
+                <div class="col-md-6">
+                    <label class="form-label">盘点仓库 <span class="text-danger">*</span></label>
+                    <select id="form-warehouse" name="warehouse_id" class="form-select">
+                        <option value="">请选择仓库</option>
+                        {foreach $warehouses as $w}
+                        <option value="{$w.id}">{$w.name}</option>
+                        {/foreach}
+                    </select>
+                    <div class="form-text">创建后将自动快照该仓库当前系统库存</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">盘点日期</label>
+                    <input type="date" id="form-date" name="order_date" class="form-control">
+                </div>
+                <div class="col-12">
+                    <label class="form-label">备注</label>
+                    <textarea id="form-remark" name="remark" class="form-control" rows="3"></textarea>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" form="check-form" class="btn btn-primary"><i class="bi bi-check-lg"></i> 创建盘点计划</button>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

@@ -1,0 +1,36 @@
+<?php
+/**
+ * CMS 插件服务提供者注册
+ */
+return [
+    'wisecms.content'     => \plugin\wisecms\service\content\ContentService::class,
+    'wisecms.category'    => \plugin\wisecms\service\content\CategoryService::class,
+    'wisecms.tag'         => \plugin\wisecms\service\content\TagService::class,
+    'wisecms.field'       => \plugin\wisecms\service\model\FieldFactory::class,
+    'wisecms.field.registry' => \plugin\wisecms\service\model\FieldRegistry::class,
+    'wisecms.update'      => \plugin\wisecms\service\model\UpdateService::class,
+    'wisecms.pipeline'    => \plugin\wisecms\pipeline\ContentPipeline::class,
+    'wisecms.quality'     => \plugin\wisecms\service\engine\QualityScorer::class,
+    'wisecms.seo.audit'   => \plugin\wisecms\service\seo\SeoAuditService::class,
+    'wisecms.seo.push'    => \plugin\wisecms\service\seo\SeoPushService::class,
+    'wisecms.seo.sitemap' => \plugin\wisecms\service\seo\SitemapService::class,
+    'wisecms.seo.structured' => \plugin\wisecms\service\seo\StructuredDataService::class,
+    'wisecms.seo.ogimage' => \plugin\wisecms\service\seo\OgImageService::class,
+    'wisecms.template'    => \plugin\wisecms\service\content\TemplateService::class,
+    'wisecms.internallink'=> \plugin\wisecms\service\seo\InternalLinkService::class,
+    'wisecms.generate'    => \plugin\wisecms\service\engine\GenerationEngine::class,
+    'wisecms.scheduler'   => \plugin\wisecms\service\engine\SchedulerService::class,
+    'wisecms.search'      => \plugin\wisecms\service\content\SearchService::class,
+    'wisecms.comment'     => \plugin\wisecms\service\content\CommentService::class,
+    'wisecms.cache'       => \plugin\wisecms\service\site\CacheService::class,
+    'wisecms.workflow'    => \plugin\wisecms\service\engine\WorkflowService::class,
+    'wisecms.notify'      => \plugin\wisecms\service\integration\NotificationService::class,
+    'wisecms.attach'      => \plugin\wisecms\service\content\AttachmentService::class,
+    'wisecms.agent'       => \plugin\wisecms\service\integration\AgentIntegrationService::class,
+    'wisecms.crontab'     => \plugin\wisecms\service\engine\CrontabService::class,
+    'wisecms.site'        => \plugin\wisecms\service\site\SiteService::class,
+    'wisecms.spider'      => \plugin\wisecms\service\engine\SpiderService::class,
+    'wisecms.webhook'     => \plugin\wisecms\service\integration\WebhookService::class,
+    'wisecms.redirect'    => \plugin\wisecms\service\content\RedirectService::class,
+    'wisecms.analytics'   => \plugin\wisecms\service\integration\AnalyticsService::class,
+];

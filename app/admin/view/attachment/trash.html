@@ -1,0 +1,109 @@
+{extend name="public/base" /}
+
+{block name="title"}回收站 - 附件管理{/block}
+
+{block name="css"}
+<style>
+.attachment-card {
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+.attachment-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--bs-box-shadow);
+}
+.attachment-thumb {
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bs-tertiary-bg);
+    overflow: hidden;
+    border-top-left-radius: var(--bs-card-border-radius);
+    border-top-right-radius: var(--bs-card-border-radius);
+}
+.attachment-thumb img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+}
+.file-icon {
+    font-size: 3rem;
+    color: var(--bs-secondary-color);
+}
+.selected {
+    border: 2px solid var(--bs-danger) !important;
+}
+.badge-deleted {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 1;
+}
+</style>
+{/block}
+
+{block name="content"}
+<body>
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="bi bi-trash me-2"></i>回收站
+                </h1>
+                <div>
+                    <a href="/admin/attachment/index" class="btn btn-outline-secondary me-2"><i class="bi bi-arrow-left me-1"></i>返回附件管理</a>
+                    <button class="btn btn-outline-success me-2" id="batchRestoreBtn" disabled><i class="bi bi-arrow-counterclockwise me-1"></i>批量恢复</button>
+                    <button class="btn btn-outline-danger me-2" id="batchForceDeleteBtn" disabled><i class="bi bi-x-octagon me-1"></i>批量删除</button>
+                    <button class="btn btn-danger" id="emptyTrashBtn"><i class="bi bi-trash-fill me-1"></i>清空回收站</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 筛选 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <label class="col-form-label">关键词:</label>
+                        </div>
+                        <div class="col-auto">
+                            <input type="text" class="form-control" id="keywordFilter" placeholder="搜索文件名...">
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-outline-primary" id="searchBtn"><i class="bi bi-search me-1"></i>搜索</button>
+                        </div>
+                        <div class="col-auto ms-auto">
+                            <span class="text-muted" id="trashCount">共 0 个已删除文件</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 批量操作工具栏 -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="d-flex align-items-center" id="batchToolbar" style="display:none !important;">
+                <span class="me-3" id="selectedCount">已选择 0 个文件</span>
+                <button class="btn btn-outline-secondary btn-sm" id="clearSelectionBtn"><i class="bi bi-x-circle me-1"></i>取消选择</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 附件列表 -->
+    <div class="row" id="trashList"></div>
+
+    <!-- 分页 -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <nav id="paginationContainer"></nav>
+        </div>
+    </div>
+</div>
+{/block}

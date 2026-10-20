@@ -1,0 +1,90 @@
+{
+    "name": "shortlink",
+    "title": "短链接管理",
+    "version": "1.0.0",
+    "description": "短链接生成与管理插件，支持分组管理、访问统计、密码保护，可被其他插件方便调用",
+    "author": "WiseAdmin",
+    "dependencies": {},
+    "service_provider": "plugin\\shortlink\\BootServiceProvider",
+    "develop": false,
+    "menus": [
+        {
+            "name": "短链接",
+            "icon": "bi bi-link-45deg",
+            "path": "",
+            "sort": 0,
+            "type": "dir",
+            "status": 1,
+            "children": [
+                {
+                    "name": "链接管理",
+                    "icon": "bi bi-link",
+                    "path": "/plugin/shortlink/link/index",
+                    "sort": 0,
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "分组管理",
+                    "icon": "bi bi-folder",
+                    "path": "/plugin/shortlink/group/index",
+                    "sort": 1,
+                    "type": "menu",
+                    "status": 1
+                },
+                {
+                    "name": "访问统计",
+                    "icon": "bi bi-bar-chart",
+                    "path": "/plugin/shortlink/stat/index",
+                    "sort": 2,
+                    "type": "menu",
+                    "status": 1
+                }
+            ]
+        }
+    ],
+    "permissions": [],
+    "config": {
+        "code_length": {
+            "type": "number",
+            "title": "短码长度",
+            "value": 6
+        },
+        "redirect_type": {
+            "type": "select",
+            "title": "跳转方式",
+            "value": "302",
+            "options": {
+                "301": "301 永久重定向",
+                "302": "302 临时重定向"
+            }
+        },
+        "default_expire_days": {
+            "type": "number",
+            "title": "默认有效天数（0=永久）",
+            "value": 0
+        },
+        "allow_custom_code": {
+            "type": "boolean",
+            "title": "允许自定义短码",
+            "value": true
+        },
+        "enable_password": {
+            "type": "boolean",
+            "title": "允许访问密码",
+            "value": true
+        },
+        "rate_limit": {
+            "type": "number",
+            "title": "频率限制（次/分钟/IP，0=不限制）",
+            "value": 60
+        },
+        "blacklist_domains": {
+            "type": "array",
+            "title": "域名黑名单（一行一个，支持通配符 *.example.com）",
+            "value": []
+        }
+    },
+    "slots": {},
+    "vendor": {}
+}

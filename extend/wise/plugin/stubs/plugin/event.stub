@@ -1,0 +1,13 @@
+<?php
+// {$name} 插件 — 事件绑定（boot 链 Step 7）
+// 支持三个键，未用到的可省略：
+//   bind      => ['事件别名' => 事件类]
+//   listen    => ['事件类' => [监听器类, ...]]
+//   subscribe => [订阅器类, ...]
+return [
+    'listen' => [
+        // 'app_init' => [
+        //     \plugin\{$name}\listener\SomeListener::class,
+        // ],
+    ],
+];

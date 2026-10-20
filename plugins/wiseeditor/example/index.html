@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN" data-bs-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上传地址兜底：容器自身没有 data-upload-url 时用它（wiseeditor-init 的解析优先级） -->
+    <meta name="wise-editor-upload-url" content="/admin/attachment/upload">
+    <title>WiseEditor 示例 · 富文本（TipTap）</title>
+
+    <!--
+      ============================================================
+      路径说明：本目录下的示例页统一使用「站点绝对路径」/statics/...，
+      与后台模板 base.html 的 __STATIC__ 常量一致，因此片段可直接拷进模板。
+      本地查看请用 `node build/verify-editor.mjs --serve`
+      （它把 /statics/** 映射到 public/、/example/** 映射到本目录）。
+      ============================================================
+    -->
+    <link rel="stylesheet" href="/statics/libs/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="/statics/plugins/wiseeditor/css/wiseeditor.css">
+    <link rel="stylesheet" href="./example.css">
+</head>
+<body>
+    <header class="ex-head">
+        <h1>WiseEditor 示例</h1>
+        <nav class="ex-nav">
+            <a href="./index.html" aria-current="page">富文本</a>
+            <a href="./markdown.html">Markdown</a>
+            <a href="./api.html">实例 API</a>
+        </nav>
+    </header>
+
+    <p class="hint">
+        下面两块 HTML 与 <code>TipTapDriver::renderHtml()</code> 的产出逐字一致 —— 服务端调
+        <code>$manager-&gt;render('content', $value, ['type' =&gt; 'richtext'])</code> 得到的就是它。<br>
+        页面只需再引一个 <code>/statics/plugins/wiseeditor/js/wiseeditor-init.js</code>（type=module），
+        它会自动扫描 <code>[data-editor="wiseeditor"]</code> 并挂载、把内容同步回表单字段。
+    </p>
+
+    <form id="demoForm">
+        <div class="field">
+            <label>富文本 <code>data-mode="richtext"</code> · full 工具栏</label>
+            <div id="editor_content" class="wiseeditor-container" style="height:300px"
+                 data-editor="wiseeditor" data-editor-type="tiptap" data-mode="richtext"
+                 data-name="content" data-upload-url="/admin/attachment/upload"
+                 data-placeholder="请输入内容…"></div>
+            <input type="hidden" name="content" id="editor_content_input"
+                   value="&lt;p&gt;Hello &lt;strong&gt;world&lt;/strong&gt;&lt;/p&gt;">
+        </div>
+
+        <div class="field">
+            <label>只读 <code>data-readonly="true"</code> · 不渲染工具栏、不可编辑</label>
+            <div id="editor_ro" class="wiseeditor-container" style="height:120px"
+                 data-editor="wiseeditor" data-editor-type="tiptap" data-mode="richtext"
+                 data-name="ro" data-readonly="true"></div>
+            <input type="hidden" name="ro" id="editor_ro_input"
+                   value="&lt;p&gt;只读内容：&lt;em&gt;仅渲染，不可编辑&lt;/em&gt;&lt;/p&gt;">
+        </div>
+
+        <div class="ex-actions">
+            <button type="submit">提交表单</button>
+            <button type="button" id="btnShow">读取当前字段值</button>
+            <button type="button" id="btnTheme">切换暗色</button>
+            <button type="button" id="btnDestroy">销毁富文本</button>
+        </div>
+    </form>
+
+    <pre id="out">等待初始化…</pre>
+
+    <!-- 1) 框架入口：注册适配器 + 自动挂载 -->
+    <script type="module" src="/statics/plugins/wiseeditor/js/wiseeditor-init.js"></script>
+    <!-- 2) 本示例自己的交互（读取字段值 / 主题切换 / 销毁） -->
+    <script type="module" src="./example.js"></script>
+</body>
+</html>

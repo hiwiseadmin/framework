@@ -1,0 +1,71 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}作弊复核{/block}
+
+{block name="content"}
+<body>
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-shield-exclamation" caption="作弊复核" buttongroup="" /}
+    <div class="plugin-match3game">
+        <div class="container-fluid p-0">
+
+            <div class="alert alert-warning py-2 small">
+                <b>口径说明</b>：本页数据来自 <code>match3_pvp_player.is_cheat</code>，来源分三类：
+                <br>
+                ① <b>人工复核</b>（<code>manual_review</code>）—— 运营确认后写的标记；
+                <br>
+                ② <b><code>score_over_replay</code></b> ——
+                <b>PHP 重放引擎</b>（<code>replay_engine.mode = php</code>）算出"这一局最多能得多少分"，
+                若玩家上报分数超过该上界 × (1+容差) 则标记可疑。
+                ⚠️ 当前 <code>compare_mode = upper_bound</code> + <code>upper_bound_action = flag</code>：
+                <b>只标记、不拦截、不改分</b>（观察期），用于积累两端口径偏差数据；
+                <br>
+                ③ <b><code>result_mismatch</code> / <code>board_mismatch</code></b> ——
+                只有在 <code>compare_mode = strict</code>（口径已对齐）或
+                <code>replay_engine.mode = http</code>（Node 同源引擎）时才会产生，
+                <b>当前不会自动出现</b>。
+                <br>
+                L1/L2 独立拦截的还有 <code>invalid_op</code>（交换不相邻 / 跨 region / 移动锁定格 / 超步数）
+                与 <code>invalid_claim</code>（分数超理论上限 / 步数超限 / goals 结构非法）。
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <form class="row g-2 mb-3" id="search-form">
+                        <div class="col-md-2">
+                            <select class="form-select form-select-sm" id="search-flag">
+                                <option value="">可疑+确认</option>
+                                {foreach $flags as $k => $v}
+                                <option value="{$k}">{$v}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select form-select-sm" id="search-reason">
+                                <option value="">全部原因</option>
+                                {foreach $reasons as $k => $v}
+                                <option value="{$k}">{$v}</option>
+                                {/foreach}
+                                <option value="manual_review">人工复核</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control form-control-sm" id="search-user-id" placeholder="用户ID">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control form-control-sm" id="search-battle-id" placeholder="battleId">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm" id="btn-search"><i class="bi bi-search"></i> 搜索</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-reset"><i class="bi bi-arrow-clockwise"></i> 重置</button>
+                        </div>
+                    </form>
+
+                    <div id="toolbar" class="toolbar mb-2"></div>
+                    <table id="table"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

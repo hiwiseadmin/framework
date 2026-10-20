@@ -1,0 +1,124 @@
+{extend name="index/layout" /}
+
+{block name="script"}
+<script>
+$(document).ready(function() {
+    $('#confirmReinstall').click(function() {
+        const password = $('#password').val();
+        const confirmText = $('#confirmText').val();
+        
+        if (!password) {
+            showAlert('请输入安全密码', 'danger');
+            return;
+        }
+        
+        if (confirmText !== '确认重新安装') {
+            showAlert('请输入确认文字', 'danger');
+            return;
+        }
+        
+        const btn = $(this);
+        showLoading(btn);
+        
+        $.ajax({
+            url: "{:url('/install/index/reinstall')}",
+            type: 'POST',
+            data: {
+                password: password,
+                confirm: confirmText
+            },
+            success: function(response) {
+                if (response.code === 1) {
+                    showAlert('重置成功，即将跳转到安装页面', 'success');
+                    setTimeout(() => {
+                        window.location.href = response.redirect;
+                    }, 1500);
+                } else {
+                    hideLoading(btn, '<i class="bi bi-exclamation-triangle"></i> 确认重置');
+                    showAlert(response.msg, 'danger');
+                }
+            },
+            error: function(xhr) {
+                hideLoading(btn, '<i class="bi bi-exclamation-triangle"></i> 确认重置');
+                showAlert('请求失败: ' + xhr.statusText, 'danger');
+            }
+        });
+    });
+});
+</script>
+{/block}
+
+{block name="content"}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="text-center mb-5">
+            <div class="mb-4" style="font-size: 60px; color: #e74c3c;">
+                <i class="bi bi-exclamation-triangle"></i>
+            </div>
+            <h2 class="mb-3">重新安装系统</h2>
+            <p class="text-muted">此操作将清除所有现有数据，请谨慎操作！</p>
+        </div>
+        
+        <div class="card border-danger border-2 mb-4">
+            <div class="card-body">
+                <h5 class="card-title text-danger"><i class="bi bi-exclamation-octagon me-2"></i>危险操作警告</h5>
+                <ul class="mb-0">
+                    <li>所有用户数据将被删除</li>
+                    <li>所有系统配置将被重置</li>
+                    <li>所有上传的文件可能丢失</li>
+                    <li>操作不可逆转，请确保已备份重要数据</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title mb-4">确认重新安装</h5>
+
+                {if !$can_reinstall}
+                <div class="alert alert-danger">
+                    <i class="bi bi-shield-x me-2"></i>
+                    当前环境已禁用网页重装。如需重装，请先在 <code>.env</code> 中设置
+                    <code>ALLOW_REINSTALL = true</code>（生产环境建议保持 <code>false</code>，改用 CLI 升级）。
+                </div>
+                {elseif !$key_configured}
+                <div class="alert alert-warning">
+                    <i class="bi bi-key me-2"></i>
+                    尚未配置网页重装安全码。请在 <code>.env</code> 中设置
+                    <code>REINSTALL_KEY = 你的安全码</code> 后刷新本页，方可输入安全码执行重装。
+                </div>
+                {else}
+                
+                <div class="mb-3">
+                    <label class="form-label">安全密码</label>
+                    <input type="password" class="form-control" id="password" 
+                           placeholder="请输入 .env 中配置的 REINSTALL_KEY">
+                    <small class="form-text text-muted">安全码为 .env 的 REINSTALL_KEY 值，仅管理员可见，不会在此页面展示</small>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">确认文字</label>
+                    <input type="text" class="form-control" id="confirmText" 
+                           placeholder="请输入“确认重新安装”">
+                    <small class="form-text text-muted">请输入“确认重新安装”以确认您了解此操作的后果</small>
+                </div>
+
+                <div class="alert alert-warning alert-custom">
+                    <i class="bi bi-shield-exclamation me-2"></i>
+                    <strong>最后一次警告：</strong> 此操作将完全清除现有系统，请确保您真的需要重新安装！
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="button" id="confirmReinstall" class="btn btn-danger btn-lg">
+                        <i class="bi bi-exclamation-triangle"></i> 确认重新安装
+                    </button>
+                    <a href="{:url('/admin')}" class="btn btn-outline-secondary ms-3">
+                        <i class="bi bi-x-circle"></i> 取消
+                    </a>
+                </div>
+                {/if}
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

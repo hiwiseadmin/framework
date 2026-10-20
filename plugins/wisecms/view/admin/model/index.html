@@ -1,0 +1,24 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}模型管理{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-diagram-3" caption="模型管理" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <!-- 模型导入的文件选择器（隐藏）：由工具栏「导入模型」触发，
+                     变更后由 js/model.js 上传 multipart，不经表单提交。 -->
+                <input type="file" id="model-import-file" class="d-none" accept=".json,application/json">
+
+                <div id="toolbar" class="toolbar"></div>
+                <table id="table"></table>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/model.js（由 wsconfig.js 自动加载） -->
+{/block}

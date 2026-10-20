@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN" data-bs-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WiseEditor 示例 · Markdown（Milkdown）</title>
+    <!-- 路径说明：与 index.html / api.html 保持一致，统一使用「站点绝对路径」/statics/...
+         （verify-editor.mjs 的静态服务把 /statics/** 映射到 public/、/example/** 映射到本目录）。
+         历史遗留：本文件曾误用相对路径 ../statics/...，导致 4 个资源 404、示例页无法挂载。 -->
+    <link rel="stylesheet" href="/statics/libs/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="/statics/plugins/wiseeditor/css/wiseeditor.css">
+    <link rel="stylesheet" href="/statics/plugins/wiseeditor/css/milkdown-theme.css">
+    <!-- 右栏预览（.ws-md 作用域）的样式。后台由 wise-bundle.css 统一带上，示例页需单独引 -->
+    <link rel="stylesheet" href="/statics/libs/ws-markdown/ws-markdown.css">
+    <link rel="stylesheet" href="./example.css">
+</head>
+<body>
+    <header class="ex-head">
+        <h1>WiseEditor 示例</h1>
+        <nav class="ex-nav">
+            <a href="./index.html">富文本</a>
+            <a href="./markdown.html" aria-current="page">Markdown</a>
+            <a href="./api.html">实例 API</a>
+        </nav>
+    </header>
+
+    <p class="hint">
+        同一套前端入口、换一个 <code>data-editor-type</code> 即切到 Markdown 驱动
+        （<code>MilkdownDriver</code>）—— 契约层与编排层完全复用，页面不需要任何额外代码。<br>
+        <strong>注意</strong>：Markdown 模式的表单字段是 <code>&lt;textarea&gt;</code>，
+        富文本模式是 <code>&lt;input type="hidden"&gt;</code>，两者由各自驱动的
+        <code>renderHtml()</code> 决定，不要混用。
+    </p>
+
+    <form id="mdForm">
+        <div class="field">
+            <label>Markdown <code>data-editor-type="milkdown"</code></label>
+            <div class="wiseeditor-wrapper">
+                <div id="editor_body" class="wiseeditor-container milkdown-editor" style="height:300px"
+                     data-editor="wiseeditor" data-editor-type="milkdown" data-mode="markdown"
+                     data-name="body"></div>
+                <textarea name="body" id="editor_body_textarea" style="display:none;"># 标题
+
+正文段落，支持 **加粗**、*斜体*、`代码`。
+
+- 列表项 A
+- 列表项 B
+
+> 引用块</textarea>
+            </div>
+        </div>
+
+        <div class="ex-actions">
+            <button type="submit">提交表单</button>
+            <button type="button" id="btnShow">读取当前字段值</button>
+            <button type="button" id="btnTheme">切换暗色</button>
+        </div>
+    </form>
+
+    <pre id="out">等待初始化…</pre>
+
+    <!-- 预览栏的 Markdown 渲染器。后台页面由 wise-bundle.js 提供（window.Wise.ws.WsMarkdown），
+         示例页没有内核，必须自己引；引入后组件会挂 window.WsMarkdown，适配器两条来源都认 -->
+    <script type="module" src="/statics/libs/ws-markdown/ws-markdown.js"></script>
+    <script type="module" src="/statics/plugins/wiseeditor/js/wiseeditor-init.js"></script>
+    <script type="module" src="./markdown.js"></script>
+</body>
+</html>

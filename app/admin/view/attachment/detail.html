@@ -1,0 +1,226 @@
+{extend name="public/base" /}
+
+{block name="title"}附件详情{/block}
+
+{block name="css"}
+<style>
+.preview-container {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bs-tertiary-bg);
+    border-radius: var(--bs-border-radius);
+    overflow: hidden;
+}
+.preview-container img {
+    max-width: 100%;
+    max-height: 500px;
+    object-fit: contain;
+}
+.preview-container video {
+    max-width: 100%;
+    max-height: 500px;
+}
+.preview-container iframe {
+    width: 100%;
+    height: 600px;
+    border: none;
+}
+.version-badge-current {
+    font-size: 0.7rem;
+}
+.log-action {
+    display: inline-block;
+    min-width: 64px;
+}
+</style>
+{/block}
+
+{block name="content"}
+<body>
+<div class="container-fluid py-4">
+    <div class="row mb-3">
+        <div class="col-12">
+            <a href="/admin/attachment/index" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>返回附件管理</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- 文件信息卡片 -->
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-header"><i class="bi bi-info-circle me-1"></i>文件信息</div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        {if $attachment->isImage()}
+                        <img src="{$attachment->url}" class="img-fluid rounded" style="max-height:200px;" alt="">
+                        {else /}
+                        <i class="{$attachment->getIconClass()} display-1 text-muted"></i>
+                        {/if}
+                    </div>
+                    <table class="table table-sm">
+                        <tr><td class="text-muted">文件名</td><td id="infoName">{:basename($attachment->object_name)}</td></tr>
+                        <tr><td class="text-muted">大小</td><td id="infoSize">{$attachment->getHumanSize()}</td></tr>
+                        <tr><td class="text-muted">类型</td><td id="infoMime">{$attachment->mime_type}</td></tr>
+                        <tr><td class="text-muted">存储</td><td id="infoStorage">{$attachment->storage}</td></tr>
+                        {if $attachment->isImage()}
+                        <tr><td class="text-muted">尺寸</td><td id="infoDims">{$attachment->image_width} × {$attachment->image_height}</td></tr>
+                        {/if}
+                        <tr><td class="text-muted">上传时间</td><td id="infoTime">{$attachment->create_time}</td></tr>
+                        <tr><td class="text-muted">路径</td><td id="infoPath" class="text-truncate" style="max-width:180px;">{$attachment->object_name}</td></tr>
+                    </table>
+                </div>
+                <div class="card-footer">
+                    <div class="btn-group w-100">
+                        <a href="/admin/attachment/download?id={$attachment->id}" class="btn btn-outline-primary btn-sm"><i class="bi bi-download me-1"></i>下载</a>
+                        <a href="/admin/attachment/preview?id={$attachment->id}" class="btn btn-outline-info btn-sm"><i class="bi bi-eye me-1"></i>预览</a>
+                        <button class="btn btn-outline-danger btn-sm" onclick="if(confirm('确定删除？')){$.post('/admin/attachment/delete',{ids:'{$attachment->id}'},function(r){if(r.code==0){location.href='/admin/attachment/index'}else{alert(r.msg)}})}"><i class="bi bi-trash me-1"></i>删除</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧标签页 -->
+        <div class="col-md-8">
+            <ul class="nav nav-tabs mb-3" id="detailTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="versions-tab" data-bs-toggle="tab" data-bs-target="#versionsPane" type="button"><i class="bi bi-clock-history me-1"></i>版本历史</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="logs-tab" data-bs-toggle="tab" data-bs-target="#logsPane" type="button"><i class="bi bi-journal-text me-1"></i>操作日志</button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <!-- 版本历史 -->
+                <div class="tab-pane fade show active" id="versionsPane">
+                    <div id="versionsLoading" class="text-center py-5"><div class="spinner-border"></div></div>
+                    <div id="versionsContent" style="display:none;">
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover">
+                                <thead><tr><th>版本</th><th>文件名</th><th>大小</th><th>说明</th><th>时间</th><th>操作</th></tr></thead>
+                                <tbody id="versionsBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 操作日志 -->
+                <div class="tab-pane fade" id="logsPane">
+                    <div id="logsLoading" class="text-center py-5"><div class="spinner-border"></div></div>
+                    <div id="logsContent" style="display:none;">
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover">
+                                <thead><tr><th>操作</th><th>操作人</th><th>IP</th><th>时间</th><th>详情</th></tr></thead>
+                                <tbody id="logsBody"></tbody>
+                            </table>
+                        </div>
+                        <nav id="logsPagination" class="mt-2"></nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="js"}
+<script nonce="{$csp_nonce|default=''}">
+require(['jquery', 'bootstrap', 'ws-layer'], function($, bootstrap, Layer) {
+    var attachId = {$attachment->id};
+
+    // 加载版本历史
+    $.get('/admin/attachment/versions?id=' + attachId, function(r) {
+        $('#versionsLoading').hide();
+        if (r.code === 0) {
+            var rows = '';
+            if (r.data.versions.length === 0) {
+                rows = '<tr><td colspan="6" class="text-center text-muted">暂无版本记录</td></tr>';
+            } else {
+                r.data.versions.forEach(function(v) {
+                    var badge = v.is_current ? '<span class="badge bg-success version-badge-current">当前</span>' : '';
+                    var rollbackBtn = !v.is_current ? '<button class="btn btn-outline-warning btn-sm rollback-btn" data-ver="' + v.version_number + '"><i class="bi bi-arrow-counterclockwise"></i> 回滚</button>' : '';
+                    rows += '<tr>' +
+                        '<td>v' + v.version_number + ' ' + badge + '</td>' +
+                        '<td class="text-truncate" style="max-width:150px;">' + (v.object_name ? v.object_name.split('/').pop() : '') + '</td>' +
+                        '<td>' + v.human_size + '</td>' +
+                        '<td>' + (v.note || '') + '</td>' +
+                        '<td>' + v.create_time + '</td>' +
+                        '<td>' + rollbackBtn + '</td>' +
+                        '</tr>';
+                });
+            }
+            $('#versionsBody').html(rows);
+            $('#versionsContent').show();
+
+            // 绑定回滚按钮
+            $('.rollback-btn').on('click', function() {
+                var ver = $(this).data('ver');
+                Layer.confirm('确定要回滚到版本 v' + ver + ' 吗？', function(idx) {
+                    $.post('/admin/attachment/rollback', {id: attachId, version_number: ver}, function(r2) {
+                        if (r2.code === 0) {
+                            Layer.toast({content: '回滚成功', type: 'success'});
+                            setTimeout(function(){ location.reload(); }, 1000);
+                        } else {
+                            Layer.toast({content: r2.msg, type: 'danger'});
+                        }
+                    });
+                    Layer.close(idx);
+                });
+            });
+        }
+        $('#versionsLoading').hide();
+    });
+
+    // 加载操作日志
+    var logPage = 1;
+    loadLogs(logPage);
+
+    function loadLogs(page) {
+        $('#logsLoading').show();
+        $('#logsContent').hide();
+        $.get('/admin/attachment/logs', {id: attachId, page: page}, function(r) {
+            $('#logsLoading').hide();
+            if (r.code === 0) {
+                var rows = '';
+                if (r.data.list.length === 0) {
+                    rows = '<tr><td colspan="5" class="text-center text-muted">暂无日志记录</td></tr>';
+                } else {
+                    r.data.list.forEach(function(l) {
+                        var actionClass = l.action === 'upload' ? 'text-success' : (l.action === 'delete' || l.action === 'force_delete' ? 'text-danger' : 'text-primary');
+                        rows += '<tr>' +
+                            '<td><span class="log-action ' + actionClass + '">' + l.action_label + '</span></td>' +
+                            '<td>' + (l.operator_name || (l.operator_type === 'admin' ? '管理员#' + l.operator_id : '系统')) + '</td>' +
+                            '<td>' + (l.ip || '-') + '</td>' +
+                            '<td>' + l.create_time + '</td>' +
+                            '<td class="text-truncate" style="max-width:200px;">' + JSON.stringify(l.detail || {}).substring(0, 80) + '</td>' +
+                            '</tr>';
+                    });
+                }
+                $('#logsBody').html(rows);
+                $('#logsContent').show();
+                renderLogPagination(r.data);
+            }
+        });
+    }
+
+    function renderLogPagination(data) {
+        var html = '';
+        if (data.total_page > 1) {
+            html += '<ul class="pagination pagination-sm justify-content-center">';
+            for (var i = 1; i <= data.total_page; i++) {
+                html += '<li class="page-item ' + (i === logPage ? 'active' : '') + '"><a class="page-link log-page-link" href="#" data-page="' + i + '">' + i + '</a></li>';
+            }
+            html += '</ul>';
+        }
+        $('#logsPagination').html(html);
+        $('.log-page-link').on('click', function(e) {
+            e.preventDefault();
+            logPage = parseInt($(this).data('page'));
+            loadLogs(logPage);
+        });
+    }
+});
+</script>
+{/block}

@@ -1,0 +1,43 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}编辑重定向{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-pencil-square" caption="编辑重定向" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <form id="redirectForm" method="post" action="{:plugin_url('wisecms/redirect/edit')}">
+                    {:csrf_field()}
+                    <input id="cms-f-id" type="hidden" name="id" value="{$redirect.id}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-source_url">来源路径 <span class="text-danger">*</span></label>
+                            <input id="cms-f-source_url" type="text" name="source_url" class="form-control" required maxlength="500"
+                                   value="{$redirect.source_url}" placeholder="如 /old-page.html">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-target_url">目标地址 <span class="text-danger">*</span></label>
+                            <input id="cms-f-target_url" type="text" name="target_url" class="form-control" required maxlength="500"
+                                   value="{$redirect.target_url}" placeholder="如 /new-page.html">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-type">重定向类型</label>
+                            <select id="cms-f-type" name="type" class="form-select">
+                                <option value="301" {if $redirect.type != 302}selected{/if}>301 永久重定向</option>
+                                <option value="302" {if $redirect.type == 302}selected{/if}>302 临时重定向</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                    <button type="button" id="btn-redirect-back" class="btn btn-outline-secondary btn-sm">返回</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/redirect.js（由 wsconfig.js 自动加载） -->
+{/block}

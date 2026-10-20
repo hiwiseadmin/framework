@@ -1,0 +1,56 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}编辑采集任务{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-pencil-square" caption="编辑采集任务" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <form id="spiderForm" method="post" action="{:plugin_url('wisecms/spider/edit')}">
+                    {:csrf_field()}
+                    <input id="cms-f-id" type="hidden" name="id" value="{$task.id}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-name">任务名称 <span class="text-danger">*</span></label>
+                            <input id="cms-f-name" type="text" name="name" class="form-control" required maxlength="100" value="{$task.name}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-list_url">列表页 URL <span class="text-danger">*</span></label>
+                            <input id="cms-f-list_url" type="url" name="list_url" class="form-control" required placeholder="https://example.com/news/" value="{$task.list_url}">
+                            <div class="form-text">仅允许公网 HTTP/HTTPS 地址（含 SSRF 校验）</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-target_catid">采集到栏目 <span class="text-danger">*</span></label>
+                            <select id="cms-f-target_catid" name="target_catid" class="form-select" required>
+                                <option value="">请选择栏目</option>
+                                {foreach $catOpts as $opt}
+                                <option value="{$opt.id}" {if $task.target_catid == $opt.id}selected{/if}>{$opt.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-source_type">来源标记</label>
+                            <input id="cms-f-source_type" type="text" name="source_type" class="form-control" maxlength="20" value="{$task.source_type}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-cron">定时表达式</label>
+                            <input id="cms-f-cron" type="text" name="cron" class="form-control" maxlength="50" placeholder="如 0 3 * * *，留空手动执行" value="{$task.cron}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-status">状态</label>
+                            <select id="cms-f-status" name="status" class="form-select">
+                                <option value="1" {if $task.status == 1}selected{/if}>启用</option>
+                                <option value="0" {if $task.status == 0}selected{/if}>禁用</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                    <a href="{:plugin_url('wisecms/spider/index')}" class="btn btn-outline-secondary btn-sm">返回</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

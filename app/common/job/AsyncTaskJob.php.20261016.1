@@ -1,0 +1,95 @@
+<?php
+declare (strict_types = 1);
+
+namespace app\common\job;
+
+use think\queue\Job;
+use wise\support\context\ContextualLogger;
+use app\common\service\QueueService;
+
+/**
+ * 通用异步任务 Job
+ *
+ * 用于 QueueService::task() 的闭包任务机制。
+ * 通过回调标识（handler）查找已注册的回调函数并执行。
+ *
+ * 使用示例：
+ *   QueueService::registerHandler('cms:export', function($data) { ... });
+ *   QueueService::instance()->task('cms:export', ['article_id' => 1]);
+ */
+class AsyncTaskJob
+{
+    /**
+     * 最大重试次数
+     */
+    const MAX_ATTEMPTS = 3;
+
+    /**
+     * 首次重试延迟（秒）
+     */
+    const RETRY_DELAY = 10;
+
+    /**
+     * 执行异步任务
+     *
+     * @param Job   $job  队列任务实例
+     * @param array $data 任务数据，必须包含 handler 键
+     */
+    public function fire(Job $job, $data)
+    {
+        $handler = $data['handler'] ?? '';
+        $payload = $data['payload'] ?? [];
+        $attempt = $job->attempts();
+
+        if (empty($handler)) {
+            ContextualLogger::error('AsyncTaskJob: 缺少 handler 参数', ['queue', 'async_task']);
+            $job->delete();
+            return;
+        }
+
+        try {
+            $callback = QueueService::getHandler($handler);
+
+            if (!is_callable($callback)) {
+                ContextualLogger::error("AsyncTaskJob: 未注册的回调处理器 [{$handler}]", ['queue', 'async_task']);
+                $job->delete();
+                return;
+            }
+
+            ContextualLogger::info("AsyncTaskJob: 开始执行 [{$handler}]", ['queue', 'async_task']);
+
+            $result = call_user_func($callback, $payload);
+
+            // null 视为成功
+            if ($result === true || $result === null) {
+                ContextualLogger::info("AsyncTaskJob: 执行成功 [{$handler}]", ['queue', 'async_task']);
+                $job->delete();
+            } else {
+                ContextualLogger::warning("AsyncTaskJob: 处理器返回失败 [{$handler}]", ['queue', 'async_task']);
+                $this->releaseOrFail($job, $attempt, $handler);
+            }
+        } catch (\Exception $e) {
+            ContextualLogger::error("AsyncTaskJob: 执行异常 [{$handler}] - {$e->getMessage()}", ['queue', 'async_task']);
+            $this->releaseOrFail($job, $attempt, $handler);
+        }
+    }
+
+    /**
+     * 重试或标记失败
+     *
+     * @param Job    $job     队列任务实例
+     * @param int    $attempt  当前尝试次数
+     * @param string $handler  回调标识
+     */
+    protected function releaseOrFail(Job $job, int $attempt, string $handler): void
+    {
+        if ($attempt >= self::MAX_ATTEMPTS) {
+            ContextualLogger::error("AsyncTaskJob: 超过最大重试次数，任务失败 [{$handler}]", ['queue', 'async_task']);
+            $job->failed();
+        } else {
+            // 递增延迟：10s, 20s, 30s...
+            $delay = self::RETRY_DELAY * $attempt;
+            $job->release($delay);
+        }
+    }
+}

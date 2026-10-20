@@ -1,0 +1,53 @@
+{extend name="index/layout" /}
+
+{block name="title"}{if condition="!empty($tag)"}{$tag.name} - 标签{else /}标签云{/if} - {$cms.site_name}{/block}
+
+{block name="main"}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb small">
+        <li class="breadcrumb-item"><a href="{$cms.home_url}">首页</a></li>
+        <li class="breadcrumb-item"><a href="{$cms.tag_url}">标签</a></li>
+        {if condition="!empty($tag)"}
+        <li class="breadcrumb-item active">{$tag.name}</li>
+        {/if}
+    </ol>
+</nav>
+
+<div class="cms-card p-3 mb-4">
+    <h6 class="border-bottom pb-2">全部标签</h6>
+    <div>
+        {empty name="tags"}
+        <span class="text-muted small">暂无标签</span>
+        {else /}
+        {foreach $tags as $item}
+        <a class="cms-tag {if condition="!empty($tag) && $tag.id == $item.id"}bg-primary text-white{/if}"
+           href="{$item.url|default=''}">{$item.name}</a>
+        {/foreach}
+        {/empty}
+    </div>
+</div>
+
+{if condition="!empty($tag)"}
+<div class="cms-card p-3">
+    <h5 class="border-bottom pb-2 mb-3">标签：{$tag.name}</h5>
+
+    {empty name="list.data"}
+    <p class="text-muted py-4 text-center mb-0">该标签下暂无内容。</p>
+    {else /}
+    {foreach $list.data as $item}
+    <div class="py-3 border-bottom">
+        <a class="cms-title fw-bold d-block mb-1"
+           href="{$item.url|default=''}">{$item.title}</a>
+        <div class="cms-meta">
+            <span>{$item.category.name|default='未分类'}</span>
+            <span class="mx-2">·</span>
+            <span>{:substr($item.create_time, 0, 10)}</span>
+        </div>
+    </div>
+    {/foreach}
+    {/empty}
+
+    {include file="index/pager" /}
+</div>
+{/if}
+{/block}

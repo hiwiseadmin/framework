@@ -1,0 +1,57 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}友情链接{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-link-45deg" caption="友情链接" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <!-- 筛选条：条件变化由 js/friend_link.js 局部刷新表格，不整页跳转 -->
+                <div class="row g-2 align-items-center mb-3">
+                    <div class="col-auto">
+                        <input type="text" class="form-control form-control-sm" id="filter-keyword"
+                               placeholder="名称 / 地址" style="width:200px" autocomplete="off">
+                    </div>
+                    <div class="col-auto">
+                        <!-- 分组选项由服务端查好（列表 JSON 不返回分组清单），取值由 JS 读取 -->
+                        <select class="form-select form-select-sm" id="filter-group" style="width:140px">
+                            <option value="">全部分组</option>
+                            {foreach $groups as $g}
+                            <option value="{$g}">{$g}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <select class="form-select form-select-sm" id="filter-status" style="width:110px">
+                            <option value="">全部状态</option>
+                            <option value="1">显示</option>
+                            <option value="0">隐藏</option>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-sm btn-primary" id="btn-search-friend-link">
+                            <i class="bi bi-search"></i> 筛选
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-reset-friend-link">重置</button>
+                    </div>
+                    <div class="col-auto ms-auto">
+                        <span class="text-muted small">
+                            拖动 <i class="bi bi-grip-vertical"></i> 调整顺序（或改「排序」数值）；
+                            友链按「当前站点」隔离
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 表格：勾选列由 JS 的 { checkbox: true } 声明（bootstrap-table 只在有该列时才渲染复选框） -->
+                <div id="toolbar" class="toolbar"></div>
+                <table id="table"></table>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/friend_link.js（由 wsconfig.js 自动加载） -->
+{/block}

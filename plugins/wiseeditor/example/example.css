@@ -1,0 +1,88 @@
+/* ============================================================
+ * WiseEditor 示例页样式
+ * ============================================================
+ * 仅服务于 example/ 下的示例页，不是编辑器运行时资源。
+ * 刻意不引 bootstrap 完整包：示例要能一眼看清「编辑器本身」需要哪些依赖
+ * （只有 wiseeditor.css + bootstrap-icons）。
+ * ============================================================ */
+
+:root {
+    --ex-fg: #1f2937;
+    --ex-muted: #64748b;
+    --ex-bg: #ffffff;
+    --ex-border: #e2e8f0;
+    --ex-code-bg: #0f172a;
+    --ex-code-fg: #d1e7ff;
+    --ex-accent: #534ab7;
+}
+
+html[data-bs-theme="dark"] {
+    --ex-fg: #e5e9f0;
+    --ex-muted: #94a3b8;
+    --ex-bg: #111827;
+    --ex-border: #334155;
+    --ex-code-bg: #0b1220;
+    --ex-code-fg: #cfe4ff;
+    --ex-accent: #a79ff5;
+}
+
+body {
+    font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+    margin: 0 auto;
+    max-width: 960px;
+    padding: 24px 20px 64px;
+    background: var(--ex-bg);
+    color: var(--ex-fg);
+}
+
+a { color: var(--ex-accent); }
+
+.ex-head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--ex-border);
+    padding-bottom: 10px;
+    margin-bottom: 18px;
+}
+
+.ex-head h1 { font-size: 18px; margin: 0; }
+
+.ex-nav { display: flex; gap: 12px; font-size: 14px; }
+.ex-nav a { text-decoration: none; color: var(--ex-muted); }
+.ex-nav a[aria-current="page"] { color: var(--ex-accent); font-weight: 600; }
+
+.hint { color: var(--ex-muted); font-size: 12px; line-height: 1.7; }
+
+.field { margin: 18px 0; }
+.field > label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
+.field > label code { font-weight: 400; color: var(--ex-muted); }
+
+.ex-actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 18px 0 10px; }
+
+.ex-actions button {
+    font: inherit;
+    font-size: 13px;
+    padding: 6px 12px;
+    border: 1px solid var(--ex-border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--ex-fg);
+    cursor: pointer;
+}
+
+.ex-actions button:hover { border-color: var(--ex-accent); color: var(--ex-accent); }
+
+#out {
+    background: var(--ex-code-bg);
+    color: var(--ex-code-fg);
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.6;
+    overflow: auto;
+    max-height: 320px;
+    white-space: pre-wrap;
+    word-break: break-all;
+}

@@ -1,0 +1,49 @@
+{extend name="public/base" /}
+
+{block name="title"}权限管理{/block}
+
+{block name="content"}
+<body>
+<div class="app-main container-fluid">
+    {include file="public/index_header" /}
+    <div id="toolbar" class="toolbar">
+        <div class="d-inline" data-ws-target="toolbar"></div>
+    </div>
+    <table id="table"></table>
+</div>
+<!-- 更新权限模态框 -->
+<div class="modal fade" id="updatePermissionModal" tabindex="-1" aria-labelledby="updatePermissionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="updatePermissionForm" class="needs-validation" action="{:url('updateFromMenuActionApi')}" method="post" novalidate>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updatePermissionModalLabel">同步权限</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body px-4">
+                    <p class="text-secondary small mb-3">
+                        权限节点由「菜单/按钮」和「扩展包声明」派生；同步是幂等的，可重复执行。
+                        目录（分组）本身不产生权限节点。
+                    </p>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" role="switch" id="menus" name="menus" value="1" checked>
+                                <label class="form-check-label" for="menus">同步菜单/按钮 → 权限节点</label>
+                            </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" role="switch" id="packages" name="packages" value="1" checked>
+                                <label class="form-check-label" for="packages">同步扩展包权限（插件 / AI 工具）</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary" id="updatePermissionSubmit">开始同步</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{/block}

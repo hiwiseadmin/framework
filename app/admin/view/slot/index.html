@@ -1,0 +1,19 @@
+{extend name="public/base" /}
+
+{block name="title"}插槽管理{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="public/index_header" /}
+    <div id="toolbar" class="toolbar mb-3">
+        <button id="refresh" class="btn btn-sm btn-secondary"><i class="bi bi-arrow-repeat"></i> 刷新</button>
+        <span class="ms-2 small text-muted">系统预定义的插槽位置，插件通过 manifest.json 声明注入内容</span>
+    </div>
+
+    <div id="slot-list"></div>
+</div>
+{/block}
+
+{block name="js"}
+
+{/block}

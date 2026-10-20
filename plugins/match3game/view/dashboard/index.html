@@ -1,0 +1,34 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}运营概览{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-speedometer2" caption="运营概览" buttongroup="" /}
+    <div class="plugin-match3game">
+        <div class="container-fluid p-0">
+            <div id="statcards" class="row g-3"></div>
+
+            <div class="row g-3 mt-1">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header"><h6 class="mb-0"><i class="bi bi-graph-up me-2"></i>近7天对局趋势</h6></div>
+                        <div class="card-body">
+                            <table class="table table-sm table-striped" id="trend-table">
+                                <thead><tr><th>日期</th><th>对局数</th><th>通关数</th><th>通关率</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header"><h6 class="mb-0"><i class="bi bi-star me-2"></i>星级分布</h6></div>
+                        <div class="card-body" id="star-dist"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

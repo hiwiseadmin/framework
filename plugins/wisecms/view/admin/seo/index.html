@@ -1,0 +1,106 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}SEO 总览{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-graph-up" caption="SEO 总览" buttongroup="" /}
+    {include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <!-- 健康概览：栅格与看板 KPI 对齐（col-6 → 窄屏 2×2，而不是 4 张满宽竖排） -->
+        <div class="row g-3 mb-3">
+            <div class="col-6 col-lg-3">
+                <div class="card text-center h-100">
+                    <div class="card-body py-3">
+                        <div class="text-body-secondary small">平均 SEO 分</div>
+                        <div class="fs-3 fw-bold cms-kpi-value">{$health.avg_seo_score}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card text-center h-100">
+                    <div class="card-body py-3">
+                        <div class="text-body-secondary small">已发布内容</div>
+                        <div class="fs-3 fw-bold cms-kpi-value">{$health.total_contents}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card text-center h-100">
+                    <div class="card-body py-3">
+                        <div class="text-body-secondary small">优秀（A 级）</div>
+                        <div class="fs-3 fw-bold text-success cms-kpi-value">{$health.grade_distribution.A}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card text-center h-100">
+                    <div class="card-body py-3">
+                        <div class="text-body-secondary small">待优化（F 级）</div>
+                        <div class="fs-3 fw-bold text-danger cms-kpi-value">{$health.grade_distribution.F}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 推送 + 日志入口 -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex align-items-center flex-wrap gap-2">
+                    <label class="form-label mb-0 me-2 small">推送到搜索引擎</label>
+                    <input type="text" id="seoPushIds" class="form-control form-control-sm" style="max-width:320px"
+                           placeholder="内容 ID，逗号分隔（如 1,2,3）">
+                    <button type="button" id="btn-seo-push" class="btn btn-sm btn-primary">
+                        <i class="bi bi-send me-1"></i>推送
+                    </button>
+                    <a href="{:plugin_url('wisecms/seo/pushLog')}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-clock-history me-1"></i>推送日志
+                    </a>
+                </div>
+                <div class="form-text">推送到百度 / Google / Bing（需在 CMS 配置里填好对应 Token / Key）；仅推送当前站点已发布内容。</div>
+            </div>
+        </div>
+
+        <!-- 最近审查 -->
+        <div class="card">
+            <div class="card-header">最近审查</div>
+            <div class="card-body p-0">
+                <!-- table-responsive：不加这层的话，375 视口下表格会被压到 325px，
+                     首列 <th> 只剩 40px →「内容标题」竖排成单字（评审 §9.2）。
+                     各列加 text-nowrap，让窄屏走"容器内横滚"而不是"压缩变形"。 -->
+                <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 cms-table-min">
+                    <thead>
+                        <tr>
+                            <th class="ps-3">内容标题</th>
+                            <th class="text-nowrap" style="width:100px">SEO 分</th>
+                            <th class="text-nowrap" style="width:90px">问题数</th>
+                            <th class="text-nowrap" style="width:170px">审查时间</th>
+                            <th class="text-nowrap pe-3" style="width:120px">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {if empty($recent)}
+                        <tr><td colspan="5" class="text-center text-body-secondary py-4">暂无审查记录（对内容执行 SEO 检测后在此显示）</td></tr>
+                        {else /}
+                        {foreach $recent as $row}
+                        <tr>
+                            <td class="ps-3">{$row.title}</td>
+                            <td>{$row.total_score}</td>
+                            <td>{if $row.issue_count > 0}<span class="badge bg-warning text-dark">{$row.issue_count}</span>{else}<span class="badge bg-success">0</span>{/if}</td>
+                            <td class="text-nowrap">{$row.audit_time}</td>
+                            <td class="pe-3">
+                                <button type="button" class="btn btn-sm btn-outline-secondary cms-seo-detail" data-id="{$row.content_id}">
+                                    <i class="bi bi-eye me-1"></i>明细
+                                </button>
+                            </td>
+                        </tr>
+                        {/foreach}
+                        {/if}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

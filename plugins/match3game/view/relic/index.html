@@ -1,0 +1,39 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}遗物管理{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-gem" caption="遗物管理" buttongroup="" /}
+    <div class="plugin-match3game">
+        <div class="container-fluid p-0">
+            <div class="card">
+                <div class="card-body">
+                    <form class="row g-2 mb-3" id="search-form">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control form-control-sm" id="search-keyword" placeholder="遗物 ID/名称">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select form-select-sm" id="search-rarity">
+                                <option value="">全部稀有度</option>
+                                {foreach $rarities as $r}
+                                <option value="{$r}">{$r}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm" id="btn-search"><i class="bi bi-search"></i> 搜索</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-reset"><i class="bi bi-arrow-clockwise"></i> 重置</button>
+                        </div>
+                    </form>
+
+                    <div id="toolbar" class="toolbar mb-2"></div>
+                    <table id="table"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{include file="relic/form" /}
+{/block}

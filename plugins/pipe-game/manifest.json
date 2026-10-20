@@ -1,0 +1,15 @@
+{
+    "name": "pipe-game",
+    "title": "水管工小游戏",
+    "version": "1.0.0",
+    "description": "水管工连线通关小游戏插件 — 基于 wise-game-stage 关卡通解系统",
+    "author": "WiseAdmin Team",
+    "develop": true,
+    "service_provider": "plugin\\pipe_game\\BootServiceProvider",
+    "dependencies": {},
+    "menus": [],
+    "permissions": [],
+    "config": [],
+    "slots": {},
+    "vendor": {}
+}

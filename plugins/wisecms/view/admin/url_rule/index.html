@@ -1,0 +1,45 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}URL 规则{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-link-45deg" caption="URL 规则" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <!-- 伪静态开关状态由 js/url_rule.js 读 urlRule/presets 后填充（静态文案容易与实际不符） -->
+                <div class="alert alert-light border py-2 mb-3 small" id="rule-rewrite-hint">
+                    <i class="bi bi-info-circle me-1"></i> 正在读取伪静态开关状态…
+                </div>
+
+                <!-- 筛选条：类型切换由 js/url_rule.js 局部刷新表格，不整页跳转 -->
+                <div class="row g-2 align-items-center mb-3">
+                    <div class="col-auto">
+                        <select class="form-select form-select-sm" id="filter-type" style="width:150px">
+                            <option value="">全部类型</option>
+                            <option value="content">内容详情</option>
+                            <option value="category">栏目列表</option>
+                            <option value="tag">标签页</option>
+                            <option value="page">单页</option>
+                        </select>
+                    </div>
+                    <div class="col-auto ms-auto">
+                        <span class="text-muted small">
+                            列表含「全站」与「本站」规则；生效优先级：按单条 &gt; 按栏目 &gt; 按模型 &gt; 全站，
+                            同级下站点精确 &gt; 全站
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 表格：仅挂载点（无批量接口，故不开勾选） -->
+                <div id="toolbar" class="toolbar"></div>
+                <table id="table"></table>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/url_rule.js（由 wsconfig.js 自动加载） -->
+{/block}

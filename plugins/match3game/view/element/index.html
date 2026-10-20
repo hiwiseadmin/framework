@@ -1,0 +1,86 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}元素字典{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-gem" caption="元素字典" buttongroup="" /}
+    <div class="plugin-match3game">
+        <div class="container-fluid p-0">
+            <div class="card">
+                <div class="card-body">
+                    <form class="row g-2 mb-3" id="search-form">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control form-control-sm" id="search-keyword" placeholder="元素编码/名称">
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm" id="btn-search"><i class="bi bi-search"></i> 搜索</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-reset"><i class="bi bi-arrow-clockwise"></i> 重置</button>
+                        </div>
+                    </form>
+                    <div id="toolbar" class="toolbar mb-2"></div>
+                    <table id="table"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="element-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="form-title">新增元素</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="element-form" class="modal-body row g-3">
+                <input type="hidden" name="id" id="form-id" value="0">
+                <div class="col-md-4">
+                    <label class="form-label">元素编码 <span class="text-danger">*</span></label>
+                    <input type="text" name="code" id="form-code" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">名称 <span class="text-danger">*</span></label>
+                    <input type="text" name="name" id="form-name" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">类型</label>
+                    <select name="kind" id="form-kind" class="form-select">
+                        <option value="1">普通色块</option>
+                        <option value="2">收集目标</option>
+                        <option value="3">障碍物</option>
+                        <option value="4">特殊块</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">配色标识</label>
+                    <input type="text" name="color" id="form-color" class="form-control" placeholder="#e74c3c">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">权重</label>
+                    <input type="number" name="weight" id="form-weight" class="form-control" value="0">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">清除规则 key</label>
+                    <input type="text" name="clear_rule" id="form-clear-rule" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">排序</label>
+                    <input type="number" name="sort_order" id="form-sort-order" class="form-control" value="0">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">状态</label>
+                    <select name="status" id="form-status" class="form-select">
+                        <option value="1">启用</option>
+                        <option value="0">禁用</option>
+                    </select>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" form="element-form" class="btn btn-primary"><i class="bi bi-check-lg"></i> 保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

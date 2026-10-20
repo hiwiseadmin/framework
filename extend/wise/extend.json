@@ -1,0 +1,18 @@
+{
+    "services": [
+        "wise\\plugin\\PluginServiceProvider"
+    ],
+    "commands": [
+        "wise\\command\\VendorPublish",
+        "wise\\command\\PackageCleanup",
+        "wise\\command\\MenuSync",
+        "wise\\command\\MenuPermissionSync",
+        "wise\\command\\EnvSeed",
+        "wise\\command\\crud\\CrudCommand",
+        "wise\\command\\LangCheck",
+        "wise\\command\\TestAdmin",
+        "wise\\command\\PluginMenuMigrate",
+        "wise\\command\\ApiPermissionCheck",
+        "wise\\command\\AsyncTask"
+    ]
+}

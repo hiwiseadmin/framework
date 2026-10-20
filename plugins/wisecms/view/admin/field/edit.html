@@ -1,0 +1,102 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}编辑字段{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-pencil-square" caption="编辑字段" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <form id="fieldForm" method="post" data-model-id="{$field.model_id}" action="{:plugin_url('wisecms/modelField/edit')}">
+                    {:csrf_field()}
+                    <input id="cms-f-id" type="hidden" name="id" value="{$field.id}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-id">所属模型</label>
+                            <input type="text" class="form-control" value="{$model.title|default='-'}" disabled>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">字段标识</label>
+                            <input type="text" class="form-control" value="{$field.field}" disabled>
+                            <div class="form-text">字段标识创建后不可修改</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-name">字段名称 <span class="text-danger">*</span></label>
+                            <input id="cms-f-name" type="text" name="name" class="form-control" required maxlength="50" value="{$field.name}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-name">表单类型</label>
+                            <input type="text" id="field-form-type" class="form-control" value="{$fieldType}" disabled>
+                            <div class="form-text">类型创建后不在本页切换（改类型通常需同步调整数据类型/长度）</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-data_type">数据类型</label>
+                            <select id="cms-f-data_type" name="data_type" class="form-select">
+                                <option value="varchar" {if $field.data_type == 'varchar'}selected{/if}>varchar</option>
+                                <option value="text" {if $field.data_type == 'text'}selected{/if}>text</option>
+                                <option value="mediumtext" {if $field.data_type == 'mediumtext'}selected{/if}>mediumtext</option>
+                                <option value="int" {if $field.data_type == 'int'}selected{/if}>int</option>
+                                <option value="datetime" {if $field.data_type == 'datetime'}selected{/if}>datetime</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-length">长度（varchar 用）</label>
+                            <input id="cms-f-length" type="number" name="length" class="form-control" min="0" max="65535" value="{$field.length|default=0}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-default_value">默认值</label>
+                            <input id="cms-f-default_value" type="text" name="default_value" class="form-control" maxlength="255" value="{$field.default_value}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-sort_order">排序</label>
+                            <input id="cms-f-sort_order" type="number" name="sort_order" class="form-control" value="{$field.sort_order|default=0}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-status">状态</label>
+                            <select id="cms-f-status" name="status" class="form-select">
+                                <option value="1" {if $field.status == 1}selected{/if}>启用</option>
+                                <option value="0" {if $field.status == 0}selected{/if}>禁用</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" name="is_required" value="1" class="form-check-input" id="isRequired" {if $field.is_required == 1}checked{/if}>
+                                <label class="form-check-label" for="isRequired">必填</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" name="is_unique" value="1" class="form-check-input" id="isUnique" {if $field.is_unique == 1}checked{/if}>
+                                <label class="form-check-label" for="isUnique">唯一</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" name="is_search" value="1" class="form-check-input" id="isSearch" {if $field.is_search == 1}checked{/if}>
+                                <label class="form-check-label" for="isSearch">可搜索</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" name="is_base" value="1" class="form-check-input" id="isBase" {if $field.is_base == 1}checked{/if}>
+                                <label class="form-check-label" for="isBase">基本字段</label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 字段类型专属配置区（UIUX-P0-31）：服务端先渲染当前类型的 EditForm；
+                         若为空（实测 16 种类型里只有 editor 实现了 EditForm），
+                         由 statics/js/model_field.js 给出「暂无专属配置项」的明确文案，
+                         不留空白让人以为页面坏了。 -->
+                    <div class="card card-outline mb-3">
+                        <div class="card-header py-2"><span class="small">字段类型设置</span></div>
+                        <div class="card-body" id="field-type-config">{$editForm|raw}</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                    <a href="{:plugin_url('wisecms/modelField/index')}?model_id={$field.model_id}" id="btn-field-back" class="btn btn-outline-secondary btn-sm">返回</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：提交与「字段类型配置区」逻辑都在
+     /statics/plugins/wisecms/js/model_field.js 的 edit() 里（由 wsconfig.js 自动加载）。 -->
+{/block}

@@ -1,0 +1,84 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}添加 URL 规则{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-plus-circle" caption="添加 URL 规则" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <form id="urlRuleForm" method="post" action="{:plugin_url('wisecms/urlRule/create')}">
+                    {:csrf_field()}
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="cms-f-type">类型 <span class="text-danger">*</span></label>
+                            <!-- 预设面板按类型联动，事件由 js/url_rule.js 委托绑定（模板零内联脚本） -->
+                            <select id="cms-f-type" name="type" class="form-select">
+                                <option value="content">内容详情 content</option>
+                                <option value="category">栏目列表 category</option>
+                                <option value="tag">标签页 tag</option>
+                                <option value="page">单页 page</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="cms-f-scope_type">作用域</label>
+                            <select id="cms-f-scope_type" name="scope_type" class="form-select">
+                                <option value="global">全站（global）</option>
+                                <option value="model">按模型（model）</option>
+                                <option value="category">按栏目（category）</option>
+                                <option value="entity">按单条实体（entity）</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label" for="cms-f-scope_id">作用域 ID</label>
+                            <input id="cms-f-scope_id" type="number" name="scope_id" class="form-control" value="0" min="0">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label" for="cms-f-site_id">站点 ID</label>
+                            <input id="cms-f-site_id" type="number" name="site_id" class="form-control" value="0" min="0" placeholder="0=全站">
+                            <div class="form-text">0 = 全站通用</div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-2">
+                            <label class="form-label">预设模板（可选，点击套用）</label>
+                            <div id="presetBox"><span class="text-muted small">加载中…</span></div>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label" for="patternInput">模式模板 <span class="text-danger">*</span></label>
+                            <input type="text" name="pattern" id="patternInput" class="form-control" required maxlength="255"
+                                   placeholder="如 /{catdir}/{slug}.html">
+                            <div class="form-text" id="tokenHelp"></div>
+                            <div class="alert alert-light border py-2 mt-2 mb-0 small d-none" id="patternPreview"></div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label" for="cms-f-priority">优先级</label>
+                            <input id="cms-f-priority" type="number" name="priority" class="form-control" value="0">
+                            <div class="form-text">越大越优先</div>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label" for="cms-f-status">状态</label>
+                            <select id="cms-f-status" name="status" class="form-select">
+                                <option value="1">启用</option>
+                                <option value="0">停用</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                    <!-- 返回与提交均由 js/url_rule.js 的 create() 处理 -->
+                    <button type="button" id="btn-url-rule-back" class="btn btn-outline-secondary btn-sm">返回</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/url_rule.js（由 wsconfig.js 自动加载） -->
+{/block}

@@ -1,0 +1,464 @@
+/**
+ * admin.css — WiseDocs 后台管理页统一样式
+ *
+ * 目标：让「文档管理 / 分类管理」等插件后台列表页拥有一致的视觉与留白，
+ * 同时尽可能复用 AdminLTE / Bootstrap 5 的 CSS 变量，**自动跟随明暗主题**，
+ * 不硬编码颜色。
+ *
+ * 使用：在插件后台模板的 {block name="css"} 中引入本文件。
+ */
+
+:root {
+    --docs-radius: .75rem;
+    --docs-border: var(--bs-border-color, #dee2e6);
+}
+
+/* --------------------------------------------------------------------------
+   弹窗（新增 / 编辑）
+   目标：垂直居中、高度随内容自适应；只有表单区域滚动。
+   注意：不要用 bootstrap 的 modal-dialog-scrollable —— 它把弹窗强制拉到
+   整屏高度，字段少的弹窗（标签 / 分类）会出现大片空白，看起来像全屏。
+   -------------------------------------------------------------------------- */
+.docs-modal .modal-content {
+    max-height: calc(100vh - 80px);
+}
+
+.docs-modal .modal-body {
+    overflow-y: auto;
+}
+
+/* --------------------------------------------------------------------------
+   页面容器
+   -------------------------------------------------------------------------- */
+.docs-page {
+    padding-bottom: 8px;
+}
+
+/* --------------------------------------------------------------------------
+   筛选卡片
+   -------------------------------------------------------------------------- */
+.docs-filter {
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid var(--docs-border);
+    border-radius: var(--docs-radius);
+    background-color: var(--bs-tertiary-bg, rgba(0, 0, 0, .02));
+}
+
+.docs-filter__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+.docs-filter__item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1 1 160px;
+    min-width: 0;
+}
+
+.docs-filter__item--wide {
+    flex: 2 1 240px;
+}
+
+.docs-filter__item--actions {
+    flex: 0 0 auto;
+}
+
+.docs-filter__label {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--bs-secondary-color, #6c757d);
+}
+
+.docs-filter__actions {
+    display: flex;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
+/* --------------------------------------------------------------------------
+   表格卡片与工具栏
+   -------------------------------------------------------------------------- */
+.docs-table-card {
+    padding: 16px;
+    border: 1px solid var(--docs-border);
+    border-radius: var(--docs-radius);
+    background-color: var(--bs-body-bg, #fff);
+}
+
+.docs-table-card .toolbar,
+.docs-table-card #toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 12px;
+    min-height: 32px;
+}
+
+.docs-table-card .toolbar:empty,
+.docs-table-card #toolbar:empty {
+    display: none;
+}
+
+/* 表头更轻、行更紧凑 */
+.docs-table-card .table > thead > tr > th {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--bs-secondary-color, #6c757d);
+    white-space: nowrap;
+}
+
+.docs-table-card .table > tbody > tr > td {
+    vertical-align: middle;
+}
+
+/* 操作列按钮更紧凑 */
+.docs-table-card .table > tbody > tr > td .btn + .btn {
+    margin-left: 4px;
+}
+
+/* --------------------------------------------------------------------------
+   少量辅助
+   -------------------------------------------------------------------------- */
+.docs-hint {
+    margin: 0;
+    font-size: 12px;
+    color: var(--bs-secondary-color, #6c757d);
+}
+
+/* 抽屉 / 模态内的分区标题（表单片段使用） */
+.docs-form-section {
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--docs-border);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bs-secondary-color, #6c757d);
+}
+
+/* --------------------------------------------------------------------------
+   列表空态（与「加载失败」区分：这是「筛选无结果」）
+   -------------------------------------------------------------------------- */
+.docs-empty {
+    padding: 48px 16px;
+    text-align: center;
+    color: var(--bs-secondary-color, #6c757d);
+}
+
+.docs-empty .bi {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 34px;
+    opacity: .55;
+}
+
+.docs-empty__title {
+    margin: 0 0 4px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.docs-empty__hint {
+    margin: 0;
+    font-size: 12.5px;
+    opacity: .85;
+}
+
+/* --------------------------------------------------------------------------
+   工作台（概览页）
+   -------------------------------------------------------------------------- */
+.docs-stat {
+    display: block;
+    height: 100%;
+    padding: 16px;
+    border: 1px solid var(--docs-border);
+    border-radius: var(--docs-radius);
+    background-color: var(--bs-body-bg, #fff);
+    color: inherit;
+    text-decoration: none;
+    transition: border-color .15s, box-shadow .15s, transform .15s;
+}
+
+.docs-stat:hover {
+    border-color: var(--bs-primary, #0d6efd);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, .07);
+    transform: translateY(-2px);
+    color: inherit;
+}
+
+.docs-stat__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    margin-bottom: 10px;
+    border-radius: .6rem;
+    font-size: 19px;
+}
+
+.docs-stat__label {
+    font-size: 12.5px;
+    color: var(--bs-secondary-color, #6c757d);
+}
+
+.docs-stat__value {
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.docs-todo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--docs-border);
+    border-radius: var(--docs-radius);
+    background-color: var(--bs-body-bg, #fff);
+    color: inherit;
+    text-decoration: none;
+    transition: border-color .15s, background-color .15s;
+}
+
+.docs-todo:hover {
+    border-color: var(--bs-primary, #0d6efd);
+    color: inherit;
+}
+
+.docs-todo__count {
+    margin-left: auto;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.docs-recent {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.docs-recent th,
+.docs-recent td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--docs-border);
+    font-size: 13.5px;
+    vertical-align: middle;
+}
+
+.docs-recent th {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--bs-secondary-color, #6c757d);
+    white-space: nowrap;
+}
+
+.docs-recent tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.docs-recent tbody tr:hover {
+    background-color: var(--bs-tertiary-bg, rgba(0, 0, 0, .02));
+}
+
+/* --------------------------------------------------------------------------
+   表头（跟随主题色，替代 Bootstrap 的 table-light 固定浅色）
+   -------------------------------------------------------------------------- */
+.docs-thead > tr > th {
+    background-color: var(--bs-tertiary-bg, rgba(0, 0, 0, .03)) !important;
+    color: var(--bs-secondary-color, #6c757d);
+    font-size: 12.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    border-bottom-color: var(--bs-border-color, #dee2e6) !important;
+}
+
+/* --------------------------------------------------------------------------
+   文档编辑页（独立页面，由列表页 ws-layer iframe 载入）
+   -------------------------------------------------------------------------- */
+.docs-form-page {
+    padding: 12px 16px 24px;
+    background-color: var(--bs-body-bg, #fff);
+}
+
+.docs-form__bar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin: -12px -16px 16px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--docs-border);
+    background-color: var(--bs-body-bg, #fff);
+}
+
+.docs-form__heading {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+/* 弹层 iframe 内：标题已由弹层标题栏承担，页内标题隐藏 */
+.docs-form--embedded .docs-form__heading {
+    display: none;
+}
+
+.docs-form__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.docs-form__card {
+    margin-bottom: 16px;
+    border: 1px solid var(--docs-border);
+    border-radius: var(--docs-radius);
+    background-color: var(--bs-body-bg, #fff);
+}
+
+.docs-form__card > .docs-form__card-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--docs-border);
+    font-size: 13.5px;
+    font-weight: 600;
+}
+
+.docs-form__card > .docs-form__card-head .bi {
+    color: var(--bs-primary, #0d6efd);
+}
+
+.docs-form__card > .docs-form__card-body {
+    padding: 16px;
+}
+
+/* 右侧设置栏：滚动时保持可见 */
+.docs-form__aside {
+    position: sticky;
+    top: 64px;
+}
+
+@media (max-width: 991.98px) {
+    .docs-form__aside {
+        position: static;
+    }
+}
+
+.docs-form__divider {
+    margin: 14px 0;
+    border-top: 1px dashed var(--docs-border);
+}
+
+/* --------------------------------------------------------------------------
+   正文编辑器（wiseeditor）容器
+   -------------------------------------------------------------------------- */
+.docs-editor-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.docs-editor-format {
+    margin-left: auto;
+    min-width: 140px;
+}
+
+.docs-editor-slot .wiseeditor-container,
+.docs-editor-slot .wiseeditor-wrapper {
+    border: 1px solid var(--docs-border);
+    border-radius: .5rem;
+    overflow: hidden;
+}
+
+/* 降级 textarea 与编辑器区域高度对齐 */
+.docs-editor-slot > textarea.form-control {
+    border-radius: .5rem;
+}
+
+/* 正文校验失败态（WsFormValidator 会给 uiTarget 加 is-invalid） */
+.docs-editor-slot.is-invalid .wiseeditor-container,
+.docs-editor-slot.is-invalid .wiseeditor-wrapper,
+.docs-editor-slot.is-invalid > textarea.form-control {
+    border-color: var(--bs-danger, #dc3545) !important;
+    box-shadow: 0 0 0 .2rem rgba(var(--bs-danger-rgb, 220, 53, 69), .12);
+}
+
+/* --------------------------------------------------------------------------
+   发布前差异对比
+   -------------------------------------------------------------------------- */
+.docs-diff-host {
+    max-height: 58vh;
+    overflow: auto;
+    border: 1px solid var(--docs-border);
+    border-radius: .5rem;
+    background-color: var(--bs-body-bg, #fff);
+}
+
+.docs-diff {
+    width: 100%;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12.5px;
+    line-height: 1.6;
+}
+
+.docs-diff__row {
+    display: flex;
+    gap: 8px;
+    padding: 1px 10px;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.docs-diff__no {
+    flex: 0 0 40px;
+    color: var(--bs-secondary-color, #6c757d);
+    text-align: right;
+    opacity: .7;
+    user-select: none;
+}
+
+.docs-diff__text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.docs-diff__row--add {
+    background-color: rgba(var(--bs-success-rgb, 25, 135, 84), .12);
+}
+
+.docs-diff__row--add .docs-diff__text::before {
+    content: '+ ';
+    color: var(--bs-success, #198754);
+}
+
+.docs-diff__row--del {
+    background-color: rgba(var(--bs-danger-rgb, 220, 53, 69), .12);
+}
+
+.docs-diff__row--del .docs-diff__text::before {
+    content: '- ';
+    color: var(--bs-danger, #dc3545);
+}
+
+.docs-diff__empty {
+    padding: 24px;
+    text-align: center;
+    color: var(--bs-secondary-color, #6c757d);
+}
+
+/* 待发布徽章 */
+.docs-badge-pending {
+    background-color: rgba(var(--bs-warning-rgb, 255, 193, 7), .18);
+    color: var(--bs-warning-text-emphasis, #997404);
+}

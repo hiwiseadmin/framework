@@ -1,0 +1,94 @@
+{
+    "name": "demo",
+    "title": "示例插件",
+    "version": "1.0.0",
+    "description": "WiseAdmin 插件开发示例：后台页面 / JSON API / 会员前台页 / 会员中心入口 / 多语言 / 静态资源，同时作为 manifest.json 字段的完整规范实例",
+    "author": "wiseAdmin",
+    "develop": true,
+    "service_provider": "plugin\\demo\\BootServiceProvider",
+    "dependencies": {},
+    "packages": {
+        "wiseadmin/wise-member": {
+            "constraint": "*",
+            "required": false
+        }
+    },
+    "icon": {
+        "type": "bi",
+        "value": "bi bi-box",
+        "color": "#0d6efd"
+    },
+    "menus": [
+        {
+            "name": "示例插件",
+            "icon": "bi bi-box",
+            "path": "",
+            "component": "",
+            "sort": 90,
+            "type": "dir",
+            "status": 1,
+            "children": [
+                {
+                    "name": "插件首页",
+                    "icon": "bi bi-house",
+                    "path": "/plugin/demo/index",
+                    "component": "",
+                    "sort": 0,
+                    "type": "menu",
+                    "status": 1,
+                    "children": [
+                        {
+                            "name": "接口连通性",
+                            "icon": "",
+                            "path": "/api/demo/test/ping",
+                            "component": "",
+                            "sort": 0,
+                            "type": "button",
+                            "status": 1
+                        },
+                        {
+                            "name": "参数回显",
+                            "icon": "",
+                            "path": "/api/demo/test/echo",
+                            "component": "",
+                            "sort": 1,
+                            "type": "button",
+                            "status": 1
+                        },
+                        {
+                            "name": "统一错误响应",
+                            "icon": "",
+                            "path": "/api/demo/test/errors",
+                            "component": "",
+                            "sort": 2,
+                            "type": "button",
+                            "status": 1
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "permissions": [
+        {
+            "name": "请求信息调试",
+            "ident": "demo.test.method",
+            "method": "POST",
+            "type": "custom",
+            "description": "POST /api/demo/test/method —— 无对应菜单按钮的独立权限示例"
+        }
+    ],
+    "config": {
+        "enable": {
+            "type": "radio",
+            "title": "启用插件",
+            "value": "1",
+            "options": {
+                "1": "启用",
+                "0": "禁用"
+            }
+        }
+    },
+    "slots": {},
+    "vendor": {}
+}

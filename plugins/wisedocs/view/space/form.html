@@ -1,0 +1,62 @@
+<!-- 空间 新增/编辑 模态框片段（由 space/index.html 通过 {include} 引入） -->
+<div class="modal fade" id="space-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered docs-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="form-title">新增空间</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+            </div>
+            <form id="space-form" class="modal-body row g-3">
+                <input type="hidden" name="id" id="form-id" value="0">
+                <div class="col-md-6">
+                    <label class="form-label">空间名称 <span class="text-danger">*</span></label>
+                    <input type="text" name="name" id="form-name" class="form-control"
+                           data-validation="required|maxLength:50"
+                           data-validation-message-required="请填写空间名称"
+                           data-validation-message-maxLength="空间名称不能超过 50 个字符">
+                    <div class="invalid-feedback"><span class="validation-text"></span></div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">空间编码 <span class="text-danger">*</span></label>
+                    <input type="text" name="code" id="form-code" class="form-control" placeholder="如 default"
+                           data-validation="required|match:^[a-z0-9_-]+$"
+                           data-validation-message-required="请填写空间编码"
+                           data-validation-message-match="编码只能包含小写字母、数字、下划线和连字符">
+                    <div class="invalid-feedback"><span class="validation-text"></span></div>
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label">独立域名</label>
+                    <input type="text" name="domain" id="form-domain" class="form-control"
+                           placeholder="如 docs.example.com（留空则按路径访问）">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">主题</label>
+                    <select name="theme" id="form-theme" class="form-select">
+                        <option value="default">默认主题</option>
+                        <option value="blue">蓝色主题</option>
+                    </select>
+                    <div class="form-text">主题对应前台 theme-*.css 品牌色覆盖，新增主题需放置同名样式文件。</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">排序</label>
+                    <input type="number" name="sort_order" id="form-sort" class="form-control" value="0">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">状态</label>
+                    <select name="status" id="form-status" class="form-select">
+                        <option value="1">启用</option>
+                        <option value="0">禁用</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">描述</label>
+                    <textarea name="description" id="form-description" class="form-control" rows="2"></textarea>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" form="space-form" class="btn btn-primary"><i class="bi bi-check-lg"></i> 保存</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,86 @@
+<?php
+
+declare(strict_types=1);
+
+namespace wise\plugin\adapter;
+
+use wise\support\tools\DirFile;
+use wise\support\context\ContextualLogger;
+
+/**
+ * 静态资源管理器 — 管理插件静态资源的复制和清理。
+ *
+ * 源目录：plugins/{ident}/statics/
+ * 目标目录：public/statics/plugins/{ident}/
+ */
+class AssetManager
+{
+    /**
+     * 插件目录根路径。
+     *
+     * @var string
+     */
+    protected string $pluginPath;
+
+    /**
+     * 公共静态资源目录根路径。
+     *
+     * @var string
+     */
+    protected string $publicPath;
+
+    public function __construct()
+    {
+        $this->pluginPath = plugin_path();
+        $this->publicPath = public_path() . 'statics' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR;
+    }
+
+    /**
+     * 复制插件静态资源到公共目录。
+     *
+     * @param string $pluginIdent 插件标识
+     * @return bool
+     */
+    public function copyAssets(string $pluginIdent): bool
+    {
+        $sourceDir = $this->pluginPath . $pluginIdent . DIRECTORY_SEPARATOR . 'statics' . DIRECTORY_SEPARATOR;
+        $targetDir = $this->publicPath . $pluginIdent . DIRECTORY_SEPARATOR;
+
+        if (!is_dir($sourceDir)) {
+            return true; // 无静态资源目录，跳过
+        }
+
+        try {
+            DirFile::copyDirs($sourceDir, $targetDir);
+            ContextualLogger::info("插件静态资源复制成功：{$pluginIdent}");
+            return true;
+        } catch (\Throwable $e) {
+            ContextualLogger::error("插件静态资源复制失败：{$pluginIdent}，" . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * 删除插件静态资源。
+     *
+     * @param string $pluginIdent 插件标识
+     * @return bool
+     */
+    public function removeAssets(string $pluginIdent): bool
+    {
+        $targetDir = $this->publicPath . $pluginIdent . DIRECTORY_SEPARATOR;
+
+        if (!is_dir($targetDir)) {
+            return true;
+        }
+
+        try {
+            DirFile::rmDirs($targetDir);
+            ContextualLogger::info("插件静态资源删除成功：{$pluginIdent}");
+            return true;
+        } catch (\Throwable $e) {
+            ContextualLogger::error("插件静态资源删除失败：{$pluginIdent}，" . $e->getMessage());
+            return false;
+        }
+    }
+}

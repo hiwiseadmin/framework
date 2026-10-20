@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WsDatePicker 演示</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="/statics/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="/statics/libs/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="/statics/js/highlight/styles/vs-dark.css">
+    <script src="/statics/js/highlight/js/highlight.min.js"></script>
+    <script src="/statics/js/highlight/js/highlight.min.js"></script>
+    <style>
+        .demo-section {
+            background: var(--bs-body-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid var(--bs-border-color);
+        }
+        
+        .code-block {
+            background: var(--bs-secondary-bg);
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-top: 15px;
+            border: 1px solid var(--bs-border-color);
+        }
+        
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .picker-preview {
+            border: 1px solid var(--bs-border-color);
+            border-radius: 5px;
+            padding: 15px;
+            background: var(--bs-body-bg);
+        }
+        
+        .feature-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .feature-list li:before {
+            content: "✓ ";
+            color: #28a745;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 内容区域将在下面填充 -->
+<div class="container mt-5">
+    <h1 class="mb-4">WsDatePicker 日期选择器</h1>
+    
+    <!-- 基本示例 -->
+    <section class="demo-section">
+        <h2>1. 基本示例</h2>
+        <p class="text-muted">最简单的日期选择器用法</p>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="picker-preview">
+                    <div class="mb-3">
+                        <label for="basic-date" class="form-label">选择日期</label>
+                        <input type="text" id="basic-date" class="form-control" placeholder="点击选择日期">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="code-block">
+                    <pre><code class="language-javascript">
+// JavaScript
+$('#basic-date').wsDatePicker({
+    format: 'yyyy-MM-dd',
+    onChange: function(date, value) {
+        console.log('选择日期:', date, '值:', value);
+    }
+});
+                    </code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 多种类型 -->
+    <section class="demo-section">
+        <h2>2. 多种类型</h2>
+        <p class="text-muted">支持日期、时间、日期时间、日期范围等类型</p>
+        
+        <div class="demo-grid">
+            <div class="picker-preview">
+                <div class="mb-3">
+                    <label class="form-label">日期选择</label>
+                    <input type="text" id="type-date" class="form-control" placeholder="yyyy-MM-dd">
+                </div>
+            </div>
+            
+            <div class="picker-preview">
+                <div class="mb-3">
+                    <label class="form-label">时间选择</label>
+                    <input type="text" id="type-time" class="form-control" placeholder="HH:mm">
+                </div>
+            </div>
+            
+            <div class="picker-preview">
+                <div class="mb-3">
+                    <label class="form-label">日期时间</label>
+                    <input type="text" id="type-datetime" class="form-control" placeholder="yyyy-MM-dd HH:mm">
+                </div>
+            </div>
+            
+            <div class="picker-preview">
+                <div class="mb-3">
+                    <label class="form-label">日期范围</label>
+                    <input type="text" id="type-range" class="form-control" placeholder="开始日期 - 结束日期">
+                </div>
+            </div>
+        </div>
+        
+        <div class="code-block mt-3">
+            <pre><code class="language-javascript">
+// 日期选择
+$('#type-date').wsDatePicker({
+    type: 'date',
+    format: 'yyyy-MM-dd'
+});
+
+// 时间选择
+$('#type-time').wsDatePicker({
+    type: 'time',
+    format: 'HH:mm'
+});
+
+// 日期时间选择
+$('#type-datetime').wsDatePicker({
+    type: 'datetime',
+    format: 'yyyy-MM-dd HH:mm'
+});
+
+// 日期范围选择
+$('#type-range').wsDatePicker({
+    type: 'date',
+    range: true,
+    format: 'yyyy-MM-dd',
+    rangeSeparator: ' - '
+});
+                    </code></pre>
+        </div>
+    </section>
+    
+    <!-- 配置选项 -->
+    <section class="demo-section">
+        <h2>3. 配置选项</h2>
+        <p class="text-muted">丰富的配置选项，满足不同需求</p>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="picker-preview">
+                    <div class="mb-3">
+                        <label class="form-label">自定义格式</label>
+                        <input type="text" id="custom-format" class="form-control" value="2024-01-15">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">设置最小/最大日期</label>
+                        <input type="text" id="min-max" class="form-control" placeholder="选择日期">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">静态显示模式</label>
+                        <input type="text" id="static-mode" class="form-control" placeholder="静态显示">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="code-block">
+                    <pre><code class="language-javascript">
+// 自定义格式
+$('#custom-format').wsDatePicker({
+    format: 'yyyy年MM月dd日',
+    value: '2024-01-15'
+});
+
+// 设置最小/最大日期
+$('#min-max').wsDatePicker({
+    min: '2024-01-01',
+    max: '2024-12-31',
+    disabledDate: function(date) {
+        // 禁用周末
+        return date.getDay() === 0 || date.getDay() === 6;
+    }
+});
+
+// 静态显示模式
+$('#static-mode').wsDatePicker({
+    popup: false,
+    showQuickSelect: true
+});
+                    </code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 主题和语言 -->
+    <section class="demo-section">
+        <h2>4. 主题和语言</h2>
+        <p class="text-muted">支持多种主题和国际化</p>
+        
+        <div class="demo-grid">
+            <div class="picker-preview">
+                <div class="mb-3">
+                    <label class="form-label">中文界面</label>
+                    <input type="text" id="lang-zh" class="form-control" placeholder="选择日期">
+                </div>
+            </div>
+            
+            <div class="picker-preview">
+                <div class="mb-3">
+                    <label class="form-label">English</label>
+                    <input type="text" id="lang-en" class="form-control" placeholder="Select date">
+                </div>
+            </div>
+                        
+            <div class="picker-preview">
+                <div class="mb-3">
+                    <label class="form-label">自定义周起始日</label>
+                    <input type="text" id="week-start" class="form-control" placeholder="选择日期">
+                </div>
+            </div>
+        </div>
+        
+        <div class="code-block mt-3">
+            <pre><code class="language-javascript">
+// 中文界面（默认）
+$('#lang-zh').wsDatePicker({
+    lang: 'zh-CN'
+});
+
+// 英文界面
+$('#lang-en').wsDatePicker({
+    lang: 'en',
+    format: 'MM/dd/yyyy'
+});
+
+// 自定义周起始日（周一）
+$('#week-start').wsDatePicker({
+    weekStart: 1
+});
+                    </code></pre>
+        </div>
+    </section>
+    
+    <!-- 方法和事件 -->
+    <section class="demo-section">
+        <h2>5. 方法和事件</h2>
+        <p class="text-muted">通过API控制选择器，监听各种事件</p>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="picker-preview">
+                    <div class="mb-3">
+                        <label class="form-label">方法演示</label>
+                        <input type="text" id="methods-demo" class="form-control" placeholder="选择日期">
+                    </div>
+                    
+                    <div class="btn-group mb-3">
+                        <button id="btn-show" class="btn btn-primary">显示</button>
+                        <button id="btn-hide" class="btn btn-secondary">隐藏</button>
+                        <button id="btn-toggle" class="btn btn-info">切换</button>
+                        <button id="btn-set" class="btn btn-success">设置值</button>
+                        <button id="btn-get" class="btn btn-warning">获取值</button>
+                        <button id="btn-clear" class="btn btn-danger">清空</button>
+                    </div>
+                    
+                    <div class="alert alert-info" id="event-log" style="max-height: 200px; overflow-y: auto;">
+                        <small>事件日志：</small><br>
+                        <div id="log-content"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="code-block">
+                    <pre><code class="language-javascript">
+// 初始化
+var picker = $('#methods-demo').wsDatePicker({
+    onChange: function(date, value) {
+        logEvent('onChange', value);
+    },
+    onSelect: function(date, value) {
+        logEvent('onSelect', value);
+    },
+    onOpen: function() {
+        logEvent('onOpen');
+    },
+    onClose: function() {
+        logEvent('onClose');
+    }
+}).data('wsDatePicker');
+
+// 方法调用
+$('#btn-show').click(() => picker.show());
+$('#btn-hide').click(() => picker.hide());
+$('#btn-toggle').click(() => picker.toggle());
+$('#btn-set').click(() => picker.setValue('2024-12-25'));
+$('#btn-get').click(() => {
+    alert('当前值: ' + picker.getValue());
+});
+$('#btn-clear').click(() => picker.clear());
+
+// 事件日志函数
+function logEvent(event, value) {
+    const time = new Date().toLocaleTimeString();
+    const message = `[${time}] ${event}: ${value || ''}`;
+    $('#log-content').prepend(`<small>${message}</small><br>`);
+}
+                    </code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 完整配置说明 -->
+    <section class="demo-section">
+        <h2>6. 完整配置说明</h2>
+        
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>参数</th>
+                        <th>类型</th>
+                        <th>默认值</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>type</td>
+                        <td>string</td>
+                        <td>'date'</td>
+                        <td>选择器类型：'date', 'time', 'datetime', 'year', 'month'</td>
+                    </tr>
+                    <tr>
+                        <td>format</td>
+                        <td>string</td>
+                        <td>'yyyy-MM-dd'</td>
+                        <td>日期格式：yyyy, yy, MM, M, dd, d, HH, H, mm, m, ss, s</td>
+                    </tr>
+                    <tr>
+                        <td>value</td>
+                        <td>string/Date</td>
+                        <td>null</td>
+                        <td>初始值</td>
+                    </tr>
+                    <tr>
+                        <td>range</td>
+                        <td>boolean</td>
+                        <td>false</td>
+                        <td>是否为范围选择</td>
+                    </tr>
+                    <tr>
+                        <td>rangeSeparator</td>
+                        <td>string</td>
+                        <td>' - '</td>
+                        <td>范围分隔符</td>
+                    </tr>
+                    <tr>
+                        <td>popup</td>
+                        <td>boolean</td>
+                        <td>true</td>
+                        <td>是否弹窗方式显示</td>
+                    </tr>
+                    <tr>
+                        <td>lang</td>
+                        <td>string</td>
+                        <td>'zh-CN'</td>
+                        <td>语言：'zh-CN', 'en'</td>
+                    </tr>
+                    <tr>
+                        <td>weekStart</td>
+                        <td>number</td>
+                        <td>0</td>
+                        <td>周起始日：0(周日) 到 6(周六)</td>
+                    </tr>
+                    <tr>
+                        <td>showToday</td>
+                        <td>boolean</td>
+                        <td>true</td>
+                        <td>是否显示今天按钮</td>
+                    </tr>
+                    <tr>
+                        <td>showClear</td>
+                        <td>boolean</td>
+                        <td>true</td>
+                        <td>是否显示清空按钮</td>
+                    </tr>
+                    <tr>
+                        <td>showConfirm</td>
+                        <td>boolean</td>
+                        <td>true</td>
+                        <td>是否显示确定按钮</td>
+                    </tr>
+                    <tr>
+                        <td>showQuickSelect</td>
+                        <td>boolean</td>
+                        <td>true</td>
+                        <td>是否显示快速选择</td>
+                    </tr>
+                    <tr>
+                        <td>disabledDate</td>
+                        <td>function</td>
+                        <td>null</td>
+                        <td>禁用日期函数，返回true禁用</td>
+                    </tr>
+                    <tr>
+                        <td>onChange</td>
+                        <td>function</td>
+                        <td>null</td>
+                        <td>值变化回调</td>
+                    </tr>
+                    <tr>
+                        <td>onSelect</td>
+                        <td>function</td>
+                        <td>null</td>
+                        <td>选择回调</td>
+                    </tr>
+                    <tr>
+                        <td>onOpen</td>
+                        <td>function</td>
+                        <td>null</td>
+                        <td>打开回调</td>
+                    </tr>
+                    <tr>
+                        <td>onClose</td>
+                        <td>function</td>
+                        <td>null</td>
+                        <td>关闭回调</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    
+    <!-- 特性列表 -->
+    <section class="demo-section">
+        <h2>7. 特性列表</h2>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <ul class="feature-list">
+                    <li>支持所有主流浏览器</li>
+                    <li>响应式设计，适配移动端</li>
+                    <li>键盘导航支持（ESC关闭）</li>
+                    <li>多种日期格式支持</li>
+                    <li>内置快速选择功能</li>
+                    <li>可自定义禁用日期</li>
+                    <li>事件驱动，易于集成</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <ul class="feature-list">
+                    <li>基于 Bootstrap 5 设计</li>
+                    <li>无外部CSS依赖</li>
+                    <li>轻量级（压缩后约20KB）</li>
+                    <li>支持AMD/CommonJS/全局变量</li>
+                    <li>详细的API文档</li>
+                    <li>活跃的维护更新</li>
+                    <li>MIT开源协议</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+<!-- 在演示文档末尾添加 -->
+<section class="demo-section">
+    <h2>8. 进阶用法</h2>
+    <p class="text-muted">高级功能和实际应用场景</p>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="picker-preview">
+                <div class="mb-3">
+                    <label class="form-label">动态禁用日期</label>
+                    <input type="text" id="advanced-disabled" class="form-control" placeholder="选择日期">
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">联动选择器</label>
+                    <div class="row">
+                        <div class="col">
+                            <input type="text" id="start-date" class="form-control" placeholder="开始日期">
+                        </div>
+                        <div class="col-auto align-self-center">至</div>
+                        <div class="col">
+                            <input type="text" id="end-date" class="form-control" placeholder="结束日期">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">带标记的日期</label>
+                    <input type="text" id="marked-dates" class="form-control" placeholder="选择日期">
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="code-block">
+                <pre><code class="language-javascript">
+// 动态禁用日期
+$('#advanced-disabled').wsDatePicker({
+    disabledDate: function(date) {
+        // 禁用今天之前的日期
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return date < today;
+    }
+});
+
+// 联动选择器
+var startPicker = $('#start-date').wsDatePicker({
+    format: 'yyyy-MM-dd',
+    onChange: function(date) {
+        if (date) {
+            // 设置结束日期的最小值为开始日期
+            endPicker.setOption('min', date);
+        }
+    }
+}).data('wsDatePicker');
+
+var endPicker = $('#end-date').wsDatePicker({
+    format: 'yyyy-MM-dd',
+    min: new Date() // 默认最小值为今天
+}).data('wsDatePicker');
+
+// 带标记的日期
+$('#marked-dates').wsDatePicker({
+    mark: {
+        '2024-01-01': '元旦',
+        '2024-02-10': '春节',
+        '2024-05-01': '劳动节',
+        '2024-10-01': '国庆节'
+    },
+    onChange: function(date, value) {
+        const marks = {
+            '2024-01-01': '元旦',
+            '2024-02-10': '春节',
+            '2024-05-01': '劳动节',
+            '2024-10-01': '国庆节'
+        };
+        
+        if (marks[value]) {
+            alert('今天是：' + marks[value]);
+        }
+    }
+});
+
+// 动态更新配置
+function updatePickerOptions() {
+    const picker = $('#marked-dates').data('wsDatePicker');
+    picker.setOption('lang', 'en');
+}
+                </code></pre>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="demo-section">
+    <h2>9. 移动端适配</h2>
+    <p class="text-muted">在移动设备上的优化体验</p>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="picker-preview">
+                <div class="mb-3">
+                    <label class="form-label">移动端优化</label>
+                    <input type="text" id="mobile-optimized" class="form-control" placeholder="点击选择">
+                </div>
+                
+                <div class="alert alert-info">
+                    <small>在移动设备上：</small>
+                    <ul class="mb-0">
+                        <li>选择器会居中显示</li>
+                        <li>触摸操作优化</li>
+                        <li>更大的点击区域</li>
+                        <li>滑动选择时间</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="code-block">
+                <pre><code class="language-javascript">
+// 移动端优化配置
+$('#mobile-optimized').wsDatePicker({
+    type: 'datetime',
+    format: 'yyyy-MM-dd HH:mm',
+    
+    // 移动端特定配置
+    mobile: true,
+    touchEnabled: true,
+    
+    // 简化界面
+    showFooter: true,
+    showHeader: true,
+    
+    onChange: function(date, value) {
+        if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
+            // 移动端特定处理
+            console.log('移动端选择:', value);
+        }
+    }
+});
+
+// 检测移动设备
+function isMobileDevice() {
+    return /Mobi|Android|iPhone/i.test(navigator.userAgent);
+}
+
+// 根据设备类型调整配置
+if (isMobileDevice()) {
+    $.wsDatePicker.setDefaults({
+        popup: false,
+        showQuickSelect: false
+    });
+}
+                </code></pre>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="demo-section">
+    <h2>10. 常见问题</h2>
+    
+    <div class="accordion" id="faqAccordion">
+        <div class="accordion-item">
+            <h3 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                    Q: 如何设置默认值？
+                </button>
+            </h3>
+            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    <p>通过 <code class="language-javascript">value</code> 参数设置默认值：</p>
+                    <div class="code-block">
+                    <pre><code class="language-javascript">
+$('#picker').wsDatePicker({
+    value: '2024-01-01',
+    format: 'yyyy-MM-dd'
+});
+                    </code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="accordion-item">
+            <h3 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                    Q: 如何禁用特定日期？
+                </button>
+            </h3>
+            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    <p>使用 <code class="language-javascript">disabledDate</code> 回调函数：</p>
+                    <div class="code-block">
+                    <pre><code class="language-javascript">
+$('#picker').wsDatePicker({
+    disabledDate: function(date) {
+        // 禁用周末
+        const day = date.getDay();
+        return day === 0 || day === 6;
+        
+        // 禁用特定日期
+        const disabledDates = ['2024-01-01', '2024-05-01'];
+        const dateStr = utils.formatDate(date, 'yyyy-MM-dd');
+        return disabledDates.includes(dateStr);
+    }
+});
+                    </code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="accordion-item">
+            <h3 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                    Q: 如何动态更新选择器配置？
+                </button>
+            </h3>
+            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    <p>获取选择器实例后调用 <code class="language-javascript">setOption</code> 方法：</p>
+                    <div class="code-block">
+                    <pre><code class="language-javascript">
+var picker = $('#picker').data('wsDatePicker');
+picker.setOption('min', '2024-01-01');
+picker.setOption('max', '2024-12-31');
+picker.setOption('lang', 'en');
+                    </code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="accordion-item">
+            <h3 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                    Q: 如何在表单验证中使用？
+                </button>
+            </h3>
+            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    <p>与其他表单验证库集成：</p>
+                    <div class="code-block">
+                    <pre><code class="language-javascript">
+// 配合 Bootstrap 5 表单验证
+$('#myForm').submit(function(e) {
+    e.preventDefault();
+    
+    const dateValue = $('#date-picker').val();
+    if (!dateValue) {
+        $('#date-picker').addClass('is-invalid');
+        return;
+    }
+    
+    // 验证逻辑
+    const date = utils.parseDate(dateValue, 'yyyy-MM-dd');
+    if (date < new Date()) {
+        alert('不能选择过去的日期');
+        return;
+    }
+    
+    this.submit();
+});
+
+// 清除验证状态
+$('#date-picker').on('change', function() {
+    $(this).removeClass('is-invalid');
+});
+                    </code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</div>
+    <!-- jQuery -->
+    <script src="/statics/js/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 5 JS -->
+    <script src="/statics/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- WsDatePicker JS -->
+    <!-- 组件为原生 ESM，可直接加载源码：改完组件刷新即可，无需任何构建。
+         样式必须单独 link —— 组件刻意不 import CSS，否则浏览器会因 MIME 类型
+         是 text/css 而拒绝加载整个模块。 -->
+    <link rel="stylesheet" href="ws-date-picker.css">
+    <script type="module" src="ws-date-picker.js"></script>
+    <script src="/statics/js/theme.js"></script>
+    
+<script>
+$(document).ready(function() {
+    // 1. 基本示例
+    $('#basic-date').wsDatePicker({
+        format: 'yyyy-MM-dd',
+        onChange: function(date, value) {
+            console.log('选择日期:', date, '值:', value);
+        }
+    });
+
+    // 2. 多种类型
+    $('#type-date').wsDatePicker({
+        type: 'date',
+        format: 'yyyy-MM-dd'
+    });
+
+    $('#type-time').wsDatePicker({
+        type: 'time',
+        format: 'HH:mm'
+    });
+
+    $('#type-datetime').wsDatePicker({
+        type: 'datetime',
+        format: 'yyyy-MM-dd HH:mm'
+    });
+
+    $('#type-range').wsDatePicker({
+        type: 'date',
+        range: true,
+        format: 'yyyy-MM-dd',
+        rangeSeparator: ' - '
+    });
+
+    // 3. 配置选项
+    $('#custom-format').wsDatePicker({
+        format: 'yyyy年MM月dd日',
+        value: '2024-01-15'
+    });
+
+    $('#min-max').wsDatePicker({
+        min: '2024-01-01',
+        max: '2024-12-31',
+        disabledDate: function(date) {
+            // 禁用周末
+            return date.getDay() === 0 || date.getDay() === 6;
+        }
+    });
+
+    $('#static-mode').wsDatePicker({
+        popup: false,
+        showQuickSelect: true
+    });
+
+    // 4. 主题和语言
+    $('#lang-zh').wsDatePicker({
+        lang: 'zh-CN'
+    });
+
+    $('#lang-en').wsDatePicker({
+        lang: 'en',
+        format: 'MM/dd/yyyy'
+    });
+
+    $('#week-start').wsDatePicker({
+        weekStart: 1
+    });
+
+    // 5. 方法和事件
+    var picker = $('#methods-demo').wsDatePicker({
+        onChange: function(date, value) {
+            logEvent('onChange', value);
+        },
+        onSelect: function(date, value) {
+            logEvent('onSelect', value);
+        },
+        onOpen: function() {
+            logEvent('onOpen');
+        },
+        onClose: function() {
+            logEvent('onClose');
+        }
+    }).data('wsDatePicker');
+
+    $('#btn-show').click(() => picker.show());
+    $('#btn-hide').click(() => picker.hide());
+    $('#btn-toggle').click(() => picker.toggle());
+    $('#btn-set').click(() => picker.setValue('2024-12-25'));
+    $('#btn-get').click(() => {
+        alert('当前值: ' + picker.getValue());
+    });
+    $('#btn-clear').click(() => picker.clear());
+
+    // 事件日志函数
+    function logEvent(event, value) {
+        const time = new Date().toLocaleTimeString();
+        const message = `[${time}] ${event}: ${value || ''}`;
+        $('#log-content').prepend(`<small>${message}</small><br>`);
+    }
+
+    // 设置全局默认配置
+    $.wsDatePicker.setDefaults({
+        lang: 'zh-CN',
+        weekStart: 1
+    });
+
+    // 进阶用法的JavaScript代码
+$('#advanced-disabled').wsDatePicker({
+    disabledDate: function(date) {
+        // 禁用今天之前的日期
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return date < today;
+    }
+});
+
+// 联动选择器
+var startPicker = $('#start-date').wsDatePicker({
+    format: 'yyyy-MM-dd',
+    onChange: function(date) {
+        if (date) {
+            // 设置结束日期的最小值为开始日期
+            const minDate = new Date(date);
+            minDate.setDate(minDate.getDate() + 1);
+            endPicker.setOption('min', minDate);
+        }
+    }
+}).data('wsDatePicker');
+
+var endPicker = $('#end-date').wsDatePicker({
+    format: 'yyyy-MM-dd'
+}).data('wsDatePicker');
+
+// 带标记的日期
+$('#marked-dates').wsDatePicker({
+    mark: {
+        '2024-01-01': '元旦',
+        '2024-02-10': '春节',
+        '2024-05-01': '劳动节',
+        '2024-10-01': '国庆节'
+    },
+    onChange: function(date, value) {
+        const marks = {
+            '2024-01-01': '元旦',
+            '2024-02-10': '春节',
+            '2024-05-01': '劳动节',
+            '2024-10-01': '国庆节'
+        };
+        
+        if (marks[value]) {
+            console.log('今天是：' + marks[value]);
+        }
+    }
+});
+});
+</script>
+
+<script>
+    $(document).ready(function() {
+        hljs.highlightAll();
+    });
+    // document.addEventListener('DOMContentLoaded', (event) => {
+//   document.querySelectorAll('pre code').forEach((el) => {
+//     hljs.highlightElement(el);
+//   });
+// });
+</script>
+</body>
+</html>

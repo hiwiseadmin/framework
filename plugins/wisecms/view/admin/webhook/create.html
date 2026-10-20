@@ -1,0 +1,113 @@
+{extend name="__PLUGIN_VIEW__/base"}
+{block name="css"}<link rel="stylesheet" href="/statics/plugins/wisecms/css/wisecms-admin.css">{/block}
+{block name="title"}添加 Webhook{/block}
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-plus-circle" caption="添加 Webhook" buttongroup="" /}
+{include file="admin/common/site_switch" /}
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <!-- 投递模式 / 依赖状态由控制器下发（P0-40：queue 模式必须显式警告） -->
+                <div class="alert {if condition="$webhookInstalled !== true || $webhookMode === 'queue'"}alert-warning{else /}alert-light{/if} border py-2 mb-3 small">
+                    {if condition="$webhookInstalled !== true"}
+                    <div class="text-danger">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        <b>未检测到 wise-webhook 包</b>：保存后事件<b>不会真正发送</b>（`WebhookService::trigger()` 会静默短路）。
+                    </div>
+                    {/if}
+                    {if condition="$webhookMode === 'queue'"}
+                    <div class="text-danger">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        投递模式为 <code>queue</code>：<b>必须部署队列 worker</b>（<code>php think queue:work</code>），
+                        否则任务只入队、不会投递。
+                    </div>
+                    {/if}
+                    <div>
+                        当前投递模式：<code>{$webhookMode|default='auto'}</code>
+                        <span class="text-muted">（在「CMS 配置」中调整 <code>webhook_mode</code>）</span>
+                    </div>
+                </div>
+
+                <form id="webhookForm" method="post" action="{:plugin_url('wisecms/webhook/create')}">
+                    {:csrf_field()}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-name">名称 <span class="text-danger">*</span></label>
+                            <input id="cms-f-name" type="text" name="name" class="form-control" required maxlength="100"
+                                   placeholder="如 订单系统 / 企业微信机器人">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-url">回调地址 <span class="text-danger">*</span></label>
+                            <input id="cms-f-url" type="url" name="url" class="form-control" required maxlength="500"
+                                   placeholder="https://example.com/hook">
+                            <div class="form-text">需为对端可公网访问的地址（wise-webhook 内置 SSRF 防护）</div>
+                        </div>
+
+                        <div class="col-12 mb-3">
+                            <label class="form-label">触发事件 <span class="text-danger">*</span></label>
+                            <div id="eventChecks" class="d-flex flex-wrap gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" data-event="content.published"
+                                           id="ev-content-published">
+                                    <label class="form-check-label" for="ev-content-published">
+                                        <code>content.published</code> 内容发布
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" data-event="comment.created"
+                                           id="ev-comment-created">
+                                    <label class="form-check-label" for="ev-comment-created">
+                                        <code>comment.created</code> 新评论
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-text">
+                                以上是插件<b>实际会触发</b>的全部事件（`WebhookService::trigger()` 的调用点）。
+                            </div>
+                            <input type="text" class="form-control mt-2" id="eventsExtra" maxlength="400"
+                                   placeholder="其他事件（英文逗号分隔，可选；当前不会被触发）">
+                            <!-- 提交用的真实字段：由 js/webhook.js 在 submit 时合并勾选项与手填项 -->
+                            <input type="hidden" name="events" id="eventsValue">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="cms-f-secret">签名密钥（HMAC-SHA256）</label>
+                            <div class="input-group">
+                                <input id="cms-f-secret" type="password" name="secret" class="form-control" maxlength="64"
+                                       placeholder="留空则不签名" autocomplete="new-password">
+                                <button type="button" class="btn btn-outline-secondary" id="btn-secret-toggle"
+                                        title="显示 / 隐藏"><i class="bi bi-eye"></i></button>
+                                <button type="button" class="btn btn-outline-secondary" id="btn-secret-generate"
+                                        title="生成随机密钥"><i class="bi bi-shuffle"></i> 生成</button>
+                                <button type="button" class="btn btn-outline-secondary" id="btn-secret-copy"
+                                        title="复制密钥"><i class="bi bi-clipboard"></i></button>
+                            </div>
+                            <div class="form-text">对端用同一密钥校验 <code>X-Signature</code> 头</div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label" for="cms-f-max_retries">最大重试次数</label>
+                            <input id="cms-f-max_retries" type="number" name="max_retries" class="form-control" value="3" min="0" max="10">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label" for="cms-f-status">状态</label>
+                            <select id="cms-f-status" name="status" class="form-select">
+                                <option value="1">启用</option>
+                                <option value="0">禁用</option>
+                            </select>
+                            <div class="form-text">禁用后不再投递</div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                    <!-- 返回与提交均由 js/webhook.js 处理（模板零内联脚本） -->
+                    <button type="button" id="btn-webhook-back" class="btn btn-outline-secondary btn-sm">返回</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<!-- 无内联业务脚本：逻辑在 /statics/plugins/wisecms/js/webhook.js（由 wsconfig.js 自动加载） -->
+{/block}

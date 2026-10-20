@@ -1,0 +1,51 @@
+{extend name="public/base" /}
+
+{block name="title"}连接器配置{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="public/index_header" /}
+    <div id="toolbar" class="toolbar mb-3">
+        <button id="refresh" class="btn btn-sm btn-secondary"><i class="bi bi-arrow-repeat"></i> 刷新</button>
+        <span class="ms-2 small text-muted">已注册连接器列表，点击配置可编辑凭据</span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle" id="connector-table">
+            <thead class="table-light">
+                <tr>
+                    <th>连接器</th>
+                    <th>类型</th>
+                    <th>标识</th>
+                    <th>操作</th>
+                    <th>健康</th>
+                </tr>
+            </thead>
+            <tbody id="connector-tbody">
+                <tr><td colspan="5" class="text-center text-muted py-4">加载中...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 配置编辑 Modal -->
+    <div class="modal fade" id="configModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">编辑配置: <span id="configTitle"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="configBody"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="saveConfig">保存</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="js"}
+
+{/block}

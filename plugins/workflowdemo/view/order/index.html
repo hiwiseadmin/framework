@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订单列表 - 工作流演示</title>
+    <link href="__CSS__/bootstrap.min.css" rel="stylesheet">
+    <link href="__CSS__/adminlte.min.css" rel="stylesheet">
+    <link href="__PLUGINS__/bootstrap-table/bootstrap-table.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">订单列表</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">工作流演示</a></li>
+                    <li class="breadcrumb-item active">订单列表</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">订单管理</h3>
+                <div class="card-tools">
+                    <a href="<?php echo plugin_url('workflowdemo/order/create'); ?>" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> 创建订单
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- 状态筛选 -->
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <div class="btn-group" role="group">
+                            <a href="<?php echo plugin_url('workflowdemo/order/index'); ?>" 
+                               class="btn btn-sm <?php echo empty($status) ? 'btn-primary' : 'btn-outline-primary'; ?>">
+                                全部
+                            </a>
+                            <?php foreach ($places as $key => $label): ?>
+                            <a href="<?php echo plugin_url('workflowdemo/order/index', ['status' => $key]); ?>" 
+                               class="btn btn-sm <?php echo $status == $key ? 'btn-primary' : 'btn-outline-primary'; ?>">
+                                <?php echo $label; ?>
+                            </a>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 订单列表 -->
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>订单标题</th>
+                                <th>金额</th>
+                                <th>当前状态</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($list)): ?>
+                            <tr>
+                                <td colspan="6" class="text-center">暂无数据</td>
+                            </tr>
+                            <?php else: ?>
+                            <?php foreach ($list as $item): ?>
+                            <tr>
+                                <td><?php echo $item['id']; ?></td>
+                                <td><?php echo htmlspecialchars($item['title']); ?></td>
+                                <td>¥<?php echo number_format($item['amount'], 2); ?></td>
+                                <td>
+                                    <span class="badge <?php echo $this->getStatusBadgeClass($item['status']); ?>">
+                                        <?php echo $places[$item['status']] ?? $item['status']; ?>
+                                    </span>
+                                </td>
+                                <td><?php echo date('Y-m-d H:i:s', $item['create_time']); ?></td>
+                                <td>
+                                    <a href="<?php echo plugin_url('workflowdemo/order/detail', ['id' => $item['id']]); ?>" 
+                                       class="btn btn-info btn-xs">查看</a>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 分页 -->
+                <div class="mt-3">
+                    <?php echo $list->render(); ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php
+// 在视图中定义辅助函数（ThinkPHP 视图中可以直接定义）
+function getStatusBadgeClass($status) {
+    $map = [
+        'draft'     => 'bg-secondary',
+        'submitted' => 'bg-info',
+        'reviewing' => 'bg-warning',
+        'approved'  => 'bg-success',
+        'rejected'  => 'bg-danger',
+        'cancelled' => 'bg-dark',
+    ];
+    return $map[$status] ?? 'bg-secondary';
+}
+?>
+
+<script src="__JS__/jquery.min.js"></script>
+<script src="__JS__/bootstrap.bundle.min.js"></script>
+</body>
+</html>

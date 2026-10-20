@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>我的成就 - {$texts.site_name|default='会员中心'}</title>
+<!-- 主题通用样式（P3-3）：__THEME__ → /statics/member/themes/{当前场景主题}/ -->
+<link rel="stylesheet" href="__THEME__/css/theme.css">
+<!-- 插件自带样式（P3-4）：__PLUGIN_ASSET__ → /statics/plugins/demo/（AssetManager 发布） -->
+<link rel="stylesheet" href="__PLUGIN_ASSET__/css/achievements.css">
+</head>
+<body>
+<header class="topbar">
+  <strong>{$texts.site_name|default='会员中心'}</strong>
+  <!-- web_base 由会员前台基类注入（P1-5 归一后为 /member），插件勿硬编码前缀 -->
+  <a href="{$web_base}/center">会员中心</a>
+  {if !empty($member)}<span class="muted">{$member.nickname|default='会员'}</span>{/if}
+</header>
+
+<main class="page">
+  <div class="panel">
+    <h1>我的成就</h1>
+    <p class="muted">当前场景：{$scene.name|default='默认会员'}</p>
+    <p>{$intro}</p>
+
+    <ul class="achievements-list">
+      {volist name="items" id="item"}
+      <li>
+        <b>{$item.name}</b>
+        {if $item.done}<span class="ok">已达成</span>{else}<span class="muted">未达成</span>{/if}
+        <span class="muted">— {$item.desc}</span>
+      </li>
+      {/volist}
+    </ul>
+  </div>
+</main>
+</body>
+</html>

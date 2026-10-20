@@ -1,0 +1,63 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}分类管理{/block}
+
+{block name="css"}
+<link rel="stylesheet" href="/statics/plugins/wisedocs/css/admin.css">
+{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-diagram-2" caption="分类管理" buttongroup="" /}
+
+    <div class="docs-page">
+        <form class="docs-filter" id="search-form">
+            <div class="docs-filter__row">
+                <div class="docs-filter__item docs-filter__item--wide">
+                    <label class="docs-filter__label" for="search-keyword">关键词</label>
+                    <input type="text" class="form-control form-control-sm" id="search-keyword"
+                           placeholder="分类名称 / 标识">
+                </div>
+                <div class="docs-filter__item">
+                    <label class="docs-filter__label" for="search-project">所属空间</label>
+                    <select class="form-select form-select-sm" id="search-project">
+                        <option value="">全部空间</option>
+                        {volist name="spaces" id="space"}
+                        <option value="{$space.id}">{$space.name}</option>
+                        {/volist}
+                    </select>
+                </div>
+                <div class="docs-filter__item">
+                    <label class="docs-filter__label" for="search-status">状态</label>
+                    <select class="form-select form-select-sm" id="search-status">
+                        <option value="">全部状态</option>
+                        <option value="1">启用</option>
+                        <option value="0">禁用</option>
+                    </select>
+                </div>
+                <div class="docs-filter__actions">
+                    <button type="submit" class="btn btn-sm btn-primary" id="btn-search">
+                        <i class="bi bi-search"></i> 搜索
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-reset">
+                        <i class="bi bi-arrow-clockwise"></i> 重置
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <div class="docs-tips text-secondary small mb-2">
+            <i class="bi bi-info-circle me-1"></i>
+            拖动行内 <i class="bi bi-arrows-expand-vertical"></i> 图标可调整同级顺序；
+            右键行可快捷操作（新增子分类 / 编辑 / 展开折叠 / 删除）。
+        </div>
+
+        <div class="docs-table-card">
+            <div id="toolbar" class="toolbar"></div>
+            <table id="table"></table>
+        </div>
+    </div>
+</div>
+
+{include file="category/form" /}
+{/block}

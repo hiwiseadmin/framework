@@ -1,0 +1,31 @@
+# ============================================================
+# 编辑器引擎产物 —— 入库 / 不入库边界
+# ============================================================
+# 入库：tiptap.bundle.js + tiptap.bundle.js.map
+#
+#   生产版与其 sourcemap，二者都必须进版本库：
+#     1) 部署环境没有 Node，不会执行 npm run build:editor。缺 bundle，
+#        编辑器会静默退化成内置 contenteditable 引擎（不报错、不 404）。
+#     2) map 是线上排障的唯一手段。`src/.gitattributes` 与
+#        `public/statics/.gitignore` 都明确规定「statics 下的构建产物与
+#        sourcemap 随包发布」，本目录遵循同一条约定。
+#
+#   注意本 bundle 与内核 wise-bundle 的 sourcemap 策略**不同源，但结论一致**：
+#     - 内核：sourcesContent:false，靠把 wise-*.js 源码一起发布，让 DevTools
+#       按 map 里 sources 的相对路径到同目录取源码 → 源码与 map 同包发布。
+#     - 本 bundle：sources 共 367 项，其中 366 项指向 node_modules/@tiptap/**、
+#       prosemirror-*，而 node_modules 不入库 —— 照抄上面那套必然解析失败。
+#       因此改用 sourcesContent:true：map 内嵌全部源码、自包含，不依赖任何
+#       外部文件，本地调试 / 线上排障 / 开源后使用者三条路径行为一致。
+#     （代价：map 由 702 KB 涨到约 2.2 MB。绝对值可接受，且它是唯一能真正
+#       还原源码的形态。）
+#
+# 不入库：下面两类都能由 `npm run build:editor` 再生，且无独立价值
+#
+#   *.dev.js / *.dev.js.map
+#     不压缩的调试版 + 其 linked map。生产版 map 已自包含，调试版只在需要
+#     对未压缩代码单步排障时才用；两者合计约 3 MB，属纯死重。
+# ============================================================
+
+*.dev.js
+*.dev.js.map

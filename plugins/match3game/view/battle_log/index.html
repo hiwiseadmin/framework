@@ -1,0 +1,39 @@
+{extend name="__PLUGIN_VIEW__/base"}
+
+{block name="title"}对局日志{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="__PLUGIN_VIEW__/index_header" icon="bi bi-journal-text" caption="对局日志" buttongroup="" /}
+    <div class="plugin-match3game">
+        <div class="container-fluid p-0">
+            <div class="card">
+                <div class="card-body">
+                    <form class="row g-2 mb-3" id="search-form">
+                        <div class="col-md-2">
+                            <input type="number" class="form-control form-control-sm" id="search-user-id" placeholder="用户ID">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="text" class="form-control form-control-sm" id="search-level-code" placeholder="关卡编码">
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select form-select-sm" id="search-outcome">
+                                <option value="">全部结果</option>
+                                <option value="win">胜利</option>
+                                <option value="lose">失败</option>
+                                <option value="quit">放弃</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm" id="btn-search"><i class="bi bi-search"></i> 搜索</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-reset"><i class="bi bi-arrow-clockwise"></i> 重置</button>
+                        </div>
+                    </form>
+                    <div id="toolbar" class="toolbar mb-2"></div>
+                    <table id="table"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
