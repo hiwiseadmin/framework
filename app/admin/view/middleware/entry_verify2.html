@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>需要登录</title>
+    <!-- Bootstrap 6 CSS -->
+    <link href="/static/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="/static/libs/bootstrap-icons/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --gradient-bg: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--gradient-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: white;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        
+        .login-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .login-content {
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .login-icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            display: inline-block;
+        }
+        
+        .login-title {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .login-message {
+            font-size: 1.3rem;
+            line-height: 1.6;
+            margin-bottom: 0;
+            color: rgba(255, 255, 255, 0.85);
+            max-width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* 装饰元素 */
+        .decor-circle {
+            position: absolute;
+            border-radius: 50%;
+            z-index: 0;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .circle-1 {
+            width: 300px;
+            height: 300px;
+            top: 10%;
+            left: 5%;
+        }
+        
+        .circle-2 {
+            width: 200px;
+            height: 200px;
+            bottom: 15%;
+            right: 8%;
+        }
+        
+        .circle-3 {
+            width: 150px;
+            height: 150px;
+            top: 25%;
+            right: 12%;
+        }
+        
+        .circle-4 {
+            width: 250px;
+            height: 250px;
+            bottom: 25%;
+            left: 10%;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .login-content {
+                padding: 2.5rem 1.5rem;
+                max-width: 90%;
+            }
+            
+            .login-title {
+                font-size: 2.2rem;
+            }
+            
+            .login-message {
+                font-size: 1.1rem;
+                max-width: 100%;
+            }
+            
+            .login-icon {
+                font-size: 4rem;
+            }
+            
+            .circle-1 {
+                width: 200px;
+                height: 200px;
+                top: 5%;
+                left: -10%;
+            }
+            
+            .circle-2 {
+                width: 150px;
+                height: 150px;
+                bottom: 10%;
+                right: -5%;
+            }
+            
+            .circle-3, .circle-4 {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .login-content {
+                padding: 2rem 1.5rem;
+                max-width: 95%;
+            }
+            
+            .login-title {
+                font-size: 1.8rem;
+            }
+            
+            .login-message {
+                font-size: 1rem;
+            }
+            
+            .login-icon {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景装饰元素 -->
+    <div class="decor-circle circle-1"></div>
+    <div class="decor-circle circle-2"></div>
+    <div class="decor-circle circle-3"></div>
+    <div class="decor-circle circle-4"></div>
+    
+    <!-- 主要内容区域 -->
+    <div class="login-container">
+        <div class="login-content">
+            <div class="login-icon">
+                <i class="bi bi-shield-lock"></i>
+            </div>
+            <h1 class="login-title">需要登录访问</h1>
+            <p class="login-message">
+                此页面需要登录才能访问。您当前未登录或会话已过期，请登录后重试。
+            </p>
+        </div>
+    </div>
+</body>
+</html>

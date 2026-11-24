@@ -1,0 +1,56 @@
+<?php
+declare(strict_types=1);
+
+namespace plugin\{$name};
+
+use wise\plugin\WiseBootServiceProvider;
+
+/**
+ * {$name} 插件服务提供者
+ *
+ * 继承 WiseBootServiceProvider 获得完整的 boot 链：
+ *   1. copyStaticFiles     — debug 模式复制静态资源
+ *   2. loadConfig          — 加载配置到 Config domain
+ *   2b. injectRuntimeConfig — 注入插件中心保存的用户配置
+ *   2c. mergeGlobalConfig  — 按 $globalConfigMap 白名单并入全局配置域
+ *   3. loadCommonFile      — 加载 common.php 公共函数
+ *   4. registerNamespace  — 注册 PSR-4 命名空间
+ *   5. registerVendor      — 注册第三方命名空间
+ *   6. registerCommands   — 注册 CLI 命令
+ *   7. loadEventFile      — 加载事件绑定
+ *   8. loadMiddleware     — 加载中间件
+ *   9. registerRoute      — 注册路由
+ *  10. registerProviders  — 注册 DI 绑定
+ *  11. registerServices   — 注册子服务提供者
+ */
+class BootServiceProvider extends WiseBootServiceProvider
+{
+    /**
+     * 并入全局配置域的插件配置白名单（可选，默认空数组）。
+     *
+     * 键 = 全局域名（对应框架 config/{domain}.php），值 = 该域内按「逗号并集」合并的键。
+     * 插件把配置写在 config/{domain}.php，boot 时自动并入全局域，无需改动框架配置。
+     *
+     * 例：config/view.php 声明 taglib_pre_load，模板即可直接使用 {xxx:标签}。
+     *
+     * ⚠️ 仅适用于「boot 之后才被读取」的域：view ✅ / lang ❌
+     *    —— lang.extend_list 在 App::initialize() 阶段即被消费并冻结，此处写入无效；
+     *    插件语言包请放 lang/ 目录，由 LangPack 自动发现。
+     *
+     * protected array $globalConfigMap = ['view' => ['taglib_pre_load']];
+     */
+
+    public function register(): void
+    {
+        // 合并插件配置到 Config domain: config('{$name}.xxx')
+        $this->mergeConfig($this->getPluginIdent());
+
+        // 绑定自定义服务
+        // $this->app->bind(SomeInterface::class, SomeService::class);
+    }
+
+    public function boot(): void
+    {
+        parent::boot();
+    }
+}

@@ -1,0 +1,88 @@
+{extend name="public/base" /}
+
+{block name="title"}回收站 - 附件管理{/block}
+
+{block name="css"}
+<style>
+.attachment-card {
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+.attachment-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--bs-box-shadow);
+}
+.attachment-thumb {
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bs-tertiary-bg);
+    overflow: hidden;
+    border-top-left-radius: var(--bs-card-border-radius);
+    border-top-right-radius: var(--bs-card-border-radius);
+}
+.attachment-thumb img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+}
+.file-icon {
+    font-size: 3rem;
+    color: var(--bs-secondary-color);
+}
+.selected {
+    border: 2px solid var(--bs-danger) !important;
+}
+.badge-deleted {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 1;
+}
+</style>
+{/block}
+
+{block name="content"}
+<div class="container-fluid py-4">
+    {include file="public/page_header" icon="bi bi-trash" title="回收站" desc="恢复或彻底删除已移除的附件" actions="<a href='/admin/attachment/index' class='btn btn-sm btn-outline-secondary'><i class='bi bi-arrow-left me-1'></i>返回附件管理</a>" /}
+
+    {/* 搜索区：统一 .ws-filter-bar 外壳（UIS v1.1 §3.5），控件 id 保持不变，由 attachment_trash.js 读值 */}
+    <form id="ws-filter" class="ws-filter-bar ws-filter-form row g-2 align-items-end" novalidate>
+        <div class="col-12 col-md-6 col-lg-4 ws-filter-item" data-field="keyword">
+            <label class="form-label" for="keywordFilter">关键词</label>
+            <input type="text" class="form-control form-control-sm" id="keywordFilter" placeholder="搜索文件名 / 描述">
+        </div>
+        <div class="col-auto ws-filter-actions">
+            <button type="button" class="btn btn-sm btn-primary" id="searchBtn"><i class="bi bi-search me-1"></i>查询</button>
+        </div>
+        <div class="col-auto ms-auto d-flex align-items-center">
+            <span class="text-secondary small" id="trashCount">共 0 个已删除文件</span>
+        </div>
+    </form>
+
+    {/* 批量操作：有选中项才出现（attachment_trash.js 用 d-none 切换，不再写内联 display 覆盖 flex 布局） */}
+    <div id="toolbar" class="ws-toolbar">
+        <div class="ws-toolbar-actions d-none" id="batchToolbar">
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="batchRestoreBtn" disabled><i class="bi bi-arrow-counterclockwise me-1"></i>批量恢复</button>
+            <button type="button" class="btn btn-sm btn-outline-danger" id="batchForceDeleteBtn" disabled><i class="bi bi-x-octagon me-1"></i>批量删除</button>
+            <span class="text-secondary small ms-2" id="selectedCount">已选择 0 个文件</span>
+            <button class="btn btn-sm btn-outline-secondary" id="clearSelectionBtn"><i class="bi bi-x-circle me-1"></i>取消选择</button>
+        </div>
+        <div class="ws-toolbar-tools">
+            {/* 清空回收站：整表销毁级操作，刻意与批量按钮分开摆到右侧，配色用实心 danger 以示不可逆 */}
+            <button type="button" class="btn btn-sm btn-danger" id="emptyTrashBtn"><i class="bi bi-trash3 me-1"></i>清空回收站</button>
+        </div>
+    </div>
+
+    <!-- 附件列表 -->
+    <div class="row" id="trashList"></div>
+
+    <!-- 分页 -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <nav id="paginationContainer"></nav>
+        </div>
+    </div>
+</div>
+{/block}

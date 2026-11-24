@@ -1,0 +1,22 @@
+# statics 是运行时必需的静态资源目录，默认全部入库并随包发布。
+#
+# 关键约束：wise-bundle.js / wise-bundle.css 是构建产物，必须入库。
+# composer 安装完成后没有 Node 环境，也不会执行 npm run build；前端对这两个产物
+# 不做运行时兜底（base.html 只在 debug/非 debug 间切换未压缩/压缩版本），缺失即 404。
+#
+# 同时必须保留 wise-*.js 源码与 wise-bundle.js.map：
+# 产物采用 sourcesContent:false 构建，DevTools 会依据 map 中 sources 的相对路径
+# 到本目录拉取源文件。源码与 map 缺一，线上排障能力即失效，二者同包发布。
+#
+# 发布前请先执行 npm run build:js，确保产物与源码同步（脚本自带内联与契约自检）。
+
+# 本地依赖（正常情况下应装在仓库根目录，此处仅作防御）
+node_modules/
+member/
+wise/
+
+# 日志与临时文件
+*.log
+*.tmp
+*.cache
+*.bak

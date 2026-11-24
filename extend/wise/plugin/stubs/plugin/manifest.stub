@@ -1,0 +1,37 @@
+{
+    "name": "{$name}",
+    "title": "{$name}",
+    "version": "{$version}",
+    "description": "{$description}",
+    "author": "{$author}",
+    "develop": true,
+    "service_provider": "plugin\\{$name}\\BootServiceProvider",
+    "dependencies": {},
+    "compatible_with": ["^{$framework_major}.0"],
+    "menus": [
+        {
+            "name": "{$name}",
+            "icon": "bi bi-plug",
+            "path": "/plugin/{$name}/index",
+            "type": "menu",
+            "sort": 0,
+            "status": 1,
+            "children": []
+        }
+    ],
+    "permissions": [],
+    "config": [
+        {
+            "name": "enable",
+            "type": "radio",
+            "title": "启用插件",
+            "value": "1",
+            "options": {
+                "1": "启用",
+                "0": "禁用"
+            }
+        }
+    ],
+    "slots": {},
+    "vendor": {}
+}

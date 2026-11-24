@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ws-* 组件声明式表单接入 · 统一演示</title>
+    <link href="../libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../libs/bootstrap-icons/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="../css/wise-bundle.css">
+    <style>
+        body { background: var(--bs-tertiary-bg); }
+
+        .demo-section {
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--bs-border-color);
+            border-radius: 10px;
+            background: var(--bs-body-bg);
+        }
+        .demo-section > h5 { margin-bottom: 0.25rem; }
+        .demo-hint { font-size: 0.8125rem; color: var(--bs-secondary-color); margin-bottom: 1rem; }
+
+        .code-block {
+            position: relative;
+            margin: 0.75rem 0 0;
+            padding: 0.75rem 0.875rem;
+            background: var(--bs-dark);
+            color: #e6edf3;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            line-height: 1.65;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 15rem;
+            overflow: auto;
+        }
+        .code-block::before {
+            content: 'HTML';
+            position: absolute;
+            top: 0.25rem;
+            right: 0.5rem;
+            font-size: 0.625rem;
+            letter-spacing: 0.08em;
+            color: #6e7681;
+        }
+
+        .field-row { margin-bottom: 1rem; }
+        .field-row > label { font-size: 0.875rem; font-weight: 500; margin-bottom: 0.375rem; display: block; }
+
+        /* 提交结果面板 */
+        #submitPanel {
+            position: sticky;
+            top: 1rem;
+            max-height: calc(100vh - 2rem);
+            overflow: auto;
+        }
+        #formOutput {
+            margin: 0;
+            font-size: 0.75rem;
+            line-height: 1.6;
+            max-height: 26rem;
+            overflow: auto;
+            background: var(--bs-dark);
+            color: #7ee787;
+            padding: 0.75rem;
+            border-radius: 6px;
+        }
+
+        .req-counter { font-variant-numeric: tabular-nums; }
+    </style>
+</head>
+<body>
+
+<div class="container-xxl py-4">
+
+    <div class="mb-4">
+        <h1 class="h4 mb-1">ws-* 组件 · 声明式表单接入</h1>
+        <p class="text-secondary mb-2">
+            全部示例只写 <code>data-*</code>，页面上没有任何 <code>new WsXxx()</code> 调用。
+            组件自己解析配置、自己建值载体、自己拉远程数据、自己派发 change。
+        </p>
+        <nav class="d-flex flex-wrap gap-2">
+            <a class="btn btn-sm btn-light border" href="#s-select">1 ws-select</a>
+            <a class="btn btn-sm btn-light border" href="#s-date">2 date-picker</a>
+            <a class="btn btn-sm btn-light border" href="#s-hint">3 hint-input</a>
+            <a class="btn btn-sm btn-light border" href="#s-color">4 color-picker</a>
+            <a class="btn btn-sm btn-light border" href="#s-linkage">5 linkage-select</a>
+            <a class="btn btn-sm btn-light border" href="#s-upload">6 upload</a>
+            <a class="btn btn-sm btn-light border" href="#s-menu">7 popmenu</a>
+            <a class="btn btn-sm btn-primary" href="#s-form">真实表单提交</a>
+        </nav>
+    </div>
+
+    <!-- ============ 远程请求计数器（证明多人共用一次请求） ============ -->
+    <div class="alert alert-info d-flex flex-wrap align-items-center gap-3 py-2">
+        <span class="fw-semibold"><i class="bi bi-activity me-1"></i>模拟接口请求次数</span>
+        <span class="req-counter" id="reqCounter">—</span>
+        <button class="btn btn-sm btn-outline-primary ms-auto" id="btnRescan" type="button">
+            <i class="bi bi-arrow-repeat me-1"></i>重新扫描（幂等验证）
+        </button>
+        <button class="btn btn-sm btn-outline-secondary" id="btnResetReq" type="button">清零计数</button>
+    </div>
+
+    <div class="row g-4">
+        <!-- ==================== 左：各组件独立示例 ==================== -->
+        <div class="col-lg-7">
+
+            <!-- 1. ws-select -->
+            <div class="demo-section" id="s-select">
+                <h5><i class="bi bi-list-ul me-2 text-primary"></i>1. ws-select</h5>
+                <p class="demo-hint">
+                    <code>data-role="wsselect"</code> + <code>data-name</code> 即生成隐藏载体，可被
+                    <code>serialize()</code> 收集；<code>data-value</code> + <code>data-label</code> 成对下发。
+                </p>
+
+                <div class="field-row">
+                    <label>① 内联选项（<code>data-options</code>）</label>
+                    <div data-role="wsselect"
+                         data-name="demo_status"
+                         data-value="1"
+                         data-allow-clear="false"
+                         data-options='[{"value":"1","label":"启用","secondary":"默认状态"},{"value":"0","label":"禁用","secondary":"不可登录"},{"value":"2","label":"待审核","secondary":"需人工处理"}]'
+                         data-placeholder="请选择状态"></div>
+                </div>
+
+                <div class="field-row">
+                    <label>
+                        ② 远程加载（<code>data-url</code>）
+                        <span class="badge text-bg-light fw-normal">初始值靠 data-label 立即显示</span>
+                    </label>
+                    <div data-role="wsselect"
+                         data-name="demo_owner"
+                         data-url="/demo/user/options"
+                         data-value="12"
+                         data-label="赵六"
+                         data-searchable="true"
+                         data-page-size="20"
+                         data-placeholder="请选择负责人"></div>
+                    <div class="form-text mt-1">
+                        接口回来前显示 <code>data-label</code> 的灰字（避免露出原始 ID 或空白），
+                        数据到达后按 <code>data-value</code> 匹配到真实选项再覆盖。
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <label>
+                        ③ 两个字段共用同一接口
+                        <span class="badge text-bg-light fw-normal">ws-select 有自己的远程实现，各自请求一次</span>
+                    </label>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <div data-role="wsselect" data-name="demo_reviewer" data-url="/demo/user/options"
+                                 data-searchable="true" data-placeholder="审核人"></div>
+                        </div>
+                        <div class="col-6">
+                            <div data-role="wsselect" data-name="demo_creator" data-url="/demo/user/options"
+                                 data-searchable="true" data-placeholder="创建人"></div>
+                        </div>
+                    </div>
+                    <div class="form-text mt-1">
+                        上面的「请求次数」可直接对照：这两个下拉会各发 1 次。
+                        走 <code>ws-common.fetchOptions</code> 的组件（hint-input / linkage-select）才享受
+                        并发去重与 30 秒缓存。
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <label>④ 多选 + JSON 单载体（<code>data-multiple</code> + <code>data-use-json-value</code>）</label>
+                    <div data-role="wsselect"
+                         data-name="demo_roles"
+                         data-multiple="true"
+                         data-use-json-value="true"
+                         data-value='["admin","editor"]'
+                         data-options='[{"value":"admin","label":"管理员"},{"value":"editor","label":"编辑"},{"value":"viewer","label":"访客"}]'
+                         data-placeholder="请选择角色"></div>
+                </div>
+
+                <div class="field-row mb-0">
+                    <label>
+                        ⑤ 原生 <code>&lt;select&gt;</code> 直接提升
+                        <span class="badge text-bg-light fw-normal">后端 foreach 代码零改动</span>
+                    </label>
+                    <select name="demo_catid" class="form-select" data-role="wsselect" data-searchable="true">
+                        <option value="">请选择分类</option>
+                        <option value="1" selected>技术</option>
+                        <option value="2">产品</option>
+                        <option value="3">运营</option>
+                        <option value="4">设计</option>
+                    </select>
+                </div>
+
+<pre class="code-block">&lt;div data-role="wsselect"
+     data-name="owner_id"
+     data-url="/admin/user/options"
+     data-value="12" data-label="张三"
+     data-searchable="true"&gt;&lt;/div&gt;
+
+&lt;!-- 或：原生 select 直接提升 --&gt;
+&lt;select name="catid" data-role="wsselect"&gt;
+  &lt;option value="1"&gt;技术&lt;/option&gt;
+&lt;/select&gt;</pre>
+            </div>
+
+            <!-- 2. ws-date-picker -->
+            <div class="demo-section" id="s-date">
+                <h5><i class="bi bi-calendar3 me-2 text-primary"></i>2. ws-date-picker</h5>
+                <p class="demo-hint">
+                    宿主就是原生 <code>input</code>，<code>name</code> 天然参与提交，无需载体。
+                    <b>点选后会派发 change</b>，实时校验立刻生效。
+                </p>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="field-row mb-0">
+                            <label>日期</label>
+                            <input type="text" class="form-control" name="demo_start"
+                                   data-role="wsdatepicker" data-format="yyyy-MM-dd"
+                                   data-value="2026-10-27" placeholder="选择日期">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="field-row mb-0">
+                            <label>日期范围</label>
+                            <input type="text" class="form-control" name="demo_range"
+                                   data-role="wsdatepicker" data-range="true"
+                                   data-format="yyyy-MM-dd" placeholder="开始 - 结束">
+                        </div>
+                    </div>
+                </div>
+
+<pre class="code-block">&lt;input type="text" name="start_date" class="form-control"
+       data-role="wsdatepicker"
+       data-format="yyyy-MM-dd"
+       data-value="2026-10-27"
+       data-validation="required"&gt;</pre>
+            </div>
+
+            <!-- 3. ws-hint-input -->
+            <div class="demo-section" id="s-hint">
+                <h5><i class="bi bi-lightbulb me-2 text-primary"></i>3. ws-hint-input</h5>
+                <p class="demo-hint">
+                    宿主是原生 <code>input</code>，建议项选中后写回并派发事件。
+                    支持本地数组与远程接口两种数据源。
+                </p>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="field-row mb-0">
+                            <label>本地数据（<code>data-options</code>）</label>
+                            <input type="text" class="form-control" name="demo_tags"
+                                   data-role="wshint"
+                                   data-options='["WiseAdmin","ThinkPHP","Bootstrap 5","jQuery 插件","ESM 模块"]'
+                                   placeholder="输入试试，如 th">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="field-row mb-0">
+                            <label>远程接口（<code>data-url</code>）</label>
+                            <input type="text" class="form-control" name="demo_skill"
+                                   data-role="wshint"
+                                   data-url="/demo/suggest"
+                                   data-min-chars="1"
+                                   placeholder="输入 a 触发远程">
+                        </div>
+                    </div>
+                </div>
+
+<pre class="code-block">&lt;input type="text" name="tags" class="form-control"
+       data-role="wshint"
+       data-url="/admin/tag/suggest"
+       data-response-path="data.rows"
+       data-min-chars="2"&gt;</pre>
+            </div>
+
+            <!-- 4. ws-color-picker -->
+            <div class="demo-section" id="s-color">
+                <h5><i class="bi bi-palette me-2 text-primary"></i>4. ws-color-picker</h5>
+                <p class="demo-hint">
+                    组件本体是纯模态框（无触发器、无 name）。声明式模式下由组件自己渲染
+                    <b>色块触发器</b>与 <b>隐藏载体</b>，确认后只写 <code>hex</code>。
+                </p>
+
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-6">
+                        <div class="field-row mb-0">
+                            <label>主题色</label>
+                            <div data-role="wscolor" data-name="demo_color" data-value="#0d6efd"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="field-row mb-0">
+                            <label>迷你模式（<code>data-mode="mini"</code>）</label>
+                            <div data-role="wscolor" data-name="demo_color2" data-value="#fd7e14" data-mode="mini"></div>
+                        </div>
+                    </div>
+                </div>
+
+<pre class="code-block">&lt;div data-role="wscolor"
+     data-name="theme_color"
+     data-value="#0d6efd"
+     data-validation="required"&gt;&lt;/div&gt;</pre>
+            </div>
+
+            <!-- 5. ws-linkage-select -->
+            <div class="demo-section" id="s-linkage">
+                <h5><i class="bi bi-diagram-3 me-2 text-primary"></i>5. ws-linkage-select</h5>
+                <p class="demo-hint">
+                    <code>data-selects</code> 指定级联顺序，<code>data-url</code> 提供
+                    <code>?parent=</code> 接口；<code>data-leaf-only</code> 只提交叶子值。
+                    （下方会按 <code>data-value-path</code> 自动逐级回填）
+                </p>
+
+                <div class="field-row">
+                    <label>省 / 市 / 区（只提交叶子）</label>
+                    <div data-role="wslinkage"
+                         data-selects="demoProvince,demoCity,demoDistrict"
+                         data-url="/demo/area/options"
+                         data-value-path="330000,330100,330106"
+                         data-leaf-only="true"
+                         data-name="demo_area_id">
+                        <div class="d-flex flex-wrap gap-2">
+                            <select id="demoProvince" class="form-select" style="flex:1;min-width:130px"></select>
+                            <select id="demoCity" class="form-select" style="flex:1;min-width:130px"></select>
+                            <select id="demoDistrict" class="form-select" style="flex:1;min-width:130px"></select>
+                        </div>
+                    </div>
+                </div>
+
+<pre class="code-block">&lt;div data-role="wslinkage"
+     data-selects="province,city,district"
+     data-url="/admin/area/options"
+     data-value-path="330000,330100,330106"
+     data-leaf-only="true"
+     data-name="area_id"&gt;
+  &lt;select id="province"&gt;&lt;/select&gt;
+  &lt;select id="city"&gt;&lt;/select&gt;
+  &lt;select id="district"&gt;&lt;/select&gt;
+&lt;/div&gt;</pre>
+            </div>
+
+            <!-- 6. ws-upload -->
+            <div class="demo-section" id="s-upload">
+                <h5><i class="bi bi-cloud-arrow-up me-2 text-primary"></i>6. ws-upload</h5>
+                <p class="demo-hint">
+                    组件原本没有任何 <code>name</code> 概念，<code>serialize()</code> 拿不到东西。
+                    现在 <code>data-name</code> 会生成单隐藏载体（多值写 JSON），
+                    <code>data-value</code> 里的历史附件会渲染成「已存在」条目。
+                </p>
+
+                <div class="field-row">
+                    <label>封面图（已有历史文件回填）</label>
+                    <div data-role="wsupload"
+                         data-name="demo_cover"
+                         data-url="/demo/upload"
+                         data-response-field="data.url"
+                         data-theme="drag"
+                         data-accept="image"
+                         data-value="/uploads/2026/10/cover-a.png"
+                         data-browse-text="选择图片"></div>
+                </div>
+
+                <div class="field-row mb-0">
+                    <label>多附件（JSON 单载体）</label>
+                    <div data-role="wsupload"
+                         data-name="demo_files"
+                         data-url="/demo/upload"
+                         data-response-field="data.url"
+                         data-multiple="true"
+                         data-json-value="true"
+                         data-value='["/uploads/2026/10/a.pdf","/uploads/2026/10/b.xlsx"]'
+                         data-auto-upload="false"></div>
+                </div>
+
+<pre class="code-block">&lt;div data-role="wsupload"
+     data-name="cover"
+     data-url="/admin/attachment/upload"
+     data-response-field="data.url"
+     data-value="{$row.cover}"
+     data-accept="image"&gt;&lt;/div&gt;</pre>
+            </div>
+
+            <!-- 7. ws-popmenu -->
+            <div class="demo-section mb-0" id="s-menu">
+                <h5><i class="bi bi-three-dots-vertical me-2 text-primary"></i>7. ws-popmenu</h5>
+                <p class="demo-hint">
+                    非表单控件（无值、不提交）。<code>data-items</code> 可内联 JSON，
+                    也可用 <code>data-url</code> 由服务端按权限下发菜单项。
+                </p>
+
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-secondary"
+                            data-role="wspopmenu"
+                            data-items='[{"id":"copy","text":"复制","icon":"bi bi-files","shortcut":"Ctrl+C"},{"id":"move","text":"移动到…","icon":"bi bi-folder-symlink"},{"type":"divider"},{"id":"del","text":"删除","icon":"bi bi-trash","disabled":true}]'
+                            data-on-item-click="demoMenuClick">
+                        更多操作 <i class="bi bi-chevron-down ms-1"></i>
+                    </button>
+
+                    <button type="button" class="btn btn-outline-secondary"
+                            data-role="wspopmenu"
+                            data-trigger="hover"
+                            data-items='[{"id":"a","text":"悬停触发 A"},{"id":"b","text":"悬停触发 B"}]'
+                            data-on-item-click="demoMenuClick">
+                        悬停触发
+                    </button>
+                </div>
+
+<pre class="code-block">&lt;button data-role="wspopmenu"
+        data-items='[{"id":"copy","text":"复制","icon":"bi bi-files"}]'&gt;更多&lt;/button&gt;</pre>
+            </div>
+
+        </div>
+
+        <!-- ==================== 右：真实表单 + 提交结果 ==================== -->
+        <div class="col-lg-5">
+            <div id="submitPanel">
+                <div class="demo-section">
+                    <h5><i class="bi bi-check2-square me-2 text-success"></i>真实表单提交</h5>
+                    <p class="demo-hint mb-3">
+                        这个 <code>&lt;form&gt;</code> 里的字段全部由 <code>data-*</code> 生成。
+                        点「查看提交值」直接展示 <code>FormData</code> —— 证明隐藏载体确实进得去。
+                    </p>
+
+                    <form id="demoForm" action="#" method="post" novalidate>
+                        <div class="field-row">
+                            <label>负责人 <span class="text-danger">*</span></label>
+                            <div data-role="wsselect"
+                                 data-name="owner_id"
+                                 data-url="/demo/user/options"
+                                 data-searchable="true"
+                                 data-placeholder="请选择负责人"
+                                 data-validation="required"
+                                 data-validation-message-required="请选择负责人"></div>
+                            <div class="invalid-feedback"><span class="validation-text"></span></div>
+                        </div>
+
+                        <div class="field-row">
+                            <label>开始日期 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="start_date"
+                                   data-role="wsdatepicker" data-format="yyyy-MM-dd"
+                                   placeholder="选择日期"
+                                   data-validation="required"
+                                   data-validation-message-required="请选择开始日期">
+                            <div class="invalid-feedback"><span class="validation-text"></span></div>
+                        </div>
+
+                        <div class="field-row">
+                            <label>标签</label>
+                            <input type="text" class="form-control" name="tags"
+                                   data-role="wshint"
+                                   data-options='["WiseAdmin","ThinkPHP","Bootstrap 5","FormData"]'
+                                   placeholder="输入 t 试试">
+                        </div>
+
+                        <div class="field-row">
+                            <label>主题色 <span class="text-danger">*</span></label>
+                            <div data-role="wscolor" data-name="theme_color" data-value="#198754"
+                                 data-validation="required"
+                                 data-validation-message-required="请选择主题色"></div>
+                            <div class="invalid-feedback"><span class="validation-text"></span></div>
+                        </div>
+
+                        <div class="field-row">
+                            <label>所属区域</label>
+                            <div data-role="wslinkage"
+                                 data-selects="formProvince,formCity,formDistrict"
+                                 data-url="/demo/area/options"
+                                 data-leaf-only="true"
+                                 data-name="area_id">
+                                <div class="d-flex flex-column gap-2">
+                                    <select id="formProvince" class="form-select"></select>
+                                    <select id="formCity" class="form-select"></select>
+                                    <select id="formDistrict" class="form-select"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-row">
+                            <label>附件</label>
+                            <div data-role="wsupload"
+                                 data-name="attachment"
+                                 data-url="/demo/upload"
+                                 data-response-field="data.url"
+                                 data-value="/uploads/2026/10/old.pdf"></div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send me-1"></i>提交（查看 FormData）
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" id="btnResetForm">重置</button>
+                        </div>
+                    </form>
+
+                    <div class="alert alert-success py-2 px-3 mt-3 mb-2 d-none" id="submitOk">
+                        <i class="bi bi-check-circle me-1"></i>校验通过，已收集到提交值
+                    </div>
+                    <div class="alert alert-danger py-2 px-3 mt-3 mb-2 d-none" id="submitFail">
+                        <i class="bi bi-exclamation-circle me-1"></i>校验未通过，请检查标红字段
+                    </div>
+
+                    <pre id="formOutput">// 提交后在此显示 FormData</pre>
+                </div>
+
+                <div class="demo-section mb-0">
+                    <h6 class="mb-2"><i class="bi bi-info-circle me-1"></i>校验说明</h6>
+                    <ul class="mb-0 ps-3 small text-secondary">
+                        <li>直接点「提交（查看 FormData）」→ 必填项标红，提示文案出现在组件下方。</li>
+                        <li>选中值后红框立即消失（组件派发了 <code>change</code>，实时校验生效）。</li>
+                        <li><code>data-validation</code> 会被组件<b>迁移</b>到隐藏载体上，宿主不再重复持有。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     下面的 classic script 必须早于 module：它替换 window.fetch，
+     让「远程加载」在无后端的情况下也能跑通。真实项目里删掉即可。
+     ============================================================ -->
+<script src="../js/jquery/jquery.min.js"></script>
+<script src="../libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ============================================================
+ * Demo 专用 Mock 接口（真实项目不需要）
+ * ============================================================ */
+(function () {
+    var USERS = [];
+    var SURNAME = ['张', '李', '王', '赵', '刘', '陈', '杨', '黄'];
+    var GIVEN = ['三', '四', '五', '六', '七', '八', '九', '十'];
+    for (var i = 1; i <= 24; i++) {
+        USERS.push({
+            value: String(i),
+            label: SURNAME[(i - 1) % 8] + GIVEN[(i - 1) % 8],
+            secondary: '技术部 ' + i
+        });
+    }
+
+    var AREAS = [
+        { value: '330000', label: '浙江省', parent_id: '0' },
+        { value: '320000', label: '江苏省', parent_id: '0' },
+        { value: '330100', label: '杭州市', parent_id: '330000' },
+        { value: '330200', label: '宁波市', parent_id: '330000' },
+        { value: '320100', label: '南京市', parent_id: '320000' },
+        { value: '320500', label: '苏州市', parent_id: '320000' },
+        { value: '330106', label: '西湖区', parent_id: '330100' },
+        { value: '330108', label: '滨江区', parent_id: '330100' },
+        { value: '330203', label: '海曙区', parent_id: '330200' },
+        { value: '320102', label: '玄武区', parent_id: '320100' },
+        { value: '320505', label: '虎丘区', parent_id: '320500' }
+    ];
+
+    window.__demoReq = {};
+
+    /**
+     * 统一 Mock 响应：返回框架标准外壳 {code,msg,data:{rows,total}}。
+     * @param {string} path
+     * @param {URLSearchParams} q
+     */
+    function mockRespond(path, q) {
+        if (path === '/demo/user/options') {
+            var key = (q.get('q') || q.get('search') || '').toLowerCase();
+            var rows = USERS.filter(function (u) {
+                return !key || u.label.toLowerCase().indexOf(key) !== -1;
+            });
+            return { code: 0, msg: '', data: { rows: rows, total: rows.length } };
+        }
+
+        if (path === '/demo/area/options') {
+            var parent = q.get('parent');
+            var wanted = parent === null || parent === '' ? '0' : String(parent);
+            var areas = AREAS.filter(function (a) { return a.parent_id === wanted; });
+            return { code: 0, msg: '', data: { rows: areas, total: areas.length } };
+        }
+
+        if (path === '/demo/suggest') {
+            var kw = (q.get('q') || '').toLowerCase();
+            var pool = ['Bootstrap 5', 'Bootstrap Icons', 'Bootstrap Table', 'basis', 'batch', 'buffer',
+                        'cache', 'callback', 'carrier', 'checkbox'];
+            var hit = pool.filter(function (t) {
+                return !kw || t.toLowerCase().indexOf(kw) !== -1;
+            }).map(function (t) { return { value: t, label: t }; });
+            return { code: 0, msg: '', data: { rows: hit, total: hit.length } };
+        }
+
+        if (path === '/demo/upload') {
+            var n = Math.floor(Math.random() * 9000) + 1000;
+            return { code: 0, msg: 'ok', data: { url: '/uploads/demo-' + n + '.bin' } };
+        }
+
+        return null;
+    }
+
+    function countReq(path) {
+        window.__demoReq[path] = (window.__demoReq[path] || 0) + 1;
+        renderReqCounter();
+    }
+
+    /* ---------- 1) fetch：ws-common.fetchOptions（hint-input / linkage-select） ---------- */
+    var _fetch = window.fetch.bind(window);
+
+    window.fetch = function (input, init) {
+        var url = typeof input === 'string' ? input : (input && input.url) || '';
+        var path = url.split('?')[0];
+        var body = mockRespond(path, new URLSearchParams(url.split('?')[1] || ''));
+
+        if (!body) return _fetch(input, init);
+
+        countReq(path);
+
+        return Promise.resolve(new Response(JSON.stringify(body), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+        }));
+    };
+
+    /* ---------- 2) jQuery ajax：ws-select 远程 / ws-upload 上传 ---------- */
+    // ws-select 与 ws-upload 内部走 $.ajax（不是 fetch），所以必须在这一层拦。
+    $.ajaxTransport('+*', function (options) {
+        var url = options.url || '';
+        var path = url.split('?')[0];
+        var body = mockRespond(path, new URLSearchParams(url.split('?')[1] || ''));
+
+        if (!body) return undefined;
+
+        return {
+            send: function (headers, complete) {
+                countReq(path);
+                setTimeout(function () {
+                    complete(200, 'OK', { text: JSON.stringify(body) }, 'Content-Type: application/json');
+                }, 260);
+            },
+            abort: function () { /* demo 不处理中断 */ }
+        };
+    });
+
+    function renderReqCounter() {
+        var el = document.getElementById('reqCounter');
+        if (!el) return;
+        var keys = Object.keys(window.__demoReq);
+        if (!keys.length) { el.textContent = '—'; return; }
+        el.innerHTML = keys.map(function (k) {
+            return '<span class="badge text-bg-light me-2">' + k + ' × ' + window.__demoReq[k] + '</span>';
+        }).join('');
+    }
+
+    window.renderReqCounter = renderReqCounter;
+
+    // popmenu 的 onItemClick：data-on-item-click 按函数名从 window 取
+    window.demoMenuClick = function (id) {
+        alert('点击了菜单项：' + id);
+    };
+})();
+</script>
+
+<script type="module">
+import WsSelect from '../libs/ws-select/ws-select.js';
+import WsDatePicker from '../libs/ws-date-picker/ws-date-picker.js';
+import WsHintInput from '../libs/ws-hint-input/ws-hint-input.js';
+import WsUpload from '../libs/ws-upload/ws-upload.js';
+import WsColorPicker from '../libs/ws-color-picker/ws-color-picker.js';
+import WsLinkageSelect from '../libs/ws-linkage-select/ws-linkage-select.js';
+import WsPopMenu from '../libs/ws-popmenu/ws-popmenu.js';
+import WsFormValidator from '../libs/ws-form-validator/ws-form-validator.js';
+
+/* 与 wise-bootstrap 的 ws:core:ready 做同一件事：统一初始化 */
+function autoInitializeAll(root = document) {
+    return {
+        select: WsSelect.autoInitialize(root),
+        datePicker: WsDatePicker.autoInitialize(root),
+        hintInput: WsHintInput.autoInitialize(root),
+        upload: WsUpload.autoInitialize(root),
+        colorPicker: WsColorPicker.autoInitialize(root),
+        linkageSelect: WsLinkageSelect.autoInitialize(root),
+        popMenu: WsPopMenu.autoInitialize(root),
+    };
+}
+
+// 组件模块自身的 $(function(){}) 已经跑过一次；这里再扫一遍，
+// 顺便拿到各组件实际初始化数量，验证幂等。
+const stats = autoInitializeAll(document);
+console.log('[demo] 组件初始化数量', stats);
+
+// 校验器必须在组件之后创建：规则挂在组件生成的隐藏载体上
+const validator = new WsFormValidator('demoForm', {
+    liveValidation: true,
+    showIcons: false,
+    autoSubmit: false,
+});
+
+const form = document.getElementById('demoForm');
+const output = document.getElementById('formOutput');
+const okBox = document.getElementById('submitOk');
+const failBox = document.getElementById('submitFail');
+
+form.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    okBox.classList.add('d-none');
+    failBox.classList.add('d-none');
+
+    if (validator.validate() === false) {
+        failBox.classList.remove('d-none');
+        output.textContent = '// 校验未通过，未收集提交值';
+        return;
+    }
+
+    // 与 $(form).serialize() 等价：只收有 name 的表单控件
+    const data = {};
+    new FormData(form).forEach((value, key) => {
+        data[key] = data[key] === undefined ? value : [].concat(data[key], value);
+    });
+
+    output.textContent = JSON.stringify(data, null, 2);
+    okBox.classList.remove('d-none');
+});
+
+document.getElementById('btnResetForm').addEventListener('click', () => {
+    form.reset();
+    output.textContent = '// 提交后在此显示 FormData';
+    okBox.classList.add('d-none');
+    failBox.classList.add('d-none');
+    autoInitializeAll(form);
+});
+
+// 幂等验证：重复扫描不会产生第二个隐藏域
+document.getElementById('btnRescan').addEventListener('click', () => {
+    const carriers = document.querySelectorAll('[data-ws-carrier]').length;
+    const again = autoInitializeAll(document);
+    const carriers2 = document.querySelectorAll('[data-ws-carrier]').length;
+
+    alert(
+        '第二次扫描结果：\n' + JSON.stringify(again) + '\n\n' +
+        '载体数量：' + carriers + ' → ' + carriers2 + '\n' +
+        (carriers === carriers2 ? '✅ 幂等，没有重复创建' : '❌ 出现重复载体')
+    );
+});
+
+document.getElementById('btnResetReq').addEventListener('click', () => {
+    window.__demoReq = {};
+    window.renderReqCounter();
+});
+</script>
+
+</body>
+</html>

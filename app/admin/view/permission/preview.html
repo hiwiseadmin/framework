@@ -1,0 +1,92 @@
+{extend name="public/base" /}
+
+{block name="title"}权限详情{/block}
+
+{block name="content"}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header"><h6 class="mb-0"><i class="bi bi-info-circle"></i> 基本信息</h6></div>
+                <div class="card-body">
+                    <table class="table table-sm table-borderless mb-0">
+                        <tr>
+                            <td class="text-secondary" style="width:90px;">权限标题</td>
+                            <td><strong>{$permission.name}</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="text-secondary">权限标识</td>
+                            <td><code>{$permission.ident}</code></td>
+                        </tr>
+                        <tr>
+                            <td class="text-secondary">权限类型</td>
+                            <td>
+                                {if $permission.type == 'route'}
+                                    <span class="badge bg-primary">路由</span>
+                                {elseif $permission.type == 'api'}
+                                    <span class="badge bg-info text-dark">接口</span>
+                                {else}
+                                    <span class="badge bg-secondary">通用</span>
+                                {/if}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-secondary">请求方法</td>
+                            <td><span class="badge bg-light text-dark border">{$permission.method|default='*'}</span></td>
+                        </tr>
+                        <tr>
+                            <td class="text-secondary">路由地址</td>
+                            <td>{$permission.route|default='<span class="text-secondary">无</span>'}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-secondary">所属插件</td>
+                            <td>{$permission.plugin|default='<span class="text-secondary">系统</span>'}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-secondary">上级权限</td>
+                            <td>
+                                {if $permission.parent_id > 0}
+                                    <span class="text-secondary">ID: {$permission.parent_id}</span>
+                                {else}
+                                    <span class="text-secondary">顶级权限</span>
+                                {/if}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header"><h6 class="mb-0"><i class="bi bi-shield-check"></i> 属性与状态</h6></div>
+                <div class="card-body">
+                    <table class="table table-sm table-borderless mb-0">
+                        <tr>
+                            <td class="text-secondary" style="width:90px;">状态</td>
+                            <td>
+                                {if $permission.status == 1}
+                                    <span class="badge bg-success">启用</span>
+                                {else}
+                                    <span class="badge bg-danger">禁用</span>
+                                {/if}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-secondary">排序号</td>
+                            <td>{$permission.sort|default=0}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-secondary">层级</td>
+                            <td>{$permission.level|default='-'}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-secondary">备注</td>
+                            <td>{$permission.description}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

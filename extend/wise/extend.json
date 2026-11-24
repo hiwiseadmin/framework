@@ -1,0 +1,24 @@
+{
+    "services": [
+        "wise\\plugin\\PluginServiceProvider"
+    ],
+    "commands": [
+        "wise\\command\\crud\\CrudCommand",
+        "wise\\command\\package\\VendorPublish",
+        "wise\\command\\package\\PackageCleanup",
+        "wise\\command\\package\\PackageInstall",
+        "wise\\command\\package\\PackageList",
+        "wise\\command\\package\\PackageUninstall",
+        "wise\\command\\menu\\MenuSync",
+        "wise\\command\\menu\\MenuPermissionSync",
+        "wise\\command\\menu\\PluginMenuMigrate",
+        "wise\\command\\menu\\ApiPermissionCheck",
+        "wise\\command\\system\\EnvSeed",
+        "wise\\command\\system\\LangCheck",
+        "wise\\command\\system\\TestAdmin",
+        "wise\\command\\system\\AsyncTask",
+        "wise\\command\\system\\ChangeLogArchive",
+        "wise\\command\\system\\CacheClear",
+        "wise\\command\\system\\Version"
+    ]
+}

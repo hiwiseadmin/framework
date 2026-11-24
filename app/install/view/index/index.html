@@ -1,0 +1,106 @@
+{extend name="index/layout" /}
+
+{block name="script"}
+<script>
+$(document).ready(function() {
+    // 如果已安装，显示提示
+    {if $installed}
+    showAlert('系统已安装，如需重新安装请进入管理员后台操作', 'warning');
+    {/if}
+    
+    // 下一步按钮特殊处理
+    $('.btn-install').click(function(e) {
+        e.preventDefault();
+        window.location.href = "{:url('/install/index/license')}";
+    });
+});
+</script>
+{/block}
+
+{block name="content"}
+<div class="row">
+    <div class="col-md-8 mx-auto text-center mb-4">
+        <h2 class="mb-3">欢迎使用 {$system_name|default='后台管理系统'}</h2>
+        <p class="text-muted">版本 {$version|default='1.0.0'} | {$author|default='开发团队'}</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-info-circle text-primary me-2"></i>系统简介</h5>
+                <p class="card-text">
+                    基于ThinkPHP6开发的后台管理系统，集成了RBAC权限管理、菜单管理、用户管理、操作日志等核心功能模块，采用现代化的界面设计，提供丰富的API接口，支持多语言扩展，是企业级后台管理系统的理想选择。
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-lightning-charge text-warning me-2"></i>主要特性</h5>
+                <ul class="list-unstyled">
+                    {volist name="features" id="feature"}
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>{$feature}</li>
+                    {/volist}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-cpu text-info me-2"></i>系统要求</h5>
+                <table class="requirements-table">
+                    {volist name="requirements" id="value" key="name"}
+                    <tr>
+                        <td width="40%">{$name}</td>
+                        <td width="60%">{$value}</td>
+                    </tr>
+                    {/volist}
+                    <tr>
+                        <td>服务器环境</td>
+                        <td>{$server_software|default='未知'}</td>
+                    </tr>
+                    <tr>
+                        <td>PHP版本</td>
+                        <td>
+                            {$php_version|default='未知'}
+                            {if isset($php_version) && version_compare($php_version, '7.4.0', '>=')}
+                            <span class="badge bg-success ms-2">✓ 符合</span>
+                            {else}
+                            <span class="badge bg-danger ms-2">✗ 不符合</span>
+                            {/if}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-warning alert-custom">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <strong>注意：</strong> 在开始安装前，请确保您已备份现有数据（如需升级），并已准备好数据库连接信息。
+        </div>
+        
+        {if $installed}
+        <div class="alert alert-warning alert-custom">
+            <i class="bi bi-shield-exclamation me-2"></i>
+            <strong>系统已安装：</strong> 检测到系统已完成安装，如需重新安装，请先删除 <code>install.lock</code> 文件。
+            <div class="mt-2">
+                <a href="{:url('/admin')}" class="btn btn-success btn-sm me-2">进入后台</a>
+                <a href="{:url('/install/index/reinstall')}" class="btn btn-outline-danger btn-sm">重新安装</a>
+            </div>
+        </div>
+        {/if}
+    </div>
+</div>
+{/block}

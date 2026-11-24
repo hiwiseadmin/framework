@@ -1,0 +1,408 @@
+{extend name="public/base" /}
+
+{block name="title"}消息中心{/block}
+
+{block name="css"}
+<style>
+.stat-card {
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.5rem;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bs-tertiary-bg);
+    height: 100%;
+}
+
+.stat-card .stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.stat-card .stat-value {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.stat-card .stat-label {
+    font-size: 12px;
+    color: var(--bs-secondary-color);
+}
+
+.message-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.5rem;
+    margin-bottom: 8px;
+    background: var(--bs-body-bg);
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.message-item:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.message-item.unread {
+    background: rgba(var(--bs-primary-rgb), 0.04);
+    border-left: 3px solid var(--bs-primary);
+}
+
+.message-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 16px;
+}
+
+.message-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.message-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.message-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--bs-body-color);
+}
+
+.message-item:not(.unread) .message-title {
+    font-weight: 500;
+    color: var(--bs-secondary-color);
+}
+
+.unread-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--bs-primary);
+    flex-shrink: 0;
+}
+
+.message-content {
+    font-size: 13px;
+    color: var(--bs-secondary-color);
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.message-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--bs-secondary-color);
+    margin-top: 5px;
+}
+
+.message-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.message-actions .btn {
+    padding: 2px 8px;
+    font-size: 12px;
+}
+
+.message-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--bs-secondary-color);
+}
+
+.message-empty i {
+    font-size: 48px;
+    opacity: 0.3;
+    display: block;
+    margin-bottom: 12px;
+}
+
+.pagination-sm .page-link {
+    font-size: 13px;
+}
+</style>
+{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="public/page_header" icon="bi bi-bell" title="消息中心" desc="查看系统通知与站内消息" actions="" /}
+
+    {/* 表格操作归工具栏；卡片头不再重复「消息中心」标题（页头已表达） */}
+    <div id="toolbar" class="ws-toolbar">
+        <div class="ws-toolbar-tools">
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-refresh" title="刷新列表">
+                <i class="bi bi-arrow-repeat me-1"></i>刷新
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="btn-read-all" title="全部标记为已读">
+                <i class="bi bi-check2-all me-1"></i>全部已读
+            </button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <!-- 统计卡片 -->
+            <div class="row g-3 mb-3" id="stats-row">
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-envelope"></i></div>
+                        <div>
+                            <div class="stat-value" id="stat-total">0</div>
+                            <div class="stat-label">全部消息</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-danger-subtle text-danger"><i class="bi bi-envelope-exclamation"></i></div>
+                        <div>
+                            <div class="stat-value text-danger" id="stat-unread">0</div>
+                            <div class="stat-label">未读消息</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-success-subtle text-success"><i class="bi bi-calendar-day"></i></div>
+                        <div>
+                            <div class="stat-value" id="stat-today">0</div>
+                            <div class="stat-label">今日新增</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-warning-subtle text-warning"><i class="bi bi-flag"></i></div>
+                        <div>
+                            <div class="stat-value" id="stat-high">0</div>
+                            <div class="stat-label">高优先级</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 消息列表 -->
+            <div id="message-list"></div>
+
+            <!-- 空状态 -->
+            <div id="message-empty" class="message-empty d-none">
+                <i class="bi bi-inbox"></i>
+                <div>暂无消息</div>
+            </div>
+
+            <!-- 分页 -->
+            <nav class="d-flex justify-content-end mt-3" id="pagination-wrap" style="display:none;">
+                <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+            </nav>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="js"}
+<script nonce="{$csp_nonce|default=''}">
+$(function () {
+    var PAGE_SIZE = 10;
+    var currentPage = 1;
+
+    // 读取 CSRF Token（与 wise-util 保持一致）
+    function csrfToken() {
+        var meta = document.querySelector('meta[name="csrf-token"]');
+        return meta ? meta.getAttribute('content') : '';
+    }
+
+    // 统一 Ajax 封装
+    function api(method, url, data) {
+        return $.ajax({
+            type: method,
+            url: url,
+            data: data,
+            dataType: 'json',
+            headers: { 'X-CSRF-Token': csrfToken(), 'X-Requested-With': 'XMLHttpRequest' }
+        });
+    }
+
+    function isSuccess(res) {
+        return res && (res.code === 0 || res.code === 200);
+    }
+
+    function esc(str) {
+        return String(str == null ? '' : str)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function priorityInfo(priority) {
+        var p = parseInt(priority, 10) || 1;
+        if (p >= 3) return { icon: 'bi-flag-fill', cls: 'bg-danger-subtle text-danger', text: '高', badge: 'text-bg-danger' };
+        if (p === 2) return { icon: 'bi-flag', cls: 'bg-warning-subtle text-warning', text: '中', badge: 'text-bg-warning' };
+        return { icon: 'bi-envelope', cls: 'bg-secondary-subtle text-secondary', text: '普通', badge: 'text-bg-secondary' };
+    }
+
+    function renderStats() {
+        api('GET', '/admin/system_message/getStats').done(function (res) {
+            if (!isSuccess(res) || !res.data) return;
+            var d = res.data;
+            $('#stat-total').text(d.total || 0);
+            $('#stat-unread').text(d.unread || 0);
+            $('#stat-today').text(d.today || 0);
+            $('#stat-high').text(d.high_priority || 0);
+        });
+    }
+
+    function renderMessage(item) {
+        var m = item.message || {};
+        var unread = item.status === 1;
+        var p = priorityInfo(m.priority);
+        var sender = m.sender_name || m.sender || '';
+
+        var html = '<div class="message-item ' + (unread ? 'unread' : '') + '" data-id="' + esc(item.id) + '">';
+        html += '<div class="message-icon ' + p.cls + '"><i class="bi ' + p.icon + '"></i></div>';
+        html += '<div class="message-body">';
+        html += '<div class="message-head">';
+        html += '<span class="message-title">' + esc(m.title || '（无标题）') + '</span>';
+        if (p.text !== '普通') html += '<span class="badge ' + p.badge + '">' + p.text + '</span>';
+        if (unread) html += '<span class="unread-dot" title="未读"></span>';
+        html += '</div>';
+        if (m.content) html += '<div class="message-content" title="' + esc(m.content) + '">' + esc(m.content) + '</div>';
+        html += '<div class="message-meta">';
+        html += '<span><i class="bi bi-clock"></i> ' + esc(m.create_time || '') + '</span>';
+        if (sender) html += '<span><i class="bi bi-person"></i> ' + esc(sender) + '</span>';
+        if (m.action_url) {
+            html += '<a class="btn btn-xs btn-outline-primary py-0 px-1" href="' + esc(m.action_url) + '" target="_blank">' + esc(m.action_text || '查看') + ' <i class="bi bi-box-arrow-up-right"></i></a>';
+        }
+        html += '</div>';
+        html += '</div>';
+        html += '<div class="message-actions">';
+        if (unread) {
+            html += '<button type="button" class="btn btn-outline-secondary btn-read" title="标为已读"><i class="bi bi-check2"></i></button>';
+        }
+        html += '<button type="button" class="btn btn-outline-danger btn-delete" title="删除"><i class="bi bi-trash3"></i></button>';
+        html += '</div>';
+        html += '</div>';
+        return html;
+    }
+
+    function renderPagination(total) {
+        var totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+        var $pg = $('#pagination');
+        $pg.empty();
+        if (totalPages <= 1) {
+            $('#pagination-wrap').hide();
+            return;
+        }
+        $('#pagination-wrap').show();
+
+        $pg.append('<li class="page-item ' + (currentPage <= 1 ? 'disabled' : '') + '"><a class="page-link" href="javascript:;" data-page="' + (currentPage - 1) + '"><i class="bi bi-chevron-left"></i></a></li>');
+
+        var start = Math.max(1, currentPage - 2);
+        var end = Math.min(totalPages, start + 4);
+        start = Math.max(1, end - 4);
+
+        for (var i = start; i <= end; i++) {
+            $pg.append('<li class="page-item ' + (i === currentPage ? 'active' : '') + '"><a class="page-link" href="javascript:;" data-page="' + i + '">' + i + '</a></li>');
+        }
+
+        $pg.append('<li class="page-item ' + (currentPage >= totalPages ? 'disabled' : '') + '"><a class="page-link" href="javascript:;" data-page="' + (currentPage + 1) + '"><i class="bi bi-chevron-right"></i></a></li>');
+    }
+
+    function loadMessages(page) {
+        currentPage = page || 1;
+        api('GET', '/admin/system_message/getList', { page: currentPage, limit: PAGE_SIZE }).done(function (res) {
+            if (!isSuccess(res) || !res.data) return;
+            var d = res.data;
+            var list = d.messages || [];
+            var $list = $('#message-list');
+            $list.empty();
+
+            if (list.length === 0) {
+                $('#message-empty').removeClass('d-none');
+            } else {
+                $('#message-empty').addClass('d-none');
+                list.forEach(function (item) {
+                    $list.append(renderMessage(item));
+                });
+            }
+            renderPagination(d.total || 0);
+            renderStats();
+        });
+    }
+
+    function markAsRead(id) {
+        api('POST', '/admin/system_message/markAsRead', { message_id: id }).done(function (res) {
+            if (isSuccess(res)) {
+                loadMessages(currentPage);
+            }
+        });
+    }
+
+    function deleteMessage(id) {
+        if (!confirm('确定删除这条消息吗？')) return;
+        api('POST', '/admin/system_message/delete', { message_id: id }).done(function (res) {
+            if (isSuccess(res)) {
+                loadMessages(currentPage);
+            }
+        });
+    }
+
+    // 事件绑定
+    $(document).on('click', '.btn-read', function () {
+        var id = $(this).closest('.message-item').data('id');
+        markAsRead(id);
+    });
+
+    $(document).on('click', '.btn-delete', function () {
+        var id = $(this).closest('.message-item').data('id');
+        deleteMessage(id);
+    });
+
+    $(document).on('click', '#pagination .page-link', function () {
+        var page = parseInt($(this).data('page'), 10);
+        if (page && page !== currentPage) {
+            loadMessages(page);
+        }
+    });
+
+    $('#btn-refresh').on('click', function () {
+        loadMessages(currentPage);
+    });
+
+    $('#btn-read-all').on('click', function () {
+        api('POST', '/admin/system_message/markAllAsRead').done(function (res) {
+            if (isSuccess(res)) {
+                loadMessages(1);
+            }
+        });
+    });
+
+    // 初始加载
+    loadMessages(1);
+});
+</script>
+{/block}

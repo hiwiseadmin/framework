@@ -1,0 +1,103 @@
+# composer dist / git archive 打包时排除的内容
+# 说明：statics 下的构建产物（modules/、css/、js/）仍随包分发，
+# 它们是使用方 composer 安装后开箱即用的前提；
+# 但 libs/ 下的第三方库只带运行时真正加载的文件，源码/示例/sourcemap 不进包。
+
+# 换行策略：统一入库为 LF，避免 dist 中出现 CRLF
+* text=auto
+
+# 子包源码与内置插件不进框架分发包：
+#   packages/ 是 36 个 wise-* 子包的开发真源（由 Packagist 分别分发），
+#   plugins/  是整仓项目才需要的内置插件。
+#   （release.php::buildMainTree() 会直接从 tag tree 里剔除这两个目录，本处
+#    export-ignore 覆盖 git archive / GitHub dist zip 口径，两处保持一致。）
+/packages/          export-ignore
+/plugins/           export-ignore
+
+# 仓库元数据：使用方拿到的是一个应用项目，不需要框架仓库自身的 git 配置
+/.gitattributes      export-ignore
+/.gitignore          export-ignore
+
+/node_modules/      export-ignore
+/runtime/           export-ignore
+/.codebuddy/        export-ignore
+/.workbuddy/        export-ignore
+/tests/             export-ignore
+/docs/              export-ignore
+/composer.lock      export-ignore
+
+# 开发期工具链与环境文件：使用方 composer 安装后不需要（也不需要 Node 环境）
+/.playwright-cli/   export-ignore
+/build/             export-ignore
+/package.json       export-ignore
+/package-lock.json  export-ignore
+
+# 贡献类文件不进 dist：
+#   CONTRIBUTING.md 与 CLA/（个人/企业贡献者许可协议）是成套的，
+#   指向的是「往上游项目贡献」的流程；使用方拿到的是一个应用项目，用不到。
+#   两者必须同进同出，仓库（Gitee 私有仓 / GitHub 快照仓）里仍然完整保留。
+/CONTRIBUTING.md    export-ignore
+/CLA/               export-ignore
+
+/.travis.yml        export-ignore
+/.user.ini          export-ignore
+
+*.log               export-ignore
+
+# ---------------------------------------------------------------------------
+# 第三方前端库（public/statics/libs）：仓库内保留完整文件（bootstrap-table
+# 需要用 merge.sh + extensions/locale 重新打包 bundle，上游升级也要对照），
+# 但 dist 只带运行时真正加载的那几个文件。
+#
+# 写法约束：目录级 export-ignore 会让 git archive 直接跳过整个子树，子树内也
+# 无法用 -export-ignore 找回；所以只有「整块都不进包」的目录（extensions/
+# locale/ themes/）才整目录排除，其余一律按文件模式表述。
+#
+# bootstrap-icons 只保留雪碧图 bootstrap-icons.svg（2078 个 <symbol>）：
+#   内嵌 = <use href=".../bootstrap-icons.svg#name">；
+#   下载 = 后台 Icons::downloadSvg 从雪碧图提取 symbol 生成独立 svg。
+# 单图标 svg（2078 个）已从仓库移除；.scss/.json 属构建源文件，不进包。
+# ---------------------------------------------------------------------------
+
+# bootstrap-table：bundle 产物 + 许可证进包，其余是重新打包的输入
+/public/statics/libs/bootstrap-table/extensions/                 export-ignore
+/public/statics/libs/bootstrap-table/locale/                     export-ignore
+/public/statics/libs/bootstrap-table/themes/                     export-ignore
+/public/statics/libs/bootstrap-table/merge.sh                    export-ignore
+/public/statics/libs/bootstrap-table/bootstrap-table.js          export-ignore
+/public/statics/libs/bootstrap-table/bootstrap-table.css         export-ignore
+/public/statics/libs/bootstrap-table/bootstrap-table.min.js      export-ignore
+/public/statics/libs/bootstrap-table/bootstrap-table.min.css     export-ignore
+/public/statics/libs/bootstrap-table/bootstrap-table-locale-all.js      export-ignore
+/public/statics/libs/bootstrap-table/bootstrap-table-locale-all.min.js  export-ignore
+/public/statics/libs/bootstrap-table/bootstrap-table-vue.js      export-ignore
+/public/statics/libs/bootstrap-table/bootstrap-table-vue.umd.js  export-ignore
+
+# bootstrap：只留 bootstrap.min.css 与 bootstrap.bundle.min.js
+# （bootstrap-ui.css 是项目自制覆盖层，保留在包里）
+/public/statics/libs/bootstrap/css/bootstrap-grid*               export-ignore
+/public/statics/libs/bootstrap/css/bootstrap-reboot*             export-ignore
+/public/statics/libs/bootstrap/css/bootstrap-utilities*          export-ignore
+/public/statics/libs/bootstrap/css/bootstrap.rtl*                export-ignore
+/public/statics/libs/bootstrap/css/bootstrap.css                 export-ignore
+/public/statics/libs/bootstrap/js/bootstrap.bundle.js*           export-ignore
+/public/statics/libs/bootstrap/js/bootstrap.esm*                 export-ignore
+/public/statics/libs/bootstrap/js/bootstrap.js*                  export-ignore
+/public/statics/libs/bootstrap/js/bootstrap.min.js*              export-ignore
+
+# adminlte4：只留项目自制皮肤 adminelte.*；原版 adminlte.* 仅作上游对照
+# （assets/ 已整体删除：皮肤里只有 data-URI，不引用示例图）
+/public/statics/libs/adminlte4/css/adminlte*                      export-ignore
+/public/statics/libs/adminlte4/js/adminlte*                       export-ignore
+
+# 通用开发期文件：sourcemap / 图标源数据 / 组件示例 / 类型声明
+/public/statics/libs/**/*.map                                     export-ignore
+/public/statics/libs/bootstrap-icons/bootstrap-icons.scss         export-ignore
+/public/statics/libs/bootstrap-icons/bootstrap-icons.json         export-ignore
+/public/statics/libs/ws-*/demo.html                               export-ignore
+/public/statics/libs/ws-*/*.d.ts                                  export-ignore
+
+# 历史 IP 库（qqwry.dat 等，约 10MB）：归属地已改用 ip2region，数据随
+# zoujingli/ip2region 包分发。此规则只兜底——防止残留 dat 被 `git add -f`
+# 重新入库后混进 dist。
+/app/common/library/ipdata/*.[dD]at                                export-ignore

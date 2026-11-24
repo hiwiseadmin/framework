@@ -1,0 +1,29 @@
+{extend name="public/base" /}
+
+{block name="title"}{$crudTitle|default=''}{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {/* 页头：crudTitle / crudIcon / crudDesc 是运行时 assign 的变量，而 include 参数是
+       编译期文本替换，二者不能混用，所以这里直接写页头结构（与 page_header 片段同构）。
+       标题保留 id + data-title，直接访问（非 iframe）时由 wise-framework 兜底回填。
+       注意：模板注释内不要出现花括号，否则注释正则会提前截断。 */}
+    <div class="ws-page-header">
+        <div class="ws-page-heading">
+            <i class="ws-page-icon {$crudIcon|default='bi bi-table'}" id="index_header_icon"></i>
+            <div class="ws-page-text">
+                <h1 class="ws-page-title" id="index_header_title" data-title="{$crudTitle|default=''}">{$crudTitle|default=''}</h1>
+                {notempty name="crudDesc"}<p class="ws-page-desc">{$crudDesc}</p>{/notempty}
+            </div>
+        </div>
+    </div>
+
+    {/* 搜索区：由 defineSearch() 声明 + SearchRenderer 渲染；无声明时为空串，不渲染 */}
+    {notempty name="filterHtml"}{$filterHtml|raw}{/notempty}
+
+    <div id="toolbar" class="ws-toolbar"></div>
+    {/* 表格由页面控制器 JS（生成器产出）建实例；如需纯 schema 自动装配，
+        把 data-crud-schema="{$crudSchemaUrl}" 加在 <table> 上并去掉控制器里的建表代码 */}
+    <table id="table"></table>
+</div>
+{/block}

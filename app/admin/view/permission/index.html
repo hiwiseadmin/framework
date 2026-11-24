@@ -1,0 +1,16 @@
+{extend name="public/base" /}
+
+{block name="title"}权限管理{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="public/page_header" icon="bi bi-key" title="权限管理" desc="维护权限节点并同步到角色" actions="" /}
+    <div id="toolbar" class="ws-toolbar">
+        <div class="d-inline" data-ws-target="toolbar"></div>
+    </div>
+    <table id="table"></table>
+</div>
+{/* 同步权限弹窗已迁移到 Wise.ui.dialog.form（UIS v1 §4.2）；
+    提交地址由服务端下发，避免 JS 里硬编码路由 */}
+<script type="application/json" id="perm-urls">{"sync":"{:url('updateFromMenuActionApi')}"}</script>
+{/block}

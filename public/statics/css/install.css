@@ -1,0 +1,217 @@
+/* ============================================================
+   WiseAdmin Install - 静态 CSS（作为内联样式的补充）
+   主样式已内联在 index.html 中，此文件提供回退支持
+   ============================================================ */
+:root {
+    --primary-color: #6366f1;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --dark: #1e293b;
+}
+
+body.install-body, body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    min-height: 100vh;
+    font-family: 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+}
+
+/* 旧版兼容样式 */
+.install-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.install-container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    max-width: 1100px;
+    width: 100%;
+}
+
+.install-header {
+    background: linear-gradient(to right, #6366f1, #7c3aed);
+    color: white;
+    padding: 25px 30px;
+}
+
+.install-header h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.install-progress {
+    height: 4px;
+    background: #e9ecef;
+}
+
+.install-progress-bar {
+    height: 100%;
+    background: var(--success-color);
+    transition: width 0.3s ease;
+}
+
+.install-steps {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 30px;
+    background: #f8f9fa;
+}
+
+.install-content {
+    padding: 30px;
+    min-height: 400px;
+}
+
+.install-footer {
+    padding: 20px 30px;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 按钮 */
+.btn-install {
+    background: linear-gradient(to right, #6366f1, #7c3aed);
+    border: none;
+    padding: 10px 30px;
+    font-weight: 500;
+    min-width: 120px;
+    color: #fff;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.btn-install:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+}
+
+.btn-install:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* 表单 */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+}
+
+.form-control {
+    padding: 10px 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+/* 密码强度条 */
+.password-strength {
+    height: 4px;
+    background: #e9ecef;
+    margin-top: 5px;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.strength-bar {
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s;
+}
+
+.strength-weak { background: var(--danger-color); }
+.strength-fair { background: var(--warning-color); }
+.strength-good { background: var(--primary-color); }
+.strength-strong { background: var(--success-color); }
+
+/* Alert */
+.alert-custom {
+    border-left: 4px solid;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.alert-success { border-left-color: var(--success-color); background-color: rgba(16, 185, 129, 0.1); }
+.alert-danger  { border-left-color: var(--danger-color); background-color: rgba(239, 68, 68, 0.1); }
+.alert-warning { border-left-color: var(--warning-color); background-color: rgba(245, 158, 11, 0.1); }
+
+/* Loading */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+    .install-container {
+        margin: 10px;
+        border-radius: 10px;
+    }
+
+    .install-header {
+        padding: 20px;
+    }
+
+    .install-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .install-content {
+        padding: 20px;
+    }
+
+    .install-steps {
+        padding: 15px 20px;
+    }
+}
+
+@media print {
+    .install-wrapper {
+        background: none !important;
+    }
+    .install-container {
+        box-shadow: none !important;
+        border: 1px solid #ddd;
+    }
+    .btn, .install-footer {
+        display: none !important;
+    }
+}

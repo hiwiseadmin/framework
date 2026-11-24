@@ -1,0 +1,202 @@
+{extend name="public/base" /}
+
+{block name="title"}角色权限对比{/block}
+
+{block name="css"}
+<style>
+.compare-container { padding: 16px; }
+.compare-selects {
+    display: flex; gap: 12px; align-items: center;
+    padding: 16px; background: var(--bs-tertiary-bg);
+    border-radius: 0.375rem; margin-bottom: 16px;
+}
+.compare-selects .vs { font-weight: bold; color: var(--bs-secondary-color); font-size: 18px; }
+.compare-selects select { min-width: 200px; }
+.compare-stats {
+    display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap;
+}
+.compare-stat-card {
+    flex: 1; min-width: 150px; padding: 12px 16px;
+    border-radius: 0.375rem; text-align: center;
+    border: 1px solid var(--bs-border-color);
+}
+.compare-stat-card .stat-num { font-size: 32px; font-weight: 700; }
+.compare-stat-card .stat-label { font-size: 13px; color: var(--bs-secondary-color); }
+.compare-stat-card.only-a { background: rgba(25,135,84,0.08); border-color: rgba(25,135,84,0.2); }
+.compare-stat-card.only-b { background: rgba(13,110,253,0.08); border-color: rgba(13,110,253,0.2); }
+.compare-stat-card.both { background: rgba(108,117,125,0.06); border-color: rgba(108,117,125,0.15); }
+.compare-stat-card.neither { background: rgba(220,53,69,0.04); border-color: rgba(220,53,69,0.1); }
+.compare-list { margin-top: 8px; }
+.compare-section {
+    margin-bottom: 16px; border: 1px solid var(--bs-border-color);
+    border-radius: 0.375rem; overflow: hidden;
+}
+.compare-section-header {
+    padding: 8px 12px; font-weight: 600; font-size: 13px;
+    display: flex; align-items: center; gap: 8px;
+    cursor: pointer;
+}
+.compare-section-body { padding: 0; }
+.compare-perm-row {
+    display: flex; align-items: center; padding: 4px 12px;
+    border-bottom: 1px solid var(--bs-border-color-light, rgba(0,0,0,0.04));
+    font-size: 13px; gap: 8px;
+}
+.compare-perm-row:last-child { border-bottom: none; }
+.compare-perm-row .perm-name { flex: 1; }
+.compare-perm-row .perm-indicator { font-size: 18px; line-height: 1; }
+.compare-perm-row .ind-a { color: var(--bs-success); }
+.compare-perm-row .ind-b { color: var(--bs-primary); }
+.compare-empty {
+    text-align: center; padding: 40px 16px;
+    color: var(--bs-secondary-color);
+}
+</style>
+{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="public/page_header" icon="bi bi-intersect" title="角色权限对比" desc="对比两个角色的权限差异" actions="" /}
+    <div class="compare-container">
+        <div class="compare-selects">
+            <select class="form-select" id="compare-role-a">
+                <option value="">选择角色A...</option>
+            </select>
+            <span class="vs">VS</span>
+            <select class="form-select" id="compare-role-b">
+                <option value="">选择角色B...</option>
+            </select>
+            <button class="btn btn-primary btn-sm" id="btn-compare" disabled>
+                <i class="bi bi-arrow-left-right"></i> 开始对比
+            </button>
+        </div>
+
+        <div id="compare-result" style="display:none;">
+            <!-- 统计卡片 -->
+            <div class="compare-stats" id="compare-stats"></div>
+
+            <!-- 权限列表 -->
+            <div id="compare-lists"></div>
+        </div>
+
+        <div id="compare-placeholder" class="compare-empty">
+            <i class="bi bi-arrow-left-right fs-1 d-block mb-2 opacity-25"></i>
+            <span>选择两个角色进行权限对比</span>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="js"}
+<script nonce="{$csp_nonce|default=''}">
+$(function () {
+    // 加载角色列表
+    $.ajax({
+        url: '/admin/role/getAllRoles',
+        dataType: 'json',
+        success: function (res) {
+            if (res.code === 0) {
+                var options = '<option value="">选择角色...</option>';
+                res.data.forEach(function (r) {
+                    options += '<option value="' + r.id + '">' + r.name + ' (' + r.ident + ')</option>';
+                });
+                $('#compare-role-a, #compare-role-b').html(options);
+            }
+        }
+    });
+
+    // 选择变化时检查
+    $('#compare-role-a, #compare-role-b').on('change', function () {
+        var a = $('#compare-role-a').val();
+        var b = $('#compare-role-b').val();
+        $('#btn-compare').prop('disabled', !a || !b || a === b);
+    });
+
+    // 执行对比
+    $('#btn-compare').on('click', function () {
+        var roleA = $('#compare-role-a').val();
+        var roleB = $('#compare-role-b').val();
+        if (!roleA || !roleB) return;
+
+        $.ajax({
+            url: '/admin/role/getCompareData',
+            data: { role_a: roleA, role_b: roleB },
+            dataType: 'json',
+            success: function (res) {
+                if (res.code === 0) {
+                    renderCompare(res.data);
+                }
+            }
+        });
+    });
+
+    function renderCompare(data) {
+        $('#compare-placeholder').hide();
+        $('#compare-result').show();
+
+        var c = data.counts;
+
+        // 统计卡片
+        $('#compare-stats').html(
+            '<div class="compare-stat-card only-a">'
+            + '<div class="stat-num text-success">' + c.only_a + '</div>'
+            + '<div class="stat-label">仅 ' + (data.role_a.name) + ' 拥有</div>'
+            + '</div>'
+            + '<div class="compare-stat-card only-b">'
+            + '<div class="stat-num text-primary">' + c.only_b + '</div>'
+            + '<div class="stat-label">仅 ' + (data.role_b.name) + ' 拥有</div>'
+            + '</div>'
+            + '<div class="compare-stat-card both">'
+            + '<div class="stat-num text-secondary">' + c.both + '</div>'
+            + '<div class="stat-label">两者共有</div>'
+            + '</div>'
+            + '<div class="compare-stat-card neither">'
+            + '<div class="stat-num text-danger">' + c.neither + '</div>'
+            + '<div class="stat-label">两者均无</div>'
+            + '</div>'
+        );
+
+        // 权限列表
+        function renderSection(title, items, classA, classB, bg) {
+            if (!items || items.length === 0) return '';
+            var html = '<div class="compare-section">';
+            html += '<div class="compare-section-header" style="background:' + (bg || 'var(--bs-tertiary-bg)') + ';">'
+                + title + ' (' + items.length + '项)</div>';
+            html += '<div class="compare-section-body">';
+            items.forEach(function (p) {
+                html += '<div class="compare-perm-row">';
+                html += '<span class="perm-indicator ' + classA + '">' + (classA === 'ind-a' ? '✓' : '✕') + '</span>';
+                html += '<span class="perm-indicator ' + classB + '">' + (classB === 'ind-a' ? '✓' : '✕') + '</span>';
+                html += '<span class="perm-name">' + p.name + '</span>';
+                html += '<span class="badge bg-light text-dark" style="font-size:10px;">' + (p.type || '') + '</span>';
+                html += '</div>';
+            });
+            html += '</div></div>';
+            return html;
+        }
+
+        var listHtml = '';
+        listHtml += renderSection(
+            '仅 ' + data.role_a.name + ' 拥有', data.only_a,
+            'ind-a', 'ind-b', 'rgba(25,135,84,0.06)'
+        );
+        listHtml += renderSection(
+            '仅 ' + data.role_b.name + ' 拥有', data.only_b,
+            'ind-b', 'ind-a', 'rgba(13,110,253,0.06)'
+        );
+        listHtml += renderSection('两者共有', data.both, 'ind-a', 'ind-a', 'var(--bs-tertiary-bg)');
+
+        if (!listHtml) {
+            listHtml = '<div class="compare-empty"><i class="bi bi-check-circle fs-1 d-block mb-2 opacity-25"></i><span>两个角色的权限完全相同</span></div>';
+        }
+
+        $('#compare-lists').html(listHtml);
+
+        // 添加折叠/展开
+        $('.compare-section-header').off('click').on('click', function () {
+            $(this).next('.compare-section-body').slideToggle(150);
+        });
+    }
+});
+</script>
+{/block}

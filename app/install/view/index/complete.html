@@ -1,0 +1,156 @@
+{extend name="index/layout" /}
+
+{block name="script"}
+<script>
+$(document).ready(function() {
+    // 安全提示
+    setTimeout(() => {
+        $('#securityAlert').fadeIn();
+    }, 3000);
+    
+    // 初始化样式
+    $('<style>')
+        .html(`
+            .install-success {
+                text-align: center;
+                padding: 40px 20px;
+            }
+            .success-icon {
+                font-size: 80px;
+                color: #2ecc71;
+                margin-bottom: 20px;
+                animation: bounce 1s ease-in-out;
+            }
+            @keyframes bounce {
+                0%, 20%, 60%, 100% { transform: translateY(0); }
+                40% { transform: translateY(-20px); }
+                80% { transform: translateY(-10px); }
+            }
+            .login-info {
+                background: #f8f9fa;
+                border-radius: 10px;
+                padding: 20px;
+                margin: 30px 0;
+            }
+            .info-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 0;
+                border-bottom: 1px solid #e9ecef;
+            }
+            .info-item:last-child {
+                border-bottom: none;
+            }
+            .btn-copy {
+                font-size: 0.8rem;
+                padding: 3px 10px;
+            }
+            .action-buttons {
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+                margin-top: 30px;
+            }
+            #securityAlert {
+                display: none;
+            }
+        `)
+        .appendTo('head');
+});
+</script>
+{/block}
+
+{block name="content"}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="install-success">
+            <div class="success-icon">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+            
+            <h2 class="mb-3">安装完成！</h2>
+            <p class="text-muted mb-4">恭喜！系统已成功安装，您可以开始使用后台管理系统了。</p>
+            
+            <div class="login-info">
+                <h5 class="mb-3"><i class="bi bi-key me-2"></i>管理员登录信息</h5>
+                
+                <div class="info-item">
+                    <span>后台地址：</span>
+                    <a href="{$admin_url|default='#'}" target="_blank" class="text-decoration-none">
+                        {$admin_url|default='#'}
+                    </a>
+                </div>
+                
+                <div class="info-item">
+                    <span>管理员账号：</span>
+                    <strong>{$admin_user_masked|default='ad***'}</strong>
+                </div>
+                
+                <div class="info-item">
+                    <span>管理员密码：</span>
+                    <div class="d-flex align-items-center">
+                        <code class="me-2">••••••••</code>
+                        <span class="text-muted small">出于安全考虑不在此展示，请使用安装时设置的密码登录</span>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <span>安装时间：</span>
+                    <span>{$install_info.install_time|default=date('Y-m-d H:i:s')}</span>
+                </div>
+                
+                <div class="info-item">
+                    <span>系统版本：</span>
+                    <span>{$install_info.version|default='1.0.0'}</span>
+                </div>
+            </div>
+            
+            <div class="alert alert-warning alert-custom" id="securityAlert">
+                <i class="bi bi-shield-exclamation me-2"></i>
+                <strong>安全提示：</strong> 请立即登录后台修改管理员密码，并妥善保管登录信息！
+            </div>
+            
+            <div class="action-buttons">
+                <a href="{$admin_url|default='#'}" target="_blank" class="btn btn-install">
+                    <i class="bi bi-box-arrow-in-right"></i> 进入后台
+                </a>
+                
+                <a href="{:url('/')}" class="btn btn-outline-primary">
+                    <i class="bi bi-house-door"></i> 访问首页
+                </a>
+                
+                <button type="button" class="btn btn-outline-success" onclick="location.reload()">
+                    <i class="bi bi-arrow-repeat"></i> 重新检查
+                </button>
+            </div>
+            
+            <div class="mt-5 pt-4 border-top">
+                <h5 class="mb-3">后续操作建议</h5>
+                <div class="row text-start">
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>修改管理员密码</li>
+                            <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>配置系统参数</li>
+                            <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>设置权限角色</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>添加网站菜单</li>
+                            <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>配置邮件服务</li>
+                            <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>备份数据库</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <a href="{:url('/install/index/reinstall')}" class="btn btn-link text-danger">
+                    <i class="bi bi-trash"></i> 重新安装系统
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

@@ -1,0 +1,46 @@
+{
+  "name": "wiseadmin-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "WiseAdmin 前端资源构建：esbuild 打包 ESM 内核模块与 ws-* 组件",
+  "type": "module",
+  "scripts": {
+    "build": "node build/build-js.mjs && node build/build-editor.mjs",
+    "dev": "node build/build-js.mjs --dev",
+    "watch": "node build/build-js.mjs --watch",
+    "build:editor": "node build/build-editor.mjs",
+    "dev:editor": "node build/build-editor.mjs --dev",
+    "verify:editor": "node build/verify-editor.mjs",
+    "verify:markdown": "node build/verify-tiptap-markdown.mjs",
+    "verify:ws-markdown": "node build/verify-ws-markdown.mjs",
+    "verify:markdown-driver": "php build/verify-markdown-driver.php",
+    "verify:permissions": "php build/verify-permissions.php",
+    "verify:cookie": "node build/verify-cookie.mjs",
+    "verify:guardrails": "php build/verify-guardrails.php",
+    "verify:middleware": "php build/verify-middleware.php",
+    "verify:ai-capabilities": "php build/verify-ai-capabilities.php",
+    "verify:ai-guard": "php build/verify-ai-tool-guard.php",
+    "verify:admin-security": "php build/verify-admin-security.php",
+    "verify:crud-map": "php build/verify-crud-map.php",
+    "verify:all": "npm run verify:editor && npm run verify:markdown && npm run verify:ws-markdown && npm run verify:markdown-driver && npm run verify:permissions && npm run verify:cookie && npm run verify:middleware && npm run verify:ai-capabilities && npm run verify:ai-guard && npm run verify:admin-security && npm run verify:crud-map && npm run verify:guardrails",
+    "verify:ci": "npm run verify:markdown-driver && npm run verify:permissions && npm run verify:cookie && npm run verify:middleware && npm run verify:ai-guard && npm run verify:admin-security && npm run verify:crud-map && npm run verify:guardrails && npm run verify:ws-markdown",
+    "serve:editor": "node build/verify-editor.mjs --serve"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.2"
+  },
+  "dependencies": {
+    "@tiptap/core": "3.31.4",
+    "@tiptap/extension-code-block-lowlight": "3.31.4",
+    "@tiptap/extension-highlight": "3.31.4",
+    "@tiptap/extension-image": "3.31.4",
+    "@tiptap/extension-table": "3.31.4",
+    "@tiptap/extension-text-align": "3.31.4",
+    "@tiptap/extension-text-style": "3.31.4",
+    "@tiptap/extensions": "3.31.4",
+    "@tiptap/markdown": "3.31.4",
+    "@tiptap/pm": "3.31.4",
+    "@tiptap/starter-kit": "3.31.4",
+    "lowlight": "3.3.0"
+  }
+}

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WsUpload 文件上传组件演示</title>
+    <link href="/statics/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/statics/libs/bootstrap-icons/bootstrap-icons.min.css">
+    <style>
+        .demo-section {
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid var(--bs-border-color);
+            border-radius: 10px;
+            background: var(--bs-body-bg);
+        }
+        .demo-section h3 { margin-bottom: 0.75rem; }
+        .api-output { background: var(--bs-secondary-bg); padding: 12px; border-radius: 6px; font-family: monospace; font-size: 0.85rem; max-height: 200px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+<a href="/statics/demo/ws-form.html" style="position:fixed;right:18px;bottom:18px;z-index:2050;display:inline-flex;align-items:center;gap:.35rem;padding:.5rem .875rem;font-size:.8125rem;font-weight:500;color:#fff;background:#0d6efd;border-radius:999px;box-shadow:0 4px 14px rgba(13,110,253,.35);text-decoration:none;">声明式表单接入示例 &rarr;</a>
+    <div class="container my-5">
+        <h1 class="text-center mb-1">WsUpload 文件上传组件</h1>
+        <p class="text-center text-muted mb-4">基于 jQuery + Bootstrap 5 的功能丰富文件上传组件</p>
+
+        <!-- 主题样式总览 -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="demo-section">
+                    <h3><i class="bi bi-palette me-2"></i>1. 三种主题样式</h3>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <h6>default 主题</h6>
+                            <div id="defaultUpload"></div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <h6>drag 拖拽主题</h6>
+                            <div id="dragUpload"></div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <h6>minimal 简约主题</h6>
+                            <div id="minimalUpload"></div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6 mb-3">
+                            <h6>compact 紧凑列表（listLayout:'compact'）</h6>
+                            <div id="compactUpload"></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6>mini-queue 迷你上传队列（listLayout:'mini-queue'）</h6>
+                            <div id="miniUpload"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主要功能 -->
+        <div class="row mb-4">
+            <div class="col-md-6 mb-4">
+                <div class="demo-section h-100">
+                    <h3><i class="bi bi-image me-2"></i>2. 图片上传 & 网格预览</h3>
+                    <p class="text-muted small">仅允许图片，自动生成缩略图预览，支持大图查看</p>
+                    <div id="imageUpload"></div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="demo-section h-100">
+                    <h3><i class="bi bi-files me-2"></i>3. 多文件 & 手动上传</h3>
+                    <p class="text-muted small">支持多选、手动触发上传、文件限制</p>
+                    <div id="multipleUpload"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 高级功能 -->
+        <div class="row mb-4">
+            <div class="col-md-6 mb-4">
+                <div class="demo-section h-100">
+                    <h3><i class="bi bi-shield-check me-2"></i>4. 类型/大小限制 & 自定义数据</h3>
+                    <p class="text-muted small">限制文档类型、大小、最大文件数、添加额外数据</p>
+                    <div id="advancedUpload"></div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="demo-section h-100">
+                    <h3><i class="bi bi-file-earmark-zip me-2"></i>5. 拖拽 + 预览</h3>
+                    <p class="text-muted small">拖拽上传 + 列表预览 + 统计信息</p>
+                    <div id="dragPreviewUpload"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API 控制 -->
+        <div class="row">
+            <div class="col-12">
+                <div class="demo-section">
+                    <h3><i class="bi bi-code-slash me-2"></i>6. API 方法控制</h3>
+                    <div id="apiUpload" class="mb-3"></div>
+                    <div class="d-flex gap-2 flex-wrap mb-3">
+                        <button id="apiStartBtn" class="btn btn-success btn-sm">upload() 开始上传</button>
+                        <button id="apiCancelBtn" class="btn btn-warning btn-sm">cancelUpload() 取消</button>
+                        <button id="apiClearBtn" class="btn btn-danger btn-sm">clearFiles() 清空</button>
+                        <button id="apiGetFilesBtn" class="btn btn-info btn-sm">getFiles() 获取列表</button>
+                        <button id="apiGetProgressBtn" class="btn btn-secondary btn-sm">getProgress() 进度</button>
+                        <button id="apiGetFailedBtn" class="btn btn-outline-danger btn-sm">getFailedFiles()</button>
+                    </div>
+                    <div class="api-output" id="apiOutput"><code>API 输出将显示在这里...</code></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API 参考 -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="demo-section">
+                    <h3><i class="bi bi-book me-2"></i>主要配置项速查</h3>
+                    <table class="table table-sm table-striped">
+                        <thead><tr><th>参数</th><th>类型</th><th>默认值</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>url</code></td><td>String</td><td>''</td><td>上传接口 URL</td></tr>
+                            <tr><td><code>multiple</code></td><td>Boolean</td><td>false</td><td>多文件上传</td></tr>
+                            <tr><td><code>accept</code></td><td>String</td><td>'file'</td><td>文件类型：images/video/audio/document/archive/file/custom</td></tr>
+                            <tr><td><code>exts</code></td><td>String</td><td>''</td><td>允许扩展名，逗号分隔</td></tr>
+                            <tr><td><code>maxSize</code></td><td>Number</td><td>0</td><td>最大文件大小(字节)，0不限制</td></tr>
+                            <tr><td><code>maxFiles</code></td><td>Number</td><td>0</td><td>最大文件数，0不限制</td></tr>
+                            <tr><td><code>autoUpload</code></td><td>Boolean</td><td>true</td><td>选择后自动上传</td></tr>
+                            <tr><td><code>theme</code></td><td>String</td><td>'default'</td><td>主题：default/drag/minimal</td></tr>
+                            <tr><td><code>previewType</code></td><td>String</td><td>'list'</td><td>预览类型：list/grid</td></tr>
+                            <tr><td><code>parallelUploads</code></td><td>Number</td><td>3</td><td>并行上传数</td></tr>
+                            <tr><td><code>retryAttempts</code></td><td>Number</td><td>3</td><td>失败重试次数</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/statics/js/jquery/jquery.min.js"></script>
+    <script src="/statics/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- 组件为原生 ESM，可直接加载源码：改完组件刷新即可，无需任何构建。
+         样式必须单独 link —— 组件刻意不 import CSS，否则浏览器会因 MIME 类型
+         是 text/css 而拒绝加载整个模块。 -->
+    <link rel="stylesheet" href="ws-upload.css">
+    <script type="module" src="ws-upload.js"></script>
+    <script src="/statics/js/theme.js"></script>
+
+    <script>
+        // 本地 Ajax Mock - 使用 $.ajaxPrefilter 拦截上传请求
+        $(function() {
+            $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
+                if (options.url === '/api/upload') {
+                    // 模拟上传处理
+                    var mockResponse = function() {
+                        var delay = 500 + Math.random() * 1500;
+                        var formData = options.data;
+                        var fileName = 'unknown';
+                        var fileSize = 0;
+
+                        // 从 FormData 中提取文件信息
+                        if (formData instanceof FormData) {
+                            var file = formData.get('file');
+                            if (file) {
+                                fileName = file.name;
+                                fileSize = file.size;
+                            }
+                        }
+
+                        return {
+                            delay: delay,
+                            responseText: Math.random() < 0.15 ? {
+                                success: false,
+                                message: '模拟服务器错误: ' + fileName
+                            } : {
+                                success: true,
+                                message: '上传成功',
+                                data: { url: '/uploads/mock_' + Date.now(), size: fileSize, name: fileName }
+                            }
+                        };
+                    };
+
+                    var mock = mockResponse();
+                    // 使用 setTimeout 模拟延迟
+                    var _done, _fail, _progress;
+                    var origXhr = options.xhr;
+
+                    options.xhr = function() {
+                        var xhr = origXhr ? origXhr() : new XMLHttpRequest();
+                        var upload = xhr.upload;
+                        if (upload) {
+                            // 模拟上传进度
+                            var total = 100;
+                            var loaded = 0;
+                            var interval = setInterval(function() {
+                                loaded += Math.random() * 30;
+                                if (loaded >= total) {
+                                    loaded = total;
+                                    clearInterval(interval);
+                                }
+                                if (upload.onprogress) {
+                                    upload.onprogress({ lengthComputable: true, loaded: loaded, total: total });
+                                }
+                            }, 150);
+                        }
+                        return xhr;
+                    };
+
+                    // 覆盖 done/fail
+                    var origDone, origFail;
+                    var timer = setTimeout(function() {
+                        if (mock.responseText.success) {
+                            if (jqXHR.done) {
+                                jqXHR.done(mock.responseText);
+                            }
+                        } else {
+                            if (jqXHR.fail) {
+                                jqXHR.fail({ status: 500 }, 'error', mock.responseText.message);
+                            }
+                        }
+                    }, mock.delay);
+
+                    // 让上传组件可以 abort
+                    jqXHR.abort = function() {
+                        clearTimeout(timer);
+                    };
+                }
+            });
+
+            // ========== 1. 三种主题 ==========
+            $('#defaultUpload').wsUpload({
+                url: '/api/upload',
+                theme: 'default',
+                showFileList: true,
+                showStatistics: true,
+                browseText: '<i class="bi bi-cloud-arrow-up"></i> 选择文件',
+                onSuccess: function(file, response) {
+                    console.log('上传成功:', file.name, response);
+                }
+            });
+
+            $('#dragUpload').wsUpload({
+                url: '/api/upload',
+                theme: 'drag',
+                multiple: true,
+                showFileList: true,
+                showStatistics: true,
+                showActions: true,
+                dragText: '拖拽文件到此处或<br><u>点击选择文件</u>'
+            });
+
+            $('#minimalUpload').wsUpload({
+                url: '/api/upload',
+                theme: 'minimal',
+                showFileList: true,
+                showStatistics: true,
+                browseText: '<i class="bi bi-cloud-arrow-up"></i> 上传'
+            });
+
+            $('#compactUpload').wsUpload({
+                url: '/api/upload',
+                theme: 'default',
+                multiple: true,
+                listLayout: 'compact',
+                showFileList: true,
+                showStatistics: true,
+                showActions: true,
+                browseText: '<i class="bi bi-cloud-arrow-up"></i> 选择文件'
+            });
+
+            $('#miniUpload').wsUpload({
+                url: '/api/upload',
+                theme: 'default',
+                multiple: true,
+                listLayout: 'mini-queue',
+                showFileList: true,
+                showStatistics: true,
+                showActions: true,
+                browseText: '<i class="bi bi-cloud-arrow-up"></i> 选择文件'
+            });
+
+            // ========== 2. 图片上传 ==========
+            $('#imageUpload').wsUpload({
+                url: '/api/upload',
+                accept: 'images',
+                maxSize: 10 * 1024 * 1024,
+                maxFiles: 8,
+                theme: 'drag',
+                showPreview: true,
+                previewType: 'grid',
+                showFileList: true,
+                showStatistics: true,
+                showActions: true,
+                messages: {
+                    maxFiles: '最多上传 8 张图片',
+                    maxSize: '图片不能超过 10MB'
+                }
+            });
+
+            // ========== 3. 多文件手动上传 ==========
+            $('#multipleUpload').wsUpload({
+                url: '/api/upload',
+                multiple: true,
+                maxFiles: 5,
+                maxSize: 20 * 1024 * 1024,
+                autoUpload: false,
+                theme: 'default',
+                showFileList: true,
+                showStatistics: true,
+                showActions: true,
+                uploadText: '<i class="bi bi-upload"></i> 上传所有文件',
+                onSelect: function(files) {
+                    console.log('已选择 ' + files.length + ' 个文件');
+                },
+                onComplete: function(files) {
+                    var ok = files.filter(function(f) { return f.status === 'success'; }).length;
+                    console.log('上传完成! 成功: ' + ok);
+                }
+            });
+
+            // ========== 4. 高级功能 ==========
+            $('#advancedUpload').wsUpload({
+                url: '/api/upload',
+                accept: 'custom',
+                exts: 'pdf,doc,docx,xls,xlsx,txt,zip',
+                maxSize: 50 * 1024 * 1024,
+                maxFiles: 10,
+                multiple: true,
+                autoUpload: false,
+                theme: 'default',
+                showFileList: true,
+                showStatistics: true,
+                showActions: true,
+                parallelUploads: 2,
+                retryAttempts: 2,
+                data: {
+                    category: 'documents',
+                    timestamp: function() { return new Date().toISOString(); }
+                },
+                headers: { 'X-Custom-Header': 'WsUploadDemo' },
+                beforeUpload: function(files) {
+                    return confirm('即将上传 ' + files.length + ' 个文件，确认？');
+                }
+            });
+
+            // ========== 5. 拖拽 + 预览 ==========
+            $('#dragPreviewUpload').wsUpload({
+                url: '/api/upload',
+                theme: 'drag',
+                multiple: true,
+                showPreview: true,
+                previewType: 'list',
+                showFileList: true,
+                showStatistics: true,
+                showActions: true,
+                onProgress: function(file, percent) {
+                    console.log(file.name + ': ' + percent + '%');
+                }
+            });
+
+            // ========== 6. API 控制 ==========
+            var apiInstance = $('#apiUpload').wsUpload({
+                url: '/api/upload',
+                multiple: true,
+                autoUpload: false,
+                theme: 'default',
+                showFileList: true,
+                showStatistics: true,
+                showActions: false
+            }).data('wsUpload');
+
+            var updateOutput = function(msg) {
+                var time = new Date().toLocaleTimeString();
+                var $out = $('#apiOutput');
+                $out.prepend('<div>[' + time + '] ' + msg + '</div>');
+                if ($out.children().length > 20) $out.children().last().remove();
+            };
+
+            $('#apiStartBtn').on('click', function() { apiInstance.upload(); updateOutput('upload() - 开始上传'); });
+            $('#apiCancelBtn').on('click', function() { apiInstance.cancelUpload(); updateOutput('cancelUpload()'); });
+            $('#apiClearBtn').on('click', function() { apiInstance.clearFiles(); updateOutput('clearFiles()'); });
+            $('#apiGetFilesBtn').on('click', function() {
+                var files = apiInstance.getFiles();
+                var info = files.map(function(f) { return { name: f.name, size: f.size, status: f.status }; });
+                updateOutput('getFiles(): ' + JSON.stringify(info, null, 2));
+            });
+            $('#apiGetProgressBtn').on('click', function() {
+                updateOutput('进度: ' + apiInstance.getProgress() + '% | 上传中: ' + apiInstance.isUploading());
+            });
+            $('#apiGetFailedBtn').on('click', function() {
+                var failed = apiInstance.getFailedFiles();
+                updateOutput('失败文件: ' + failed.length + ' 个 - ' + JSON.stringify(failed.map(function(f){return f.name;})));
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!-- 菜单新增/编辑模态框 -->
+<div class="modal fade" id="menuModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content ws-modal">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">新增菜单</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+            </div>
+            <form id="menuForm">
+                <div class="modal-body">
+                    <!-- 菜单ID（隐藏） -->
+                    <input type="hidden" id="menuId" name="id">
+                    
+                    <div class="row">
+                        <!-- 上级菜单 -->
+                        <div class="col-md-6 mb-3">
+                            <label for="parentId" class="form-label">上级菜单</label>
+                            <select class="form-select" id="parentId" name="parent_id" required>
+                                <option value="0">顶级菜单</option>
+                                <!-- 上级菜单列表由JS动态渲染 -->
+                            </select>
+                        </div>
+                        
+                        <!-- 菜单排序 -->
+                        <div class="col-md-6 mb-3">
+                            <label for="sort" class="form-label">排序号</label>
+                            <input type="number" class="form-control" id="sort" name="sort" value="50" min="0" required>
+                            <div class="form-text">数值越小，排序越靠前</div>
+                        </div>
+                        
+                        <!-- 菜单名称 -->
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label">菜单名称</label>
+                            <input type="text" class="form-control" id="name" name="name" placeholder="请输入菜单名称" required>
+                        </div>
+                        
+                        <!-- 菜单标题 -->
+                        <div class="col-md-6 mb-3">
+                            <label for="title" class="form-label">菜单标题</label>
+                            <input type="text" class="form-control" id="title" name="title" placeholder="请输入菜单显示标题" required>
+                        </div>
+                        
+                        <!-- 菜单图标 -->
+                        <div class="col-md-6 mb-3">
+                            <label for="icon" class="form-label">菜单图标</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="icon" name="icon" placeholder="如：fa-home" required>
+                                <button type="button" class="btn btn-outline-secondary" id="selectIcon">选择图标</button>
+                            </div>
+                            <div class="form-text mt-1">
+                                <i class="fa" id="iconPreview"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- 路由地址 -->
+                        <div class="col-md-6 mb-3">
+                            <label for="path" class="form-label">路由地址</label>
+                            <input type="text" class="form-control" id="path" name="path" placeholder="如：admin/menu/index">
+                            <div class="form-text">子菜单必填，顶级菜单可留空</div>
+                        </div>
+                        
+                        <!-- 菜单状态 -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">菜单状态</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="status" id="status-normal" value="1" checked>
+                                <label class="form-check-label" for="status-normal">启用</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="status" id="status-disabled" value="0">
+                                <label class="form-check-label" for="status-disabled">禁用</label>
+                            </div>
+                        </div>
+                        
+                        <!-- 显示状态 -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">显示状态</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="is_show" id="show-yes" value="1" checked>
+                                <label class="form-check-label" for="show-yes">显示</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="is_show" id="show-no" value="0">
+                                <label class="form-check-label" for="show-no">隐藏</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 图标选择弹窗（隐藏） -->
+<div class="modal fade" id="iconModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content ws-modal">
+            <div class="modal-header">
+                <h5 class="modal-title">选择图标</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="iconSearch" placeholder="搜索图标（如：home）">
+                    <button class="btn btn-outline-secondary" type="button" id="doIconSearch">搜索</button>
+                </div>
+                <div class="row" id="iconList">
+                    <!-- 图标列表由JS动态渲染（常用Font-Awesome图标） -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

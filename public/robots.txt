@@ -1,0 +1,4 @@
+# WiseAdmin robots.txt
+
+User-agent: *
+Allow: /

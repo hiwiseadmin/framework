@@ -1,0 +1,97 @@
+{
+  "version": "bundled-2026.11.1",
+  "engine": "plugin:test/unit",
+  "description": "插件契约用例集（随框架包冻结）。本地只做无 DB / 无网络的静态检查；装-启-停-卸全链路与服务端 CI 不在此列。case id 命名空间：contract.*。",
+  "cases": [
+    {
+      "id": "contract.manifest_present",
+      "group": "structure",
+      "level": "error",
+      "title": "manifest.json 存在（flat 或 wrapped 结构）"
+    },
+    {
+      "id": "contract.manifest_parse",
+      "group": "structure",
+      "level": "error",
+      "title": "manifest.json 是合法 JSON 对象"
+    },
+    {
+      "id": "contract.php_syntax",
+      "group": "structure",
+      "level": "error",
+      "title": "包内 PHP 文件语法可解析（不执行代码）"
+    },
+    {
+      "id": "contract.namespace_prefix",
+      "group": "structure",
+      "level": "error",
+      "title": "controller/model/validate 等目录的 namespace 以 plugin\\{ident}\\ 开头"
+    },
+    {
+      "id": "contract.provider_file",
+      "group": "structure",
+      "level": "error",
+      "title": "service_provider 声明的类有对应文件且类名正确"
+    },
+    {
+      "id": "contract.menus_shape",
+      "group": "manifest",
+      "level": "error",
+      "title": "menus 节点结构合法（name / type / path / children）"
+    },
+    {
+      "id": "contract.menus_path_scope",
+      "group": "manifest",
+      "level": "warn",
+      "title": "菜单 path 建议包含插件标识（/plugin/{ident}/...）"
+    },
+    {
+      "id": "contract.permissions_shape",
+      "group": "manifest",
+      "level": "error",
+      "title": "permissions 的 ident 非空、格式合法且不重复"
+    },
+    {
+      "id": "contract.migration_filename",
+      "group": "database",
+      "level": "error",
+      "title": "迁移文件名形如 {14 位时间戳}_{snake_case}.php"
+    },
+    {
+      "id": "contract.migration_class",
+      "group": "database",
+      "level": "error",
+      "title": "迁移类名与文件名一致（StudlyCase）"
+    },
+    {
+      "id": "contract.migration_body",
+      "group": "database",
+      "level": "error",
+      "title": "迁移存在 up() 或 change() 方法"
+    },
+    {
+      "id": "contract.seed_class",
+      "group": "database",
+      "level": "error",
+      "title": "Seeder 类名与文件名一致（忽略大小写）"
+    },
+    {
+      "id": "contract.publish_map",
+      "group": "assets",
+      "level": "error",
+      "title": "publish 映射的源目录存在、目标在 public/ 下且不含 .."
+    },
+    {
+      "id": "contract.route_targets",
+      "group": "route",
+      "level": "warn",
+      "title": "route/*.php 中的 Class@action 能解析到包内控制器与方法"
+    },
+    {
+      "id": "contract.caseset_version",
+      "group": "caseset",
+      "level": "warn",
+      "title": "外部用例集版本与内置用例集一致"
+    }
+  ]
+}

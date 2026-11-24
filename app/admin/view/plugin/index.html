@@ -1,0 +1,100 @@
+{extend name="public/base" /}
+
+{block name="title"}插件管理{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="public/page_header" icon="bi bi-puzzle" title="插件管理" desc="安装、启用与卸载插件" actions="" /}
+    <ul class="nav nav-tabs" id="category">
+        <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" data-catid="0" href="#"> 全部</a>
+        </li>
+    </ul>
+    <div id="toolbar" class="ws-toolbar">
+        <!-- 数据操作（左）-->
+        <div class="ws-toolbar-actions">
+            <button type="button" id="local_install" class="btn btn-sm btn-primary"><i class="bi bi-upload me-1"></i>本地安装</button>
+            <input type="file" id="local_install_file" class="form-control d-none" accept="">
+            <div class="btn-group btn-group-sm" role="group" aria-label="插件来源">
+                <input type="radio" class="btn-check" name="soft_type" id="soft_type_all" autocomplete="off" value="all" checked>
+                <label class="btn btn-sm btn-outline-secondary" for="soft_type_all"><i class="bi bi-list-task me-1"></i>全部</label>
+
+                <input type="radio" class="btn-check" name="soft_type" id="soft_type_local" autocomplete="off" value="local">
+                <label class="btn btn-sm btn-outline-secondary" for="soft_type_local"><i class="bi bi-pc-display-horizontal me-1"></i>本地插件</label>
+            </div>
+            <button type="button" id="plugin_member" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#loginModal"><i class="bi bi-person-circle me-1"></i>会员登录</button>
+        </div>
+        <!-- 视图工具（右） -->
+        <div class="ws-toolbar-tools">
+            <button type="button" id="refresh" class="btn-refresh btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-repeat me-1"></i>刷新</button>
+        </div>
+    </div>
+    <table id="table"></table>
+
+    <!-- 会员登录/信息 Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1"  data-bs-keyboard="false" role="dialog"
+        aria-labelledby="modalTitleId" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" style="max-width:420px;" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitleId">会员登录/信息</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning" role="alert">
+                        此处登录账号为 <a href="{:config('plugin.register_url')}" class="alert-link" target="_blank">wiseadmin</a> 官网账号。
+                        <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <form id="loginForm" class="" method="post" action="{:config('plugin.login_url')}">
+                        <div class="input-group mb-1">
+                            <div class="input-group-text">
+                                <span class="bi bi-person"></span>
+                            </div>
+                            <input type="text" name="username" class="form-control rounded-end" placeholder="用户名" autocomplete="off" 
+                                data-validation="required|minLength:2|maxLength:30" 
+                                data-validation-message-required="请输入用户名"
+                                data-validation-message-minLength="用户名至少需要2个字符"
+                                data-validation-message-maxLength="用户名不能超过30个字符">
+                            <div class="invalid-feedback" style="display: block; visibility: hidden;">
+                                <i class="bi bi-exclamation-circle me-2"></i>
+                                <span class="validation-text"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="input-group mb-1">
+                            <div class="input-group-text">
+                                <span class="bi bi-lock"></span>
+                            </div>
+                            <input type="password" name="password" class="form-control rounded-end" placeholder="密码"
+                                data-validation="required|minLength:6|maxLength:30" 
+                                data-validation-message-required="请输入密码"
+                                data-validation-message-minLength="密码至少需要6个字符"
+                                data-validation-message-maxLength="密码不能超过30个字符">
+                            <div class="invalid-feedback" style="display: block; visibility: hidden;">
+                                <i class="bi bi-exclamation-circle me-2"></i>
+                                <span class="validation-text"></span>
+                            </div>
+                        </div>
+
+                        <!-- 去注册 -->
+                        <div class="row mb-1">
+                            <div class="col-12">
+                                <a href="{:config('plugin.register_url')}" target="_blank" class="text-decoration-none float-end" data-bs-toggle="tooltip" title="没有会员立即注册">
+                                    <i class="bi bi-person"></i> 去注册
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="social-auth-links text-center mb-3 d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-block">登录</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{/block}

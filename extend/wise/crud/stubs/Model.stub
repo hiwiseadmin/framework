@@ -1,0 +1,33 @@
+<?php
+declare(strict_types=1);
+
+namespace {$namespace}\model;
+{$model_imports}
+
+/**
+ * {$title} 模型
+ *
+ * 由 `php think wise:crud` 于 {$create_time} 生成。
+ *
+ * $allowWriteField 白名单由 CrudAction::filterDataGeneric() 消费，
+ * 是防批量赋值的**实际生效点**（比控制器里的校验更靠前）。
+ */
+class {$class} extends BaseModel
+{
+{$soft_delete_trait}
+    protected $name = '{$table_short}';
+
+    /** 自动时间戳（与 create_time / update_time 列对应） */
+    protected $autoWriteTimestamp = true;
+    protected $createTime = 'create_time';
+    protected $updateTime = 'update_time';
+
+{$json_property}
+
+    /**
+     * 可写字段白名单（防批量赋值）
+     */
+    protected $allowWriteField = [
+        {$allow_write}
+    ];
+}
