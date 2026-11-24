@@ -1,0 +1,107 @@
+/**
+ * wise-slot.css — 前端插槽系统样式
+ *
+ * 为 AdminLTE 4 / Bootstrap 5 定制的插槽渲染样式。
+ */
+
+/* === 插槽容器 === */
+.slot-container {
+    --slot-gap: 12px;
+}
+
+/* Grid 渲染模式 — CSS Grid 响应式布局 */
+.slot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--slot-gap);
+    margin-bottom: var(--slot-gap);
+}
+
+/* Stack 渲染模式 — 垂直堆叠 */
+.slot-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--slot-gap);
+}
+
+/* List 渲染模式 — 水平排列 */
+.slot-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+/* Tabs 渲染模式 — 继承 AdminLTE tabs 样式 */
+.slot-tabs {
+    display: flex;
+    flex-direction: column;
+}
+
+/* === 插槽项目 === */
+.slot-item {
+    background: var(--bs-body-bg, #fff);
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.slot-grid .slot-item {
+    min-height: 120px;
+}
+
+.slot-stack .slot-item {
+    width: 100%;
+}
+
+/* === 插槽项目头部 === */
+.slot-item-header {
+    background: var(--bs-light, #f8f9fa);
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bs-secondary-color, #6c757d);
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    user-select: none;
+}
+
+/* === 插槽项目内容区 === */
+.slot-item-body {
+    flex: 1;
+    padding: 12px;
+    overflow: auto;
+    min-height: 60px;
+}
+
+/* === 加载/错误状态 === */
+.slot-item-body .spinner-border {
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+/* === Dashboard Card 集成（GridStack 兼容） === */
+.grid-stack-item .slot-item {
+    border: none;
+    height: 100%;
+}
+
+.grid-stack-item .slot-item-header {
+    cursor: move;
+    border-radius: 6px 6px 0 0;
+}
+
+.grid-stack-item .slot-item-body {
+    height: calc(100% - 37px);
+}
+
+/* === 响应式 === */
+@media (max-width: 768px) {
+    .slot-grid {
+        grid-template-columns: 1fr;
+    }
+}

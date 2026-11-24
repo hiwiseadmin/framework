@@ -1,0 +1,181 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "WiseAdmin 插件清单 manifest.json",
+    "description": "plugins/{name}/manifest.json 的字段契约。字段说明见 src/extend/wise/plugin/README.md 第 10 节。",
+    "type": "object",
+    "required": ["name", "version"],
+    "properties": {
+        "name": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{1,49}$",
+            "description": "插件唯一标识，必须与目录名一致；不能使用系统保留词（admin/common/system/index/plugin/app/api）。"
+        },
+        "title": {
+            "type": "string",
+            "description": "显示名称（通常中文）。缺省回退为 name。"
+        },
+        "version": {
+            "type": "string",
+            "description": "语义化版本号，如 1.0.0；用于依赖约束比对与升级判断。"
+        },
+        "description": { "type": "string" },
+        "author": { "type": "string" },
+        "develop": {
+            "type": "boolean",
+            "description": "开发模式标记，仅用于后台展示区分。"
+        },
+        "seed": {
+            "type": "string",
+            "enum": ["required", "demo", "none"],
+            "default": "required",
+            "description": "database/seeds 的数据填充策略。required=基线数据（安装时执行，失败阻断，缺省）；demo=演示数据（默认跳过，plugin:install --with-demo 才执行，失败只告警）；none=不执行。"
+        },
+        "compatible_with": {
+            "oneOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" }, "minItems": 1, "maxItems": 8 }
+            ],
+            "description": "框架兼容范围（作者声明）。语法同 Composer：^1.0 / ~1.2 / 1.2.* / >=1.0 <2.0 / ^1.0 ^2.0（数组=任一满足）。未声明视为未知（不拦截）。安装/升级前校验，不满足需 --ignore-compat。"
+        },
+        "dependencies": {
+            "type": "object",
+            "description": "插件间依赖：{插件名: 版本约束}。缺失时不加载且不能启用。",
+            "additionalProperties": { "type": "string" }
+        },
+        "packages": {
+            "type": "object",
+            "description": "composer 库包依赖。硬依赖缺失 → 不加载且不能启用；软依赖缺失只诊断。",
+            "additionalProperties": {
+                "oneOf": [
+                    { "type": "string" },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "constraint": { "type": "string" },
+                            "required": { "type": "boolean" }
+                        },
+                        "additionalProperties": true
+                    }
+                ]
+            }
+        },
+        "service_provider": {
+            "type": "string",
+            "description": "插件启动服务提供者类全名（必须位于 plugin\\{name}\\ 下并继承 WiseBootServiceProvider）。缺省自动推导 plugin\\{name}\\BootServiceProvider。"
+        },
+        "icon": {
+            "oneOf": [
+                { "type": "string" },
+                {
+                    "type": "object",
+                    "properties": {
+                        "type": { "enum": ["bi", "image", "emoji"] },
+                        "value": { "type": "string" },
+                        "color": { "type": "string" }
+                    },
+                    "required": ["value"],
+                    "additionalProperties": true
+                }
+            ],
+            "description": "启动台图标（纯展示，不落库）。"
+        },
+        "menu": {
+            "type": "object",
+            "description": "插件根容器声明（title/icon/mount/group/pinned/sort/path）。"
+        },
+        "menus": {
+            "type": "array",
+            "description": "后台菜单树；节点类型 dir | menu | button。button 仅用于派生权限。",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": { "type": "string" },
+                    "icon": { "type": "string" },
+                    "path": { "type": "string" },
+                    "component": { "type": "string" },
+                    "sort": { "type": "integer" },
+                    "type": { "enum": ["dir", "menu", "button"] },
+                    "status": { "type": "integer", "enum": [0, 1] },
+                    "children": { "type": "array", "items": { "type": "object" } }
+                },
+                "required": ["name", "type"],
+                "additionalProperties": true
+            }
+        },
+        "permissions": {
+            "type": "array",
+            "description": "无法由菜单 path 派生的独立权限（ident 形如 plugin.controller.action）。",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": { "type": "string" },
+                    "ident": { "type": "string" },
+                    "method": { "type": "string" },
+                    "type": { "type": "string" },
+                    "description": { "type": "string" }
+                },
+                "required": ["name", "ident"],
+                "additionalProperties": true
+            }
+        },
+        "config": {
+            "description": "配置项 schema：对象 map（key => 定义）或数组 list（含 name）。安装时幂等播种默认值。",
+            "oneOf": [
+                { "type": "object" },
+                { "type": "array", "items": { "type": "object" } }
+            ]
+        },
+        "config_tabs": {
+            "type": "object",
+            "description": "配置页标签页标题与顺序：{tabKey: {title, sort}} 或 {tabKey: \"标题\"}。"
+        },
+        "config_groups": {
+            "type": "object",
+            "description": "配置页分区标题与顺序：{groupKey: {title, sort}} 或 {groupKey: \"标题\"}。"
+        },
+        "slots": {
+            "description": "前端插槽注入声明（数组或对象）。",
+            "oneOf": [
+                { "type": "object" },
+                { "type": "array", "items": { "type": "object" } }
+            ]
+        },
+        "vendor": {
+            "type": "object",
+            "description": "第三方 PSR-4 命名空间：{命名空间: 相对插件根的路径}。"
+        },
+        "api": {
+            "type": "object",
+            "description": "API 版本策略（ApiDispatch 版本闸门消费）：versions / default_version / require_version / deprecated。"
+        },
+        "publish": {
+            "type": "object",
+            "description": "额外静态资源发布映射：{源相对插件根: 目标相对应用根（以 public/ 开头）}。"
+        },
+        "capabilities": {
+            "type": "object",
+            "description": "能力协商声明（安装/启用时由 CapabilityResolver 消费）。requires: {能力名(ExtPoint 扩展点名): {required, mode(any|all|active), preferred, description} 或布尔/字符串简写}，必需能力缺失将阻断安装/启用；provides.services: 本插件可提供的能力（仅用于缺失诊断建议，不自动注册，提供方需自行 ExtPoint::register）。",
+            "properties": {
+                "requires": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "oneOf": [
+                            { "type": "boolean" },
+                            { "type": "string" },
+                            { "type": "object" }
+                        ]
+                    }
+                },
+                "provides": {
+                    "type": "object",
+                    "properties": {
+                        "services": { "type": "object" }
+                    },
+                    "additionalProperties": true
+                }
+            },
+            "additionalProperties": true
+        }
+    },
+    "additionalProperties": true
+}

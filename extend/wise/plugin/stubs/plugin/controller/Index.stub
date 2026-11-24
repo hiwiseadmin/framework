@@ -1,0 +1,29 @@
+<?php
+declare(strict_types=1);
+
+namespace plugin\{$name}\controller;
+
+use app\common\controller\BaseController;
+use think\facade\View;
+
+/**
+ * {$name} 默认控制器
+ */
+class Index extends BaseController
+{
+    /**
+     * 插件首页
+     */
+    public function index()
+    {
+        View::assign([
+            'plugin_name' => '{$name}',
+            'title'       => '插件首页',
+        ]);
+
+        // scope 语法：由 ViewScope 解析到 {插件根}/view/index/index.html。
+        // 好处：宿主若需定制，只需新建 app/view/{$name}/index/index.html 即可覆盖，
+        //      本包无需改动；包升级时视图随包走，不会被宿主旧视图卡住。
+        return View::fetch('{$name}@index/index');
+    }
+}

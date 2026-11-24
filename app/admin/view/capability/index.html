@@ -1,0 +1,90 @@
+{extend name="public/base" /}
+
+{block name="title"}能力市场{/block}
+
+{block name="css"}
+<style>
+/* ========== 能力卡片折叠 ========== */
+/* 参考 wise_config 系统配置列表页的分组折叠交互 */
+.cap-card.collapsed .cap-card-body { display: none; }
+.cap-card.collapsed .cap-card-toggle i { transform: rotate(-90deg); }
+.cap-card-header { cursor: pointer; user-select: none; }
+.cap-card-toggle {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.15s, transform 0.2s;
+    color: var(--bs-secondary-color);
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+}
+.cap-card-header:hover .cap-card-toggle { background: var(--bs-secondary-bg); }
+
+/* ========== 标题区统一布局 ========== */
+.cap-card-title {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    margin-left: 0.25rem;
+    gap: 0.5rem;
+}
+.cap-card-name {
+    /* flex: 0 0 160px;
+    max-width: 160px; */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+}
+.cap-card-point {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.cap-card-badges {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+/* ========== 实现列表统一列宽 ========== */
+/* 固定表格布局，使每种能力的表格列宽一致、整体排版统一 */
+.cap-impl-table { table-layout: fixed; }
+.cap-impl-table th,
+.cap-impl-table td { vertical-align: middle; }
+.cap-impl-table th:nth-child(1),
+.cap-impl-table td:nth-child(1) { width: 22%; } /* 名称 */
+.cap-impl-table th:nth-child(2),
+.cap-impl-table td:nth-child(2) { width: 36%; word-break: break-all; } /* 实现类 */
+.cap-impl-table th:nth-child(3),
+.cap-impl-table td:nth-child(3) { width: 10%; } /* 优先级 */
+.cap-impl-table th:nth-child(4),
+.cap-impl-table td:nth-child(4) { width: 12%; } /* 状态 */
+.cap-impl-table th:nth-child(5),
+.cap-impl-table td:nth-child(5) { width: 20%; } /* 操作 */
+
+</style>
+{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="public/page_header" icon="bi bi-grid-3x3-gap" title="能力市场" desc="浏览与启用系统能力模块" actions="" /}
+    <div id="toolbar" class="ws-toolbar">
+        <button type="button" id="refresh" class="btn btn-sm btn-outline-secondary" title="重新加载列表"><i class="bi bi-arrow-repeat me-1"></i>刷新</button>
+        <span class="ms-2 text-muted small">
+            <span class="badge bg-info me-1">独占</span>同时只一个活跃
+            <span class="badge bg-success me-1 ms-2">共享</span>全部并行
+            <span class="badge bg-warning me-1 ms-2">路由</span>按名称查找
+        </span>
+    </div>
+    <div id="capability-list"></div>
+</div>
+{/block}
+
+{block name="js"}
+
+{/block}

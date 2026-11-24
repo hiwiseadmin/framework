@@ -1,0 +1,246 @@
+/**
+ * ws-popmenu.css
+ * WiseAdmin 右键弹出菜单组件样式（从 ws-popmenu.js 提取）
+ */
+
+.ws-popmenu {
+    position: absolute;
+    background-color: var(--bs-dropdown-bg, var(--bs-body-bg, #fff));
+    border-radius: var(--bs-border-radius, 0.375rem);
+    box-shadow: var(--bs-box-shadow, 0 0.5rem 1rem rgba(0, 0, 0, 0.15));
+    border: 1px solid var(--bs-dropdown-border-color, rgba(0, 0, 0, 0.15));
+    z-index: 1060;
+    min-width: 180px;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.95);
+    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+    padding: var(--bs-dropdown-padding-y, 0.25rem) 0;
+    font-family: var(--bs-font-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+}
+
+.ws-popmenu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    animation: popmenuFadeIn 0.15s ease-out;
+}
+
+.ws-popmenu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--bs-dropdown-item-padding-y, 0.5rem) var(--bs-dropdown-item-padding-x, 1rem);
+    border: none;
+    background: none;
+    width: 100%;
+    width: -webkit-fill-available;
+    text-align: left;
+    color: var(--bs-dropdown-link-color, var(--bs-body-color, #212529));
+    transition: background-color 0.15s ease, color 0.15s ease;
+    font-size: var(--bs-dropdown-font-size, 0.875rem);
+    position: relative;
+    cursor: pointer;
+    outline: none;
+    box-sizing: border-box;
+    border-radius: var(--bs-border-radius-sm, 0.25rem);
+    margin: 0 var(--bs-dropdown-item-spacing-x, 0.125rem);
+}
+
+.ws-popmenu-item:hover {
+    background-color: var(--bs-dropdown-link-hover-bg, var(--bs-tertiary-bg, #f8f9fa));
+    text-decoration: none;
+    color: var(--bs-dropdown-link-hover-color, var(--bs-emphasis-color, #212529));
+}
+
+/* 键盘焦点高亮：当前项与其「祖先链」同时高亮。
+   :focus-within 让任一后代被聚焦/悬停时，所属的各级父菜单项保持高亮，
+   从而直观呈现当前所在的菜单层级路径（一级菜单与它展开的二级菜单都可见选中态）。 */
+.ws-popmenu-item:focus,
+.ws-popmenu-item:focus-within {
+    background-color: var(--bs-dropdown-link-focus-bg, var(--bs-secondary-bg, #e9ecef));
+}
+
+.ws-popmenu-item i:first-child {
+    margin-right: var(--bs-dropdown-item-icon-spacing, 0.5rem);
+    width: 1.25rem;
+    text-align: center;
+}
+
+.ws-popmenu-item .bi-chevron-right {
+    margin-right: 0;
+    margin-left: var(--bs-dropdown-item-icon-spacing, 0.5rem);
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.ws-popmenu-item .ws-popmenu-shortcut {
+    text-align: right;
+    min-width: 6rem;
+}
+
+.ws-popmenu-divider {
+    height: 1px;
+    background-color: var(--bs-dropdown-divider-bg, var(--bs-border-color, #e9ecef));
+    margin: var(--bs-dropdown-divider-margin-y, 0.25rem) 0;
+}
+
+.ws-popmenu-header {
+    padding: var(--bs-dropdown-header-padding-y, 0.5rem) var(--bs-dropdown-header-padding-x, 1rem);
+    font-size: var(--bs-dropdown-font-size, 0.875rem);
+    color: var(--bs-dropdown-header-color, var(--bs-body-secondary-color, #6c757d));
+    font-weight: 500;
+    user-select: none;
+}
+
+.ws-popmenu-item.disabled {
+    opacity: var(--bs-disabled-opacity, 0.65);
+    pointer-events: none;
+    cursor: default;
+    color: var(--bs-body-secondary-color, #6c757d);
+}
+
+.ws-popmenu-submenu {
+    position: absolute;
+    top: -0.25rem;
+    left: 100%;
+    margin-left: 0.25rem;
+    min-width: 180px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-10px);
+    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+}
+
+.ws-popmenu-item:hover > .ws-popmenu-submenu,
+.ws-popmenu-item:focus > .ws-popmenu-submenu,
+/* :focus-within 保证键盘把焦点移入子菜单后，父项的子菜单仍保持展开 */
+.ws-popmenu-item:focus-within > .ws-popmenu-submenu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+.ws-popmenu-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    z-index: 1059;
+}
+
+@keyframes popmenuFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ========== 三态标准化 ========== */
+
+.ws-popmenu[data-ws-state="loading"] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 80px;
+    pointer-events: none;
+}
+
+.ws-popmenu[data-ws-state="loading"]::after {
+    content: "";
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(var(--bs-secondary-rgb, 108, 117, 125), 0.2);
+    border-top-color: var(--bs-primary, #0d6efd);
+    border-radius: 50%;
+    animation: ws-spin 0.6s linear infinite;
+}
+
+.ws-popmenu[data-ws-state="empty"] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60px;
+    padding: 16px;
+    color: var(--bs-secondary-color, #6c757d);
+    font-size: 13px;
+}
+
+.ws-popmenu[data-ws-state="empty"]::after {
+    content: attr(data-ws-empty-text);
+}
+
+.ws-popmenu[data-ws-state="error"] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60px;
+    padding: 16px;
+    color: var(--bs-danger, #dc3545);
+    font-size: 13px;
+}
+
+.ws-popmenu[data-ws-state="error"]::after {
+    content: attr(data-ws-error-text);
+}
+
+/* 深色主题适配 */
+[data-bs-theme="dark"] .ws-popmenu,
+.ws-popmenu.dark-mode {
+    background-color: var(--bs-dark, #212529);
+    border-color: var(--bs-border-color-translucent, rgba(255, 255, 255, 0.15));
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="dark"] .ws-popmenu-item,
+.ws-popmenu.dark-mode .ws-popmenu-item {
+    color: var(--bs-body-color-dark, #dee2e6);
+}
+
+[data-bs-theme="dark"] .ws-popmenu-item:hover,
+.ws-popmenu.dark-mode .ws-popmenu-item:hover {
+    background-color: var(--bs-tertiary-bg-dark, rgba(255, 255, 255, 0.1));
+    color: var(--bs-emphasis-color-dark, #fff);
+}
+
+[data-bs-theme="dark"] .ws-popmenu-divider,
+.ws-popmenu.dark-mode .ws-popmenu-divider {
+    background-color: var(--bs-border-color-translucent, rgba(255, 255, 255, 0.15));
+}
+
+[data-bs-theme="dark"] .ws-popmenu-header,
+.ws-popmenu.dark-mode .ws-popmenu-header {
+    color: var(--bs-body-secondary-color-dark, #adb5bd);
+}
+
+[data-bs-theme="dark"] .ws-popmenu-item.disabled,
+.ws-popmenu.dark-mode .ws-popmenu-item.disabled {
+    color: var(--bs-body-secondary-color-dark, #adb5bd);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .ws-popmenu {
+        min-width: 160px;
+    }
+    .ws-popmenu-submenu {
+        position: relative;
+        top: auto;
+        left: auto;
+        margin-left: 0;
+        margin-top: 0.25rem;
+        box-shadow: none;
+        border: 1px solid var(--bs-border-color-translucent, rgba(0, 0, 0, 0.15));
+    }
+    .ws-popmenu-item:hover > .ws-popmenu-submenu,
+    .ws-popmenu-item:focus > .ws-popmenu-submenu,
+    .ws-popmenu-item:focus-within > .ws-popmenu-submenu {
+        transform: translateY(0);
+    }
+}

@@ -1,0 +1,16 @@
+---
+description: WiseAdmin 插件开发约定入口（必读 AGENTS.md）
+alwaysApply: true
+---
+
+开始编码前先完整读取项目根目录的 `AGENTS.md`。
+
+硬性要求（摘自 AGENTS.md，冲突时以 AGENTS.md 为准）：
+
+- 插件代码只写 `plugins/{ident}/`，命名空间 `plugin\{ident}\`；
+- 后台列表用 `window.Wise.table.createSync()`，不手写 `<table>`、不 `import /statics/modules/*`；
+- 提示/确认用 `Wise.ui.*`，禁止 `alert()` / 原生 `confirm()`；
+- 前端校验用 `data-validation`，不是 HTML5 `required`；
+- 迁移文件名 `{14位时间戳}_{snake}.php`，`up()` + `down()` 成对；
+- 代码必须同时兼容 FPM 与 Swoole（禁 `exit` / 请求级 `static` / HTTP 路径内阻塞调用）；
+- 交付前跑完 AGENTS.md §11 的 DoD 命令链。

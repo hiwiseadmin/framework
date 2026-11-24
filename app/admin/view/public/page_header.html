@@ -1,0 +1,24 @@
+{/* 页面头部片段（UIS v1 契约 · docs/wiseadmin-后台页面统一方案.md §3.2）
+
+   用法：include 本片段并传参，参数全部可选：
+     icon    Bootstrap Icons 类名；不传则保留占位，由 wise-framework.js 按 iframe tab 回填
+     title   页面标题；老页面经 index_header 传入 "[caption]" 占位，由 JS 回填（D5=B 兜底）
+     desc    页面描述（单行）；不传请传空串，避免残留占位文本
+     actions 页面级操作区 HTML（与表格无关的操作，如分类管理、回收站）；
+             新增/批量/导出/刷新/搜索等表格操作请放 #toolbar，不要放这里
+
+   实现说明（重要）：ThinkPHP 的 include 参数是编译期文本占位符替换，不是模板变量，
+   因此这里不能用条件标签判断空值；空态由「调用方传空串 + JS 清理占位」保证。
+   注意：本注释内不要出现花括号（包括条件标签、嵌套 include 写法）—— 注释标签的
+   正则会在第一个右花括号处截断，导致注释整体失效并作为文本渲染到页面上。
+*/}
+<div class="ws-page-header">
+    <div class="ws-page-heading">
+        <i class="ws-page-icon [icon]" id="index_header_icon"></i>
+        <div class="ws-page-text">
+            <h1 class="ws-page-title" id="index_header_title">[title]</h1>
+            <p class="ws-page-desc">[desc]</p>
+        </div>
+    </div>
+    <div class="ws-page-actions">[actions]</div>
+</div>

@@ -1,0 +1,388 @@
+{extend name="public/base" /}
+
+{block name="title"}CRUD 构建器{/block}
+
+{block name="css"}
+<style>
+/* CRUD 构建器：工具型极简 + 高信息密度
+   与后台既有页面共享 Bootstrap 变量，不引入第二套视觉体系 */
+.ws-cb {
+    --cb-border: var(--bs-border-color);
+    --cb-muted: var(--bs-secondary-color);
+    --cb-aside: 260px;
+    --cb-drawer: 760px;
+}
+.ws-cb-toolbar {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex-wrap: wrap;
+    padding: .5rem .75rem;
+    border: 1px solid var(--cb-border);
+    border-radius: .5rem;
+    background: var(--bs-body-bg);
+}
+.ws-cb-toolbar .ws-cb-conn {
+    color: var(--cb-muted);
+    font-size: .8125rem;
+}
+.ws-cb-toolbar .ws-cb-conn code {
+    font-size: .8125rem;
+}
+.ws-cb-search {
+    position: relative;
+    flex: 1 1 220px;
+    max-width: 320px;
+}
+.ws-cb-search input {
+    padding-left: 1.9rem;
+    height: 32px;
+}
+.ws-cb-search i {
+    position: absolute;
+    left: .6rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--cb-muted);
+    font-size: .875rem;
+    pointer-events: none;
+}
+
+/* 主体：左栏表清单 + 中栏字段映射 */
+.ws-cb-body {
+    display: flex;
+    gap: .75rem;
+    margin-top: .75rem;
+    min-height: 520px;
+}
+.ws-cb-aside {
+    width: var(--cb-aside);
+    flex: 0 0 var(--cb-aside);
+    border: 1px solid var(--cb-border);
+    border-radius: .5rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: var(--bs-body-bg);
+}
+.ws-cb-aside-head {
+    padding: .4rem .6rem;
+    border-bottom: 1px solid var(--cb-border);
+    font-size: .8125rem;
+    color: var(--cb-muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.ws-cb-tables {
+    flex: 1;
+    overflow: auto;
+    max-height: 640px;
+}
+.ws-cb-table-item {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .35rem .6rem;
+    cursor: pointer;
+    font-size: .8125rem;
+    border-left: 2px solid transparent;
+    transition: background .12s, border-color .12s;
+}
+.ws-cb-table-item:hover { background: var(--bs-tertiary-bg); }
+.ws-cb-table-item.active {
+    background: var(--bs-primary-bg-subtle);
+    border-left-color: var(--bs-primary);
+}
+.ws-cb-table-item .name {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.ws-cb-table-item .cmt {
+    color: var(--cb-muted);
+    font-size: .75rem;
+    margin-left: auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 40%;
+}
+.ws-cb-table-item .declared {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--bs-primary);
+    flex: 0 0 auto;
+}
+
+.ws-cb-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: 1px solid var(--cb-border);
+    border-radius: .5rem;
+    background: var(--bs-body-bg);
+    display: flex;
+    flex-direction: column;
+}
+.ws-cb-main-head {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .5rem .75rem;
+    border-bottom: 1px solid var(--cb-border);
+    font-size: .8125rem;
+}
+.ws-cb-main-head .ws-cb-title {
+    font-weight: 600;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.ws-cb-main-head .ws-cb-sum {
+    margin-left: auto;
+    display: flex;
+    gap: .35rem;
+    flex-wrap: wrap;
+}
+.ws-cb-fields {
+    flex: 1;
+    overflow: auto;
+}
+.ws-cb-fields table {
+    margin-bottom: 0;
+    font-size: .8125rem;
+}
+.ws-cb-fields thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--bs-tertiary-bg);
+    font-weight: 600;
+    white-space: nowrap;
+}
+.ws-cb-fields td {
+    vertical-align: middle;
+}
+.ws-cb-fields .col-name,
+.ws-cb-fields .col-type {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.ws-cb-fields .col-dbtype {
+    color: var(--cb-muted);
+    white-space: nowrap;
+}
+.ws-cb-rule {
+    color: var(--cb-muted);
+    font-size: .75rem;
+}
+.ws-cb-badge-declared {
+    background: var(--bs-primary);
+    color: #fff;
+}
+.ws-cb-badge-guess {
+    background: var(--bs-tertiary-bg);
+    color: var(--bs-body-color);
+    border: 1px solid var(--cb-border);
+}
+.ws-cb-badge-guess .dot {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--bs-warning);
+    margin-right: .25rem;
+    vertical-align: middle;
+}
+.ws-cb-row-dirty {
+    box-shadow: inset 2px 0 0 var(--bs-warning);
+}
+
+/* 预览抽屉 */
+.ws-cb-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: var(--cb-drawer);
+    max-width: 100vw;
+    height: 100vh;
+    background: var(--bs-body-bg);
+    border-left: 1px solid var(--cb-border);
+    box-shadow: -8px 0 24px rgba(15, 23, 42, .08);
+    transform: translateX(100%);
+    transition: transform .2s ease;
+    display: flex;
+    flex-direction: column;
+    z-index: 1055;
+}
+.ws-cb-drawer.open { transform: translateX(0); }
+.ws-cb-drawer-head,
+.ws-cb-drawer-foot {
+    padding: .6rem .85rem;
+    border-bottom: 1px solid var(--cb-border);
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+.ws-cb-drawer-foot {
+    border-bottom: 0;
+    border-top: 1px solid var(--cb-border);
+    justify-content: flex-end;
+}
+.ws-cb-drawer-body {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+}
+.ws-cb-files {
+    width: 280px;
+    flex: 0 0 280px;
+    border-right: 1px solid var(--cb-border);
+    overflow: auto;
+    font-size: .8125rem;
+}
+.ws-cb-file-item {
+    padding: .4rem .6rem;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    word-break: break-all;
+}
+.ws-cb-file-item:hover { background: var(--bs-tertiary-bg); }
+.ws-cb-file-item.active {
+    background: var(--bs-primary-bg-subtle);
+    border-left-color: var(--bs-primary);
+}
+.ws-cb-code {
+    flex: 1;
+    overflow: auto;
+    margin: 0;
+    padding: .75rem;
+    font-size: .75rem;
+    line-height: 1.55;
+    background: var(--bs-tertiary-bg);
+    white-space: pre;
+    tab-size: 4;
+}
+.ws-cb-empty {
+    padding: 2.5rem 1rem;
+    text-align: center;
+    color: var(--cb-muted);
+    font-size: .8125rem;
+}
+.ws-cb-skeleton {
+    height: 14px;
+    border-radius: 3px;
+    background: var(--bs-tertiary-bg);
+    margin: .5rem .75rem;
+    animation: ws-cb-pulse 1.2s ease-in-out infinite;
+}
+@keyframes ws-cb-pulse { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
+.ws-cb-error {
+    margin: .5rem .75rem;
+    padding: .5rem .6rem;
+    border-radius: .375rem;
+    background: var(--bs-danger-bg-subtle);
+    color: var(--bs-danger-text-emphasis);
+    font-size: .8125rem;
+}
+.ws-cb-error pre {
+    margin: .35rem 0 0;
+    font-size: .75rem;
+    white-space: pre-wrap;
+    color: inherit;
+}
+
+/* 响应式：窄屏折叠左栏 / 抽屉占满 */
+@media (max-width: 1279px) {
+    .ws-cb-aside { display: none; }
+}
+@media (max-width: 991px) {
+    .ws-cb-drawer { width: 100vw; }
+    .ws-cb-drawer-body { flex-direction: column; }
+    .ws-cb-files {
+        width: auto;
+        flex: 0 0 auto;
+        max-height: 180px;
+        border-right: 0;
+        border-bottom: 1px solid var(--cb-border);
+    }
+}
+</style>
+{/block}
+
+{block name="content"}
+<div class="app-main container-fluid ws-cb">
+    {include file="public/page_header" icon="bi bi-magic" title="CRUD 构建器" desc="从数据表生成后台模块：先看判定依据，再改映射，最后预览落盘" actions="" /}
+
+    <div class="ws-cb-toolbar">
+        <span class="ws-cb-conn">连接 <code>{:config('database.default')}</code> · 前缀 <code>{:config('database.connections.' . config('database.default') . '.prefix', '')}</code></span>
+        <div class="ws-cb-search">
+            <i class="bi bi-search"></i>
+            <input type="text" id="cb-search" class="form-control form-control-sm" placeholder="搜索表名 / 注释（按 / 聚焦）" autocomplete="off">
+        </div>
+        <div class="form-check form-check-inline ms-1 mb-0">
+            <input class="form-check-input" type="checkbox" id="cb-only-undeclared">
+            <label class="form-check-label small" for="cb-only-undeclared">仅看未声明</label>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="cb-rescan" title="重新扫描数据表">
+            <i class="bi bi-arrow-repeat me-1"></i>重新扫描
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="cb-export" title="导出当前映射声明">
+            <i class="bi bi-clipboard-check me-1"></i>导出映射
+        </button>
+        <button type="button" class="btn btn-sm btn-primary ms-auto" id="cb-preview">
+            <i class="bi bi-eye me-1"></i>预览产物
+        </button>
+    </div>
+
+    <div class="ws-cb-body">
+        <aside class="ws-cb-aside">
+            <div class="ws-cb-aside-head">
+                <span>数据表</span>
+                <span id="cb-table-count">—</span>
+            </div>
+            <div class="ws-cb-tables" id="cb-tables">
+                <div class="ws-cb-empty">加载中…</div>
+            </div>
+        </aside>
+
+        <section class="ws-cb-main">
+            <div class="ws-cb-main-head">
+                <span class="ws-cb-title" id="cb-current-table">未选择数据表</span>
+                <span class="text-muted small" id="cb-current-title"></span>
+                <div class="ws-cb-sum" id="cb-stats"></div>
+            </div>
+            <div class="ws-cb-fields" id="cb-fields">
+                <div class="ws-cb-empty">从左侧选择一张表，查看逐字段判定依据<div class="mt-1 small text-muted">标注「声明」的来自 crud_map.php 或本次显式指定；标注「推断」的是命名/注释启发式结果</div></div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<div class="ws-cb-drawer" id="cb-drawer" aria-hidden="true">
+    <div class="ws-cb-drawer-head">
+        <strong class="small">产物预览</strong>
+        <span class="badge bg-secondary" id="cb-artifact-count">0</span>
+        <span class="ms-auto small text-muted">未确认前不会写入任何文件</span>
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="cb-close" title="关闭（Esc）">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+    <div class="ws-cb-drawer-body">
+        <div class="ws-cb-files" id="cb-files"></div>
+        <pre class="ws-cb-code" id="cb-code"></pre>
+    </div>
+    <div class="ws-cb-drawer-foot">
+        <label class="form-check form-check-inline mb-0 me-auto small">
+            <input class="form-check-input" type="checkbox" id="cb-force">
+            <span class="form-check-label">覆盖已存在文件</span>
+        </label>
+        <button type="button" class="btn btn-sm btn-outline-primary" id="cb-save-map">仅保存映射</button>
+        <button type="button" class="btn btn-sm btn-outline-danger" id="cb-confirm">确认生成</button>
+    </div>
+</div>
+{/block}
+
+{block name="js"}
+{/* 页面控制器由 wise-bootstrap 按 wsconfig.js 自动 import 并调用 Controller.index()，此处不重复引入 */}
+{/block}

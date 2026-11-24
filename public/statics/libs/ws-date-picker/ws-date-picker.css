@@ -1,0 +1,380 @@
+/**
+ * ws-date-picker.css
+ * WiseAdmin 日期选择组件样式（从 ws-date-picker.js 提取）
+ */
+
+.ws-date-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.ws-date-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1050;
+    min-width: 320px;
+    background: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.375rem;
+    box-shadow: var(--bs-box-shadow);
+    padding: 1rem;
+    margin-top: 0.125rem;
+}
+
+.ws-date-static .ws-date-dropdown {
+    position: static;
+    box-shadow: none;
+}
+
+.ws-date-static {
+    position: static;
+    display: block;
+    box-shadow: none;
+    margin-top: 0.5rem;
+}
+
+.ws-date-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.ws-date-title {
+    font-weight: 500;
+    margin: 0;
+    cursor: pointer;
+    user-select: none;
+    flex: 1;
+    text-align: center;
+    padding: 0 1rem;
+}
+
+.ws-date-nav {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.ws-date-nav-start {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.ws-date-nav-end {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.ws-date-body {
+    margin-bottom: 1rem;
+}
+
+.ws-date-calendar {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.ws-date-calendar th,
+.ws-date-calendar td {
+    text-align: center;
+    padding: 0 0.275rem;
+    width: 14.28%;
+}
+
+.ws-date-calendar th {
+    font-weight: 500;
+    color: var(--bs-secondary-color);
+    font-size: 0.875rem;
+}
+
+.ws-date-day {
+    cursor: pointer;
+    border-radius: 0.375rem;
+    transition: all 0.15s ease;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 0.05rem 0.375rem;
+    margin: 0.15rem 0;
+}
+
+.ws-date-day:hover {
+    background-color: var(--bs-tertiary-bg);
+}
+
+.ws-date-day.today {
+    color: var(--bs-primary);
+    background-color: var(--bs-white);
+    font-weight: 500;
+}
+
+.ws-date-day.selected {
+    background-color: var(--bs-primary);
+    color: var(--bs-white);
+}
+
+.ws-date-day.today:after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: var(--bs-primary);
+}
+
+.ws-date-day.selected.today:after {
+    background-color: var(--bs-white);
+}
+
+.ws-date-day.other-month {
+    color: var(--bs-secondary-color);
+}
+
+/* 跨月日期可点击导航 */
+.ws-date-day.navigate-month {
+    opacity: 0.55;
+    cursor: pointer;
+}
+
+.ws-date-day.navigate-month:hover {
+    background-color: var(--bs-tertiary-bg);
+    opacity: 0.8;
+}
+
+.ws-date-day.disabled {
+    color: var(--bs-secondary-color);
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.ws-date-day.disabled:hover {
+    background-color: transparent;
+}
+
+.ws-date-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--bs-border-color);
+    padding-top: 1rem;
+}
+
+.ws-date-time {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.ws-date-time-inputs {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.ws-date-time-item {
+    position: relative;
+    display: inline-block;
+}
+
+.ws-date-time-item input {
+    width: 60px;
+    text-align: center;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.25rem;
+    padding: 0.25rem;
+}
+
+.ws-date-time-separator {
+    font-weight: bold;
+    color: var(--bs-secondary-color);
+}
+
+/* 手动输入非法日期（如 2026-13-45）时的提示样式 */
+.ws-date-input-invalid {
+    border-color: var(--bs-danger, #dc3545) !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    animation: ws-date-shake 0.3s ease;
+}
+
+@keyframes ws-date-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+.ws-date-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.ws-date-range {
+    display: flex;
+    gap: 1rem;
+}
+
+.ws-date-range .ws-date-calendar {
+    flex: 1;
+}
+
+/* 面板类型标签（开始日期 / 结束日期） */
+.ws-date-panel-type {
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--bs-secondary-color);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+.ws-date-year-month-view {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+}
+
+.ws-date-year-month-item {
+    padding: 0.5rem;
+    text-align: center;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.ws-date-year-month-item:hover {
+    background-color: var(--bs-tertiary-bg);
+}
+
+.ws-date-year-month-item.selected {
+    background-color: var(--bs-primary);
+    color: var(--bs-white);
+}
+
+.ws-date-in-range {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+}
+
+.ws-date-range-start,
+.ws-date-range-end {
+    background-color: var(--bs-primary);
+    color: var(--bs-white);
+}
+
+.ws-date-marked {
+    position: relative;
+}
+
+.ws-date-marked:after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: var(--bs-warning);
+}
+
+.ws-date-quick-select {
+    margin-bottom: 1rem;
+}
+
+.ws-date-quick-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.ws-date-quick-buttons button {
+    flex: 1;
+    min-width: 60px;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.ws-date-time-slider {
+    width: 100%;
+    margin: 10px 0;
+}
+
+.ws-date-time-display {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: var(--bs-primary);
+}
+
+.ws-date-time-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.25rem;
+}
+
+.ws-date-time-cell {
+    padding: 0.15rem 0.025rem;
+    text-align: center;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.ws-date-time-cell:hover {
+    background-color: var(--bs-tertiary-bg);
+}
+
+.ws-date-time-cell.selected {
+    background-color: var(--bs-primary);
+    color: var(--bs-white);
+}
+
+.ws-date-time-cell.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .ws-date-range {
+        flex-direction: column;
+    }
+    .ws-date-dropdown {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 90vw;
+    }
+}
+
+/* 两段式 datetime：时间步骤 小时/分钟 左右并排、各自滚动，压缩弹层高度 */
+.ws-date-time-grid-container {
+    display: flex;
+    gap: 0.5rem;
+}
+.ws-date-time-grid-container .ws-date-time-col {
+    flex: 1;
+    min-width: 0;
+}
+.ws-date-time-grid-container .ws-date-time-grid {
+    max-height: 150px;
+}
+/* 返回日历按钮视觉提示 */
+.ws-date-nav-start .btn[title="返回选择日期"] {
+    color: var(--bs-primary);
+}

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HintInput 智能输入提示演示</title>
+    <link href="/statics/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/statics/libs/bootstrap-icons/bootstrap-icons.min.css">
+    <style>
+        .demo-section {
+            background: var(--bs-body-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid var(--bs-border-color);
+        }
+        .demo-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .demo-col {
+            flex: 1;
+            min-width: 280px;
+        }
+        .event-log {
+            background: var(--bs-secondary-bg);
+            border-radius: 6px;
+            padding: 10px;
+            max-height: 130px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .selected-value {
+            font-weight: 500;
+            color: var(--bs-primary);
+        }
+    </style>
+</head>
+<body>
+<a href="/statics/demo/ws-form.html" style="position:fixed;right:18px;bottom:18px;z-index:2050;display:inline-flex;align-items:center;gap:.35rem;padding:.5rem .875rem;font-size:.8125rem;font-weight:500;color:#fff;background:#0d6efd;border-radius:999px;box-shadow:0 4px 14px rgba(13,110,253,.35);text-decoration:none;">声明式表单接入示例 &rarr;</a>
+    <div class="container py-5">
+        <h1 class="text-center mb-1">HintInput 智能输入提示</h1>
+        <p class="text-center text-muted mb-4">基于 Bootstrap 5 的智能输入提示组件</p>
+
+        <!-- 基本用法 -->
+        <section class="demo-section">
+            <h3><i class="bi bi-search me-2"></i>1. 基本用法 — 本地数据</h3>
+            <div class="demo-row">
+                <div class="demo-col">
+                    <label class="form-label">搜索编程语言</label>
+                    <input type="text" id="search1" class="form-control form-control-lg" placeholder="输入编程语言名称...">
+                    <small class="text-muted">支持键盘 ↑↓ 导航，Enter/Tab 选择，Esc 关闭</small>
+                </div>
+                <div class="demo-col">
+                    <div class="mb-2"><strong>选择结果：</strong><span class="selected-value" id="result1">未选择</span></div>
+                    <div class="event-log" id="log1"><div class="text-muted">等待输入...</div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 配置选项演示 -->
+        <section class="demo-section">
+            <h3><i class="bi bi-sliders me-2"></i>2. 配置选项动态调整</h3>
+            <div class="demo-row">
+                <div class="demo-col">
+                    <label class="form-label">搜索水果</label>
+                    <input type="text" id="search2" class="form-control" placeholder="输入水果名称...">
+                </div>
+                <div class="demo-col">
+                    <strong>选择结果：</strong><span class="selected-value" id="result2">未选择</span>
+                </div>
+            </div>
+            <div class="config-grid mt-3">
+                <div>
+                    <label class="form-label">minChars（触发最小字符数）</label>
+                    <select id="cfgMinChars" class="form-select form-select-sm">
+                        <option value="0">0 - 空输入显示全部</option>
+                        <option value="1" selected>1 - 默认</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label">maxItems（最大显示条数）</label>
+                    <select id="cfgMaxItems" class="form-select form-select-sm">
+                        <option value="3">3</option>
+                        <option value="5">5</option>
+                        <option value="8" selected>8</option>
+                        <option value="15">15</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label">delay（防抖延迟 ms）</label>
+                    <select id="cfgDelay" class="form-select form-select-sm">
+                        <option value="0">0 - 无延迟</option>
+                        <option value="150">150</option>
+                        <option value="300" selected>300 - 默认</option>
+                        <option value="800">800</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label">highlightMatches（高亮匹配）</label>
+                    <select id="cfgHighlight" class="form-select form-select-sm">
+                        <option value="true" selected>开启</option>
+                        <option value="false">关闭</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mt-2">
+                <button id="btnApplyConfig" class="btn btn-sm btn-primary">应用配置（重建实例）</button>
+                <button id="btnUpdateData" class="btn btn-sm btn-outline-secondary">更新数据为蔬菜</button>
+            </div>
+        </section>
+
+        <!-- 多实例演示 -->
+        <section class="demo-section">
+            <h3><i class="bi bi-grid-3x3-gap me-2"></i>3. 多实例独立工作</h3>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label"><i class="bi bi-building me-1"></i>城市搜索</label>
+                    <input type="text" id="city-search" class="form-control" placeholder="输入城市...">
+                    <small id="city-result" class="selected-value"></small>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label"><i class="bi bi-palette me-1"></i>颜色搜索</label>
+                    <input type="text" id="color-search" class="form-control" placeholder="输入颜色...">
+                    <small id="color-result" class="selected-value"></small>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label"><i class="bi bi-cup me-1"></i>饮品搜索</label>
+                    <input type="text" id="drink-search" class="form-control" placeholder="输入饮品...">
+                    <small id="drink-result" class="selected-value"></small>
+                </div>
+            </div>
+        </section>
+
+        <!-- API 方法演示 -->
+        <section class="demo-section">
+            <h3><i class="bi bi-code-slash me-2"></i>4. API 方法演示</h3>
+            <div class="demo-row">
+                <div class="demo-col">
+                    <label class="form-label">目标输入框</label>
+                    <input type="text" id="api-search" class="form-control" placeholder="输入搜索...">
+                    <span class="selected-value" id="api-result"></span>
+                </div>
+                <div class="demo-col">
+                    <div class="event-log" id="api-log"><div class="text-muted">API 操作日志</div></div>
+                </div>
+            </div>
+            <div class="btn-group-demo mt-2" style="display:flex;flex-wrap:wrap;gap:8px;">
+                <button id="apiGetData" class="btn btn-sm btn-outline-info">获取当前数据</button>
+                <button id="apiUpdateData" class="btn btn-sm btn-outline-primary">换为"国家"数据</button>
+                <button id="apiDestroy" class="btn btn-sm btn-outline-danger">销毁实例</button>
+                <button id="apiRecreate" class="btn btn-sm btn-outline-success">重建实例</button>
+            </div>
+        </section>
+
+        <!-- 事件回调演示 -->
+        <section class="demo-section">
+            <h3><i class="bi bi-activity me-2"></i>5. 事件回调 & 搜索类型输入</h3>
+            <div class="demo-row">
+                <div class="demo-col">
+                    <label class="form-label">type="search" 输入框</label>
+                    <input type="search" id="search3" class="form-control" placeholder="搜索...">
+                </div>
+                <div class="demo-col">
+                    <strong>搜索结果：</strong><span class="selected-value" id="result3">未选择</span>
+                </div>
+            </div>
+            <div class="event-log mt-2" id="log3"><div class="text-muted">事件日志...</div></div>
+        </section>
+
+        <!-- API 参考 -->
+        <section class="demo-section">
+            <h3><i class="bi bi-book me-2"></i>选项 & API 参考</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>配置选项</h6>
+                    <table class="table table-sm">
+                        <tr><th>选项</th><th>默认值</th><th>说明</th></tr>
+                        <tr><td><code>minChars</code></td><td>1</td><td>触发提示的最小字符数</td></tr>
+                        <tr><td><code>delay</code></td><td>300</td><td>输入防抖延迟(ms)</td></tr>
+                        <tr><td><code>maxItems</code></td><td>10</td><td>最大显示建议数</td></tr>
+                        <tr><td><code>highlightMatches</code></td><td>true</td><td>是否高亮匹配部分</td></tr>
+                        <tr><td><code>data</code></td><td>[]</td><td>本地数据数组</td></tr>
+                        <tr><td><code>url</code></td><td>null</td><td>远程数据 URL</td></tr>
+                        <tr><td><code>paramName</code></td><td>'q'</td><td>远程请求参数名</td></tr>
+                        <tr><td><code>onSelect</code></td><td>null</td><td>选择建议回调(value, index)</td></tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h6>实例方法</h6>
+                    <ul>
+                        <li><code>updateData(newData)</code> - 更新本地数据</li>
+                        <li><code>updateUrl(newUrl)</code> - 更新远程 URL</li>
+                        <li><code>close()</code> - 关闭下拉</li>
+                        <li><code>open()</code> - 打开下拉</li>
+                        <li><code>destroy()</code> - 销毁实例</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="/statics/js/jquery/jquery.min.js"></script>
+    <script src="/statics/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- 组件为原生 ESM，可直接加载源码：改完组件刷新即可，无需任何构建。
+         样式必须单独 link —— 组件刻意不 import CSS，否则浏览器会因 MIME 类型
+         是 text/css 而拒绝加载整个模块。 -->
+    <link rel="stylesheet" href="ws-hint-input.css">
+    <script type="module" src="ws-hint-input.js"></script>
+    <script src="/statics/js/theme.js"></script>
+
+    <script>
+        function addLog(id, msg) {
+            var time = new Date().toLocaleTimeString();
+            $('#' + id).prepend('<div>[' + time + '] ' + msg + '</div>');
+            if ($('#' + id).children().length > 20) $('#' + id).children().last().remove();
+        }
+
+        $(document).ready(function() {
+            // ========== 1. 基本用法 ==========
+            var h1 = new HintInput('#search1', {
+                data: ['JavaScript', 'TypeScript', 'Python', 'Java', 'Go', 'Rust', 'C++', 'C#', 'PHP', 'Ruby', 'Swift', 'Kotlin', 'Dart', 'Scala', 'Haskell', 'Lua'],
+                minChars: 1,
+                maxItems: 8,
+                onSelect: function(value, index) {
+                    $('#result1').text(value);
+                    addLog('log1', '选择了: ' + value + ' (索引:' + index + ')');
+                }
+            });
+
+            // ========== 2. 配置选项动态调整 ==========
+            var defaultFruits = ['苹果', '香蕉', '橙子', '葡萄', '西瓜', '草莓', '蓝莓', '樱桃', '芒果', '菠萝', '猕猴桃', '柠檬', '椰子', '梨', '桃子', '李子'];
+            var vegetables = ['白菜', '萝卜', '黄瓜', '番茄', '茄子', '辣椒', '土豆', '洋葱', '芹菜', '菠菜', '韭菜', '香菜', '豆角', '冬瓜', '南瓜', '丝瓜'];
+
+            var currentFruitData = defaultFruits.slice();
+
+            function createHint2(data, cfg) {
+                if (h2) { h2.destroy(); }
+                h2 = new HintInput('#search2', {
+                    data: data,
+                    minChars: cfg.minChars,
+                    maxItems: cfg.maxItems,
+                    delay: cfg.delay,
+                    highlightMatches: cfg.highlight,
+                    onSelect: function(v, i) {
+                        $('#result2').text(v);
+                    }
+                });
+            }
+
+            var h2 = null;
+            createHint2(currentFruitData, { minChars: 1, maxItems: 8, delay: 300, highlight: true });
+
+            $('#btnApplyConfig').on('click', function() {
+                var cfg = {
+                    minChars: parseInt($('#cfgMinChars').val()),
+                    maxItems: parseInt($('#cfgMaxItems').val()),
+                    delay: parseInt($('#cfgDelay').val()),
+                    highlight: $('#cfgHighlight').val() === 'true'
+                };
+                createHint2(currentFruitData, cfg);
+            });
+
+            $('#btnUpdateData').on('click', function() {
+                currentFruitData = vegetables.slice();
+                if (h2) { h2.updateData(vegetables); }
+                $('#result2').text('未选择');
+            });
+
+            // ========== 3. 多实例 ==========
+            new HintInput('#city-search', {
+                data: ['北京', '上海', '广州', '深圳', '杭州', '成都', '重庆', '武汉', '西安', '南京', '天津', '苏州', '长沙', '青岛', '郑州', '大连'],
+                maxItems: 6,
+                onSelect: function(v) { $('#city-result').text('已选择: ' + v); }
+            });
+            new HintInput('#color-search', {
+                data: ['红色', '橙色', '黄色', '绿色', '蓝色', '靛蓝', '紫色', '粉色', '棕色', '黑色', '白色', '灰色', '金色', '银色', '青色'],
+                maxItems: 6,
+                onSelect: function(v) { $('#color-result').text('已选择: ' + v); }
+            });
+            new HintInput('#drink-search', {
+                data: ['咖啡', '绿茶', '红茶', '奶茶', '可乐', '雪碧', '果汁', '豆浆', '牛奶', '柠檬水', '可可', '抹茶'],
+                maxItems: 6,
+                onSelect: function(v) { $('#drink-result').text('已选择: ' + v); }
+            });
+
+            // ========== 4. API 方法 ==========
+            var countries = ['中国', '美国', '日本', '德国', '法国', '英国', '加拿大', '澳大利亚', '巴西', '印度', '韩国', '意大利'];
+
+            var hApi = new HintInput('#api-search', {
+                data: ['JavaScript', 'TypeScript', 'Python', 'Java', 'Go'],
+                onSelect: function(v) {
+                    $('#api-result').text('已选择: ' + v);
+                    addLog('api-log', 'onSelect: ' + v);
+                }
+            });
+
+            $('#apiGetData').on('click', function() {
+                addLog('api-log', '当前数据: ' + JSON.stringify(countries));
+            });
+            $('#apiUpdateData').on('click', function() {
+                hApi.updateData(countries);
+                $('#api-result').text('未选择');
+                $('#api-search').val('');
+                addLog('api-log', '数据已更新为国家列表 (' + countries.length + ' 条)');
+            });
+            $('#apiDestroy').on('click', function() {
+                hApi.destroy();
+                $('#api-result').text('实例已销毁');
+                addLog('api-log', 'destroy() - 实例已销毁');
+            });
+            $('#apiRecreate').on('click', function() {
+                if (hApi) { hApi.destroy(); }
+                hApi = new HintInput('#api-search', {
+                    data: ['JavaScript', 'TypeScript', 'Python', 'Java', 'Go'],
+                    onSelect: function(v) {
+                        $('#api-result').text('已选择: ' + v);
+                        addLog('api-log', 'onSelect: ' + v);
+                    }
+                });
+                $('#api-result').text('实例已重建');
+                addLog('api-log', '重建实例成功');
+            });
+
+            // ========== 5. search 类型 & 事件回调 ==========
+            var searchData = ['React', 'Vue', 'Angular', 'Svelte', 'Next.js', 'Nuxt', 'Gatsby', 'Remix', 'Solid', 'Qwik', 'Astro', 'Preact'];
+            new HintInput('#search3', {
+                data: searchData,
+                minChars: 0,
+                maxItems: 6,
+                highlightMatches: true,
+                onSelect: function(v, i) {
+                    $('#result3').text(v);
+                    addLog('log3', '选择了: ' + v);
+                },
+                onFetchStart: function() {
+                    addLog('log3', 'onFetchStart: 开始搜索...');
+                },
+                onFetchEnd: function(suggestions) {
+                    addLog('log3', 'onFetchEnd: 找到 ' + suggestions.length + ' 条');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+{extend name="public/base" /}
+
+{block name="title"}任务中心{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="public/page_header" icon="bi bi-lightning-charge" title="任务中心" desc="查看异步任务与队列执行结果" actions="" /}
+
+    <div class="card mb-3">
+        <div class="card-body py-2" id="async-task-health">
+            <span class="text-muted small">正在加载队列健康…</span>
+        </div>
+    </div>
+
+    {/* 搜索区：统一 .ws-filter-bar 外壳（UIS v1.1 §3.5），控件 id 保持不变，由页面脚本读值 */}
+    <form id="ws-filter" class="ws-filter-bar ws-filter-form row g-2 align-items-end" novalidate>
+        <div class="col-12 col-md-6 col-lg-3 ws-filter-item" data-field="status">
+            <label class="form-label" for="filter-status">状态</label>
+            <select id="filter-status" name="status" class="form-select form-select-sm">
+                <option value="">全部状态</option>
+                <option value="pending">等待中</option>
+                <option value="running">执行中</option>
+                <option value="success">成功</option>
+                <option value="failed">失败</option>
+                <option value="canceled">已取消</option>
+                <option value="stale">已卡死</option>
+            </select>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 ws-filter-item" data-field="keyword">
+            <label class="form-label" for="filter-keyword">关键词</label>
+            <input id="filter-keyword" name="keyword" class="form-control form-control-sm"
+                   type="text" placeholder="任务号 / 回调标识 / 名称" />
+        </div>
+        <div class="col-12 col-lg-3 ws-filter-actions ms-auto justify-content-lg-end">
+            <button type="button" class="btn btn-sm btn-primary ws-filter-submit">
+                <i class="bi bi-search me-1"></i>查询
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary ws-filter-reset">重置</button>
+        </div>
+    </form>
+
+    <div id="toolbar" class="ws-toolbar"></div>
+
+    <table id="table"></table>
+</div>
+{/block}

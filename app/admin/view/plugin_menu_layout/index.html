@@ -1,0 +1,95 @@
+{extend name="public/base" /}
+
+{block name="title"}插件菜单布局{/block}
+
+{block name="content"}
+<style>
+    .layout-card { border: 1px solid var(--bs-border-color); border-radius: .5rem; }
+    .layout-card .card-header { background-color: var(--bs-secondary-bg); }
+    .mount-badge { font-size: .72rem; }
+</style>
+<div class="app-main container-fluid">
+    {include file="public/page_header" icon="bi bi-layout-text-window" title="插件菜单布局" desc="调整插件菜单的展示布局" actions="" /}
+    <div class="d-flex align-items-center mb-3">
+        <div class="d-flex gap-2">
+            <button id="layout-refresh" class="btn btn-sm btn-secondary"><i class="bi bi-arrow-repeat"></i> 刷新</button>
+            <button id="layout-save" class="btn btn-sm btn-primary"><i class="bi bi-check2"></i> 保存布局</button>
+        </div>
+        <span class="ms-3 small text-muted">调整各插件的归属（插件扩展 / 启动台 / 常用插件区），保存后立即生效</span>
+    </div>
+
+    {empty name="roots"}
+    <div class="alert alert-info"><i class="bi bi-info-circle"></i> 暂无已安装插件。</div>
+    {else/}
+    <form id="layoutForm" method="post" action="{:url('save')}">
+        <div class="row g-3">
+            {volist name="roots" id="root"}
+            <div class="col-md-6">
+                <div class="card layout-card h-100">
+                    <div class="card-header py-2 d-flex align-items-center gap-2">
+                        <i class="{$root.icon|default='bi bi-plugin'}"></i>
+                        <span class="fw-semibold">{$root.name}</span>
+                        <span class="badge text-bg-secondary ms-1 mount-badge">{$root.placement_text}</span>
+                        <span class="ms-auto small text-muted">{$root.child_count} 个子菜单</span>
+                    </div>
+                    <div class="card-body">
+                        <input type="hidden" name="layouts[{$key}][plugin]" value="{$root.plugin}">
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <label class="form-label small mb-1">入口标题</label>
+                                <input type="text" class="form-control form-control-sm" name="layouts[{$key}][name]" value="{$root.name}">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small mb-1">图标</label>
+                                <input type="text" class="form-control form-control-sm" name="layouts[{$key}][icon]" value="{$root.icon}" placeholder="bi bi-plugin">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small mb-1">归属</label>
+                                <select class="form-select form-select-sm layout-placement" name="layouts[{$key}][placement]">
+                                    {volist name="placements" id="ptext" key="pk"}
+                                    {if $pk == 'pinned' and $root.can_pin == 0}
+                                    <option value="{$key}" disabled>常用插件区（仅多顶级插件）</option>
+                                    {else/}
+                                    <option value="{$key}" {eq name="root.placement" value="$key"}selected{/eq}>{$ptext}</option>
+                                    {/if}
+                                    {/volist}
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small mb-1">排序</label>
+                                <input type="number" class="form-control form-control-sm" name="layouts[{$key}][sort]" value="{$root.sort}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {/volist}
+        </div>
+    </form>
+    {/empty}
+</div>
+{/block}
+
+{block name="js"}
+<script nonce="{$csp_nonce|default=''}">
+$(function () {
+    $('#layout-refresh').on('click', function () { window.location.reload(); });
+
+    $('#layout-save').on('click', function (e) {
+        e.preventDefault();
+        const $btn = $(this).prop('disabled', true);
+        const form = $('#layoutForm')[0];
+        $.post(form.action, $(form).serialize(), function (res) {
+            if (window.Layer) {
+                window.Layer.toast({ content: res.msg || '保存成功', type: res.code === 0 ? 'success' : 'error' });
+            } else {
+                alert(res.msg);
+            }
+            if (res.code === 0) window.location.reload();
+        }).fail(function () {
+            if (window.Layer) window.Layer.toast({ content: '网络错误', type: 'error' });
+        }).always(function () { $btn.prop('disabled', false); });
+    });
+});
+</script>
+{/block}

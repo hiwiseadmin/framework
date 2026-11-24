@@ -1,0 +1,67 @@
+{extend name="public/base" /}
+
+{block name="title"}{$crudTitle}{/block}
+
+{block name="content"}
+<div class="container">
+    <form id="wsForm" class="ws-form needs-validation" novalidate method="post" action="{$formAction|raw}">
+        {if $isEdit}<input type="hidden" name="id" value="{$rowId}">{/if}
+        <div class="row">
+            {/* 表单字段由 wise-form-schema 的 HtmlRenderer 运行时渲染，
+               见 app\common\controller\traits\CrudSchemaTrait::renderCrudForm()。
+               要自定义本页：复制本文件到「模块目录/form.html」并覆盖 add()/edit() 的 fetch 目标。 */}
+            {$schemaHtml|raw}
+        </div>
+        {include file="public/submit" /}
+    </form>
+</div>
+{/block}
+
+{block name="js"}
+<script>
+(function () {
+    /**
+     * 统一 CRUD 表单的前端装配。
+     *
+     * 顺序不可颠倒：
+     *   1. 先让 ws-* 组件完成初始化 —— wscolor / wsselect 这类 div 宿主会在此生成
+     *      隐藏载体，并把宿主上的 data-validation 迁移到载体上；
+     *   2. 再创建 WsFormValidator —— 它在创建时扫描 [data-validation] 并绑定实时校验。
+     * 反过来的话规则还挂在没有 name 的宿主 div 上，校验器扫描时直接跳过，
+     * 表现成「必填完全没反应」。
+     */
+    function boot() {
+        var form = document.getElementById('wsForm');
+        if (!form) return;
+
+        var ws = window.Wise && window.Wise.ws;
+        if (ws && typeof ws.autoInitializeAll === 'function') {
+            try {
+                ws.autoInitializeAll(form);
+            } catch (err) {
+                console.warn('[crud-form] ws 组件初始化失败', err);
+            }
+        }
+
+        if (!window.WsFormValidator) {
+            console.warn('[crud-form] WsFormValidator 未加载，表单校验已跳过');
+            return;
+        }
+
+        // autoSubmit：校验通过后由组件 POST 到 form.action（约定 res.code == 0 为成功）。
+        // 需要自定义提交/跳转时，改传 onSubmit / onSuccess 即可。
+        new window.WsFormValidator('wsForm', {
+            liveValidation: true,
+            showIcons: true,
+            autoSubmit: true
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+    } else {
+        boot();
+    }
+})();
+</script>
+{/block}

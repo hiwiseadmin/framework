@@ -1,0 +1,19 @@
+{extend name="public/base" /}
+
+{block name="title"}插槽管理{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="public/page_header" icon="bi bi-layout-three-columns" title="插槽管理" desc="管理系统页面插槽与嵌入内容" actions="" /}
+    <div id="toolbar" class="ws-toolbar">
+        <button type="button" id="refresh" class="btn btn-sm btn-outline-secondary" title="重新加载列表"><i class="bi bi-arrow-repeat me-1"></i>刷新</button>
+        <span class="ms-2 small text-muted">系统预定义的插槽位置，插件通过 manifest.json 声明注入内容</span>
+    </div>
+
+    <div id="slot-list"></div>
+</div>
+{/block}
+
+{block name="js"}
+
+{/block}

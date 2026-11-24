@@ -1,0 +1,56 @@
+<div id="lockscreen-wrapper" class="d-none">
+<style>
+[data-bs-theme="light"] #lockscreen-wrapper {--lockscreen-bg-gradient: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);--lockscreen-card-bg: rgba(255, 255, 255, 0.95);--lockscreen-text-color: #fff;--lockscreen-secondary-text: rgba(255, 255, 255, 0.8);}
+[data-bs-theme="dark"] #lockscreen-wrapper {--lockscreen-bg-gradient: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);--lockscreen-card-bg: rgba(33, 37, 41, 0.95);--lockscreen-text-color: #f8f9fa;--lockscreen-secondary-text: rgba(248, 249, 250, 0.8);}
+#lockscreen-wrapper {position: absolute;top: 0;left: 0;height: 100vh;width: 100vw;z-index: 2000;background: var(--lockscreen-bg-gradient);display: flex;align-items: center;justify-content: center;font-family: 'Source Sans Pro', sans-serif;transition: background 0.3s ease;}
+.lockscreen-wrapper {max-width: 400px;width: 100%;}
+.lockscreen-logo {text-align: center;margin-bottom: 30px;}
+.lockscreen-logo a {font-size: 35px;color: var(--lockscreen-text-color);font-weight: 300;}
+.lockscreen-name {text-align: center;font-weight: 600;color: var(--lockscreen-text-color);margin-bottom: 10px;font-size: 18px;}
+.lockscreen-item {border-radius: 0.375rem;padding: 0;background: var(--lockscreen-card-bg);position: relative;margin: 15px auto 30px auto;width: 346px;box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);transition: background-color 0.3s ease;}
+.lockscreen-image {border-radius: 50%;position: absolute;left: -20px;top: -25px;background: var(--lockscreen-card-bg);padding: 5px;z-index: 10;width: 70px;height: 70px;box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);transition: background-color 0.3s ease;}
+.lockscreen-image img {border-radius: 50%;width: 60px;height: 60px;}
+.lockscreen-credentials {margin-left: 30px;padding: 15px;}
+.lockscreen-credentials .form-control {border: none;box-shadow: none;height: 40px;padding-left: 0;}
+.lockscreen-credentials .btn {border-radius: 0.375rem;padding: 8px 20px;margin-left: 0 !important;}
+.lockscreen-footer {margin-top: 20px;text-align: center;color: var(--lockscreen-secondary-text);}
+.lockscreen-time {text-align: center;color: var(--lockscreen-text-color);font-size: 60px;font-weight: 700;margin-bottom: 20px;text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);}
+.lockscreen-date {text-align: center;color: var(--lockscreen-secondary-text);font-size: 18px;margin-bottom: 30px;}
+.theme-switcher {position: absolute;top: 20px;right: 20px;}
+.theme-switcher .btn {border-radius: 50%;width: 40px;height: 40px;display: flex;align-items: center;justify-content: center;background-color: rgba(255, 255, 255, 0.2);border: none;color: var(--lockscreen-text-color);}
+.input-group-text {background: transparent;border: none;}
+</style>
+<div class="lockscreen-wrapper">
+    <div class="lockscreen-logo">
+        <a href="{$wsurl|default='#'}" target="_blank">{$wssite['name']|default='网站管理系统'}</a>
+    </div>
+    
+    <div class="lockscreen-time" id="currentTime">00:00:00</div>
+    <div class="lockscreen-date" id="currentDate">2023年1月1日 星期一</div>
+    
+    <div class="lockscreen-name">{$admin['nickname']|default='未知会员'}</div>
+    
+    <div class="lockscreen-item">
+        <div class="lockscreen-image">
+            <img src="{$admin.avatar|default='__IMG__/avatar/default_avatar.jpg'}" class="img-fluid">
+        </div>
+        
+        <form class="lockscreen-credentials" id="unlockForm">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="bi bi-lock-fill"></i>
+                </span>
+                <input type="password" class="form-control" placeholder="输入密码解锁" id="password" autocomplete="current-password">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+            </div>
+            <div class="invalid-feedback ps-3 mt-2" id="errorMessage">密码错误，请重试</div>
+        </form>
+    </div>
+    
+    <div class="lockscreen-footer">
+        <p>或 <a href="/admin/login.html" class="link-light">使用其他账户登录</a></p>
+    </div>
+</div>
+</div>

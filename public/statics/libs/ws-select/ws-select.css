@@ -1,0 +1,473 @@
+/**
+ * ws-select.css
+ * WiseAdmin 多功能下拉选择组件样式（从 ws-select.js 提取）
+ */
+
+.ws-select-container {
+    position: relative;
+    width: 100%;
+}
+
+.ws-select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.375rem;
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    cursor: pointer;
+    min-height: 38px;
+}
+
+.ws-select-trigger:focus {
+    border-color: var(--bs-primary);
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+/**
+ * 校验状态。
+ *
+ * ws-form-validator 把 is-invalid / is-valid 打在带有 [data-ws-ui] 的元素上，
+ * 对 ws-select 就是触发器本身（容器没有边框，标在容器上看不出变化）。
+ */
+.ws-select-trigger.is-invalid {
+    border-color: var(--bs-form-invalid-border-color);
+}
+
+.ws-select-trigger.is-invalid:focus {
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-danger-rgb), 0.25);
+}
+
+.ws-select-trigger.is-valid {
+    border-color: var(--bs-form-valid-border-color);
+}
+
+.ws-select-trigger.disabled {
+    background-color: var(--bs-secondary-bg);
+    color: var(--bs-secondary-color);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.ws-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.375rem;
+    box-shadow: 0 0.5rem 1rem var(--bs-border-color-translucent);
+    z-index: 1000;
+    display: none;
+}
+
+.ws-select-dropdown.show {
+    display: block;
+}
+
+.ws-select-search {
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.ws-select-options {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.ws-select-option {
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: var(--bs-body-color);
+}
+
+.ws-select-option.selected {
+    background-color: var(--bs-info-bg-subtle);
+    color: var(--bs-info);
+}
+
+.ws-select-option:hover {
+    background-color: var(--bs-tertiary-bg);
+}
+
+.ws-select-option.disabled {
+    color: var(--bs-secondary-color);
+    cursor: not-allowed;
+    background-color: transparent;
+}
+
+.ws-select-group {
+    padding: 0.25rem 0.75rem;
+    font-weight: 600;
+    color: var(--bs-secondary-color);
+    font-size: 0.875rem;
+    background-color: var(--bs-tertiary-bg);
+    margin: 0.1rem 0;
+}
+
+.ws-select-option-content {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.ws-select-option-content.secondary-column {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.ws-select-option-icon {
+    margin-right: 0.5rem;
+    width: 20px;
+    text-align: center;
+}
+
+.ws-select-option-main {
+    flex: 1;
+}
+
+.ws-select-option-secondary {
+    color: var(--bs-secondary-color);
+    font-size: 0.875rem;
+}
+
+.ws-select-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-right: 1.5rem;
+}
+
+.ws-select-tag {
+    background-color: var(--bs-info-bg-subtle);
+    border: 1px solid var(--bs-info-border-subtle);
+    border-radius: 0.25rem;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    color: var(--bs-info);
+}
+
+.ws-select-tag-remove {
+    margin-left: 0.25rem;
+    cursor: pointer;
+    color: var(--bs-secondary-color);
+}
+
+.ws-select-tag-remove:hover {
+    color: var(--bs-body-color);
+}
+
+.ws-select-placeholder {
+    color: var(--bs-secondary-color);
+}
+
+/**
+ * 远程回填的「待确认」态。
+ *
+ * 服务端下发了 data-value + data-label，但选项数据（data-url）尚未返回，
+ * 此时展示的文本来自 label 而非真实 option。置灰表示"暂定"，
+ * 数据到达后 updateValueDisplay() 会移除本类并换成真实 label。
+ */
+.ws-select-value-pending {
+    color: var(--bs-secondary-color);
+}
+
+.ws-select-clear {
+    position: absolute;
+    right: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: var(--bs-secondary-color);
+}
+
+.ws-select-clear:hover {
+    color: var(--bs-body-color);
+}
+
+.ws-select-arrow {
+    transition: transform 0.2s;
+    color: var(--bs-secondary-color);
+}
+
+.ws-select-arrow.rotated {
+    transform: rotate(180deg);
+}
+
+.ws-select-no-options {
+    padding: 0.5rem 0.75rem;
+    color: var(--bs-secondary-color);
+    text-align: center;
+}
+
+/* 尺寸：JS 侧 class 是 size-{settings.size}（small/medium/large），
+   历史 CSS 写的是 size-sm / size-lg。两套都保留，避免「data-size="small"
+   设了却没变化」。small 的 32px 与同排 form-control-sm 对齐。 */
+.size-sm .ws-select-trigger,
+.size-small .ws-select-trigger {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    min-height: 32px;
+}
+
+.size-lg .ws-select-trigger,
+.size-large .ws-select-trigger {
+    padding: 0.5rem 1rem;
+    font-size: 1.125rem;
+    min-height: 48px;
+}
+
+.ws-select-option.focused {
+    background-color: var(--bs-secondary-bg);
+}
+
+.ws-select-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+    color: var(--bs-secondary-color);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+.ws-select-loading .spinner-border {
+    margin-right: 0.5rem;
+}
+
+.ws-display-mode-group .ws-select-group {
+    display: block;
+}
+
+.ws-display-mode-default .ws-select-group {
+    display: none;
+}
+
+/* 分页样式 */
+.ws-select-pagination {
+    padding: 0.5rem;
+    border-top: 1px solid var(--bs-border-color);
+    background-color: var(--bs-tertiary-bg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.ws-select-pagination-info {
+    font-size: 0.875rem;
+    color: var(--bs-secondary-color);
+    margin-right: 0.5rem;
+}
+
+.ws-select-pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex: auto;
+}
+
+.ws-select-pagination-btn {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--bs-border-color);
+    background: var(--bs-body-bg);
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+
+.ws-select-pagination-btn:hover:not(:disabled) {
+    background-color: var(--bs-tertiary-bg);
+}
+
+.ws-select-pagination-btn:disabled {
+    color: var(--bs-secondary-color);
+    cursor: not-allowed;
+}
+
+.ws-select-pagination-page {
+    min-width: 2rem;
+    text-align: center;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--bs-border-color);
+    background: var(--bs-body-bg);
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+
+.ws-select-pagination-page.active {
+    background-color: var(--bs-primary-bg-subtle);
+    color: var(--bs-primary);
+    border-color: var(--bs-primary-border-subtle);
+}
+
+.ws-select-pagination-size {
+    padding: 0.25rem 0.5rem;
+    margin-left: 0.5rem;
+    border: 1px solid var(--bs-border-color);
+    background: var(--bs-body-bg);
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+}
+
+/* 树形结构样式 */
+.ws-select-tree-mode .ws-select-options {
+    padding-left: 0;
+}
+
+.ws-select-tree-node {
+    padding: 0;
+    list-style: none;
+}
+
+.ws-select-tree-node-content {
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.ws-select-tree-node-content.selected {
+    background-color: var(--bs-info-bg-subtle);
+    color: var(--bs-info);
+}
+
+.ws-select-tree-node-content:hover {
+    background-color: var(--bs-tertiary-bg);
+}
+
+.ws-select-tree-node-content.disabled {
+    color: var(--bs-secondary-color);
+    cursor: not-allowed;
+    background-color: transparent;
+}
+
+.ws-select-tree-node-toggle {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.25rem;
+    cursor: pointer;
+    color: var(--bs-secondary-color);
+}
+
+.ws-select-tree-node-toggle i {
+    transition: transform 0.2s;
+    font-size: 0.875rem;
+}
+
+.ws-select-tree-node-toggle.expanded i {
+    transform: rotate(90deg);
+}
+
+.ws-select-tree-node-indent {
+    width: 20px;
+    display: inline-block;
+}
+
+.ws-select-tree-node-children {
+    padding-left: 1.5rem;
+    display: none;
+}
+
+.ws-select-tree-node-children.expanded {
+    display: block;
+}
+
+.ws-select-tree-node-children.horizontal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.ws-select-tree-node-children.horizontal .ws-select-tree-node {
+    width: auto;
+    min-width: 120px;
+}
+
+.ws-select-tree-node-children.horizontal .ws-select-tree-node-content {
+    margin: 0.25rem 0;
+}
+
+.ws-select-tree-node-children.horizontal .ws-select-tree-node-content:hover {
+    background-color: var(--bs-tertiary-bg);
+}
+
+.ws-select-tree-node-children.horizontal .ws-select-tree-node-content.selected {
+    background-color: var(--bs-info-bg-subtle);
+    color: var(--bs-info);
+}
+
+/* 最后一级横向排列 */
+.last-level-horizontal .ws-select-tree-node-children:last-child {
+    display: none;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.last-level-horizontal .ws-select-tree-node-children:last-child .ws-select-tree-node {
+    width: auto;
+    min-width: 120px;
+}
+
+.last-level-horizontal .ws-select-tree-node-children:last-child .ws-select-tree-node-content {
+    margin: 0.25rem 0;
+}
+
+.last-level-horizontal .ws-select-tree-node-children.expanded {
+    display: block;
+}
+
+.last-level-horizontal .ws-select-tree-node-children.horizontal.expanded {
+    display: flex;
+}
+
+/* 树形复选框样式 */
+.ws-select-tree-checkbox {
+    margin-right: 0.5rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+}
+
+.ws-select-tree-checkbox i {
+    font-size: 1rem;
+    color: var(--bs-secondary-color);
+}
+
+.ws-select-tree-checkbox .bi-check-square-fill {
+    color: var(--bs-primary);
+}
+
+.ws-select-tree-checkbox .bi-dash-square {
+    color: var(--bs-primary);
+    opacity: 0.7;
+}
+
+.ws-select-tree-node-content.indeterminate {
+    background-color: var(--bs-primary-bg-subtle);
+}
+
+.ws-select-tree-node-content.indeterminate:hover {
+    background-color: var(--bs-primary-border-subtle);
+}

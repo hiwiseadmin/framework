@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WsColorPicker 颜色选择器演示</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="/statics/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="/statics/libs/bootstrap-icons/bootstrap-icons.css">
+    <style>
+        .demo-section {
+            background: var(--bs-body-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid var(--bs-border-color);
+        }
+        .color-preview-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            border: 2px solid var(--bs-border-color);
+            display: inline-block;
+            vertical-align: middle;
+            transition: background-color 0.3s;
+        }
+        .color-value {
+            font-family: monospace;
+            font-size: 0.9rem;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+        .demo-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .event-log {
+            background: var(--bs-secondary-bg);
+            border-radius: 6px;
+            padding: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+            font-family: monospace;
+        }
+        .btn-group-demo {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .color-swatch-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+        .color-swatch-item {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .color-swatch-item:hover {
+            border-color: var(--bs-primary);
+            transform: scale(1.15);
+        }
+    </style>
+</head>
+<body>
+<a href="/statics/demo/ws-form.html" style="position:fixed;right:18px;bottom:18px;z-index:2050;display:inline-flex;align-items:center;gap:.35rem;padding:.5rem .875rem;font-size:.8125rem;font-weight:500;color:#fff;background:#0d6efd;border-radius:999px;box-shadow:0 4px 14px rgba(13,110,253,.35);text-decoration:none;">声明式表单接入示例 &rarr;</a>
+    <div class="container my-5">
+        <h1 class="text-center mb-4">
+            <i class="bi bi-palette me-2"></i>WsColorPicker 颜色选择器
+        </h1>
+
+        <!-- 基本用法 -->
+        <section class="demo-section">
+            <h3>1. 基本用法</h3>
+            <p class="text-muted">最基础的颜色选择器使用方式</p>
+            <div class="demo-row">
+                <button id="openPicker1" class="btn btn-primary">
+                    <i class="bi bi-palette me-2"></i>打开颜色选择器
+                </button>
+                <div class="color-preview-box" id="preview1" style="background-color: #007bff;"></div>
+                <span class="color-value" id="colorValue1">#007bff</span>
+            </div>
+            <div class="event-log" id="eventLog1">
+                <div class="text-muted">事件日志将显示在这里...</div>
+            </div>
+        </section>
+
+        <!-- 不同初始颜色 -->
+        <section class="demo-section">
+            <h3>2. 多实例 & 不同初始颜色</h3>
+            <p class="text-muted">同时创建多个颜色选择器实例，各自独立工作</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>实例 A - 红色初始</h6>
+                    <div class="demo-row">
+                        <button id="openPickerA" class="btn btn-danger btn-sm">打开选择器</button>
+                        <div class="color-preview-box" id="previewA" style="background-color: #ff0000;"></div>
+                        <span class="color-value" id="colorValueA">#ff0000</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6>实例 B - 绿色初始</h6>
+                    <div class="demo-row">
+                        <button id="openPickerB" class="btn btn-success btn-sm">打开选择器</button>
+                        <div class="color-preview-box" id="previewB" style="background-color: #00ff00;"></div>
+                        <span class="color-value" id="colorValueB">#00ff00</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- API 控制 -->
+        <section class="demo-section">
+            <h3>3. API 方法演示</h3>
+            <p class="text-muted">通过 API 方法控制颜色选择器</p>
+            <div class="demo-row">
+                <button id="openPicker2" class="btn btn-primary btn-sm">
+                    <i class="bi bi-palette me-2"></i>打开选择器
+                </button>
+                <div class="color-preview-box" id="preview2" style="background-color: #007bff;"></div>
+                <span class="color-value" id="colorValue2">#007bff</span>
+            </div>
+            <div class="btn-group-demo">
+                <button id="btnSetPurple" class="btn btn-outline-secondary btn-sm">setColor('#6f42c1')</button>
+                <button id="btnSetOrange" class="btn btn-outline-warning btn-sm">setColor('#fd7e14')</button>
+                <button id="btnSetTeal" class="btn btn-outline-info btn-sm">setColor('#20c997')</button>
+                <button id="btnGetColor" class="btn btn-outline-success btn-sm">getCurrentColor()</button>
+                <button id="btnClose" class="btn btn-outline-danger btn-sm">close()</button>
+            </div>
+            <div class="event-log mt-2" id="eventLog2"></div>
+        </section>
+
+        <!-- 颜色变化实时监听 -->
+        <section class="demo-section">
+            <h3>4. 实时颜色变化监听</h3>
+            <p class="text-muted">演示 onColorChange 回调，拖动色盘时实时更新背景色</p>
+            <div class="demo-row">
+                <button id="openPicker3" class="btn btn-primary btn-sm">打开选择器</button>
+                <div class="color-preview-box" id="preview3" style="background-color: #0d6efd;"></div>
+                <span class="color-value" id="colorValue3">#0d6efd</span>
+            </div>
+            <div id="fullPageBg" style="padding: 20px; border-radius: 8px; border: 1px solid var(--bs-border-color); transition: background-color 0.15s;">
+                <p class="mb-0 text-center">此区域背景色将随颜色选择实时变化</p>
+            </div>
+            <p class="text-muted small mb-0 mt-2">
+                <i class="bi bi-info-circle"></i>
+                在打开的弹窗里<strong>拖动“色相条 / 亮度 / 透明度”滑块或点按色盘</strong>，
+                都会<strong>连续触发</strong> <code>onColorChange</code> 实时刷新上面的背景色。
+                已实时触发 <span id="changeHits" class="badge text-bg-primary">0</span> 次。
+            </p>
+            <p class="text-muted small mb-0 mt-1">
+                最近一次选择器关闭：<span id="lastSession">-</span><br>
+                <i class="bi bi-question-circle"></i>
+                <strong>点“确认”</strong>保留所选颜色；<strong>点 ✕ / Esc / 遮罩空白取消</strong>会自动还原为打开时的颜色
+                （由 <code>onClose</code> 的 <code>action: 'confirm' | 'cancel'</code> 区分，可配 <code>resetOnCancel:false</code> 关闭还原）。
+            </p>
+        </section>
+
+        <!-- 快速颜色预设 -->
+        <section class="demo-section">
+            <h3>5. 快速预设颜色</h3>
+            <p class="text-muted">点击预设颜色快速设置选择器颜色，然后打开选择器查看</p>
+            <div class="demo-row">
+                <button id="openPicker4" class="btn btn-primary btn-sm">打开选择器</button>
+                <div class="color-preview-box" id="preview4" style="background-color: #007bff;"></div>
+                <span class="color-value" id="colorValue4">#007bff</span>
+            </div>
+            <div class="color-swatch-grid">
+                <div class="color-swatch-item" style="background:#ff0000;" data-color="#ff0000" title="#ff0000"></div>
+                <div class="color-swatch-item" style="background:#ff8000;" data-color="#ff8000" title="#ff8000"></div>
+                <div class="color-swatch-item" style="background:#ffff00;" data-color="#ffff00" title="#ffff00"></div>
+                <div class="color-swatch-item" style="background:#00ff00;" data-color="#00ff00" title="#00ff00"></div>
+                <div class="color-swatch-item" style="background:#00ffff;" data-color="#00ffff" title="#00ffff"></div>
+                <div class="color-swatch-item" style="background:#0000ff;" data-color="#0000ff" title="#0000ff"></div>
+                <div class="color-swatch-item" style="background:#ff00ff;" data-color="#ff00ff" title="#ff00ff"></div>
+                <div class="color-swatch-item" style="background:#000000;" data-color="#000000" title="#000000"></div>
+                <div class="color-swatch-item" style="background:#808080;" data-color="#808080" title="#808080"></div>
+                <div class="color-swatch-item" style="background:#ffffff;border:2px solid #ddd;" data-color="#ffffff" title="#ffffff"></div>
+            </div>
+        </section>
+
+        <!-- 迷你模式 / 自定义色板 / 颜色记忆 -->
+        <section class="demo-section">
+            <h3>6. 迷你模式 / 自定义色板 / 颜色记忆</h3>
+            <p class="text-muted">
+                迷你弹窗只保留标准调色板 + 滑块 + 最近使用，并用图标代替文字压缩布局；
+                标准色板可通过 <code>standardColors</code> 初始化配置；最近使用与收藏通过 localStorage 持久化。
+            </p>
+            <div class="row">
+                <div class="col-md-6">
+                    <h6><i class="bi bi-window me-1"></i>迷你模式 <code>mode: 'mini'</code></h6>
+                    <div class="demo-row">
+                        <button id="openPickerMini" class="btn btn-primary btn-sm">
+                            <i class="bi bi-palette me-1"></i>打开迷你选择器
+                        </button>
+                        <div class="color-preview-box" id="previewMini" style="background-color: #0ea5e9;"></div>
+                        <span class="color-value" id="colorValueMini">#0ea5e9</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6><i class="bi bi-grid me-1"></i>自定义标准色板 <code>standardColors: [...]</code></h6>
+                    <div class="demo-row">
+                        <button id="openPickerCustom" class="btn btn-primary btn-sm">
+                            <i class="bi bi-palette me-1"></i>打开自定义色板
+                        </button>
+                        <div class="color-preview-box" id="previewCustom" style="background-color: #059669;"></div>
+                        <span class="color-value" id="colorValueCustom">#059669</span>
+                    </div>
+                </div>
+            </div>
+            <p class="text-muted small mb-0">
+                <i class="bi bi-info-circle"></i>
+                确认选择的颜色会自动进入<strong>最近使用</strong>；点 <i class="bi bi-star"></i> 可收藏当前色（再次点击取消）。
+                最近使用与收藏均写入 localStorage（默认跨实例共享，可用 <code>storagePrefix</code> 隔离），
+                <strong>刷新页面后依然保留</strong>。上面两个演示可分别体验迷你布局与自定义色板。
+            </p>
+        </section>
+
+        <!-- 配置说明 -->
+        <section class="demo-section">
+            <h3>7. 配置选项说明</h3>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>参数</th>
+                            <th>类型</th>
+                            <th>默认值</th>
+                            <th>说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>container</code></td><td>Element</td><td>document.body</td><td>模态框挂载容器</td></tr>
+                        <tr><td><code>initialColor</code></td><td>String</td><td>'#007bff'</td><td>初始颜色，仅支持 #RRGGBB 格式</td></tr>
+                        <tr><td><code>onColorChange</code></td><td>Function</td><td>null</td><td><strong>实时预览回调</strong>：任一颜色变化都会触发（拖动色相条/亮度/透明度滑块、拖动色盘、点击色块、HEX 输入、<code>setColor()</code> 等）；取消自动还原时也会触发一次。回调参数为当前颜色对象（结构见下），适合做拖拽实时预览</td></tr>
+                        <tr><td><code>onColorSelect</code></td><td>Function</td><td>null</td><td><strong>确认回调</strong>：仅当点击“确认选择”按钮时触发一次，参数为确认时的颜色对象；点 ✕/Esc/取消/遮罩关闭窗口<strong>不会触发</strong>它，如需区分“确认/取消”请使用 <code>onClose</code>（其 <code>action</code> 为 'confirm' / 'cancel'）</td></tr>
+                        <tr><td><code>modalClass</code></td><td>String</td><td>'ws-color-picker-modal'</td><td>模态框自定义 CSS 类名</td></tr>
+                        <tr><td><code>mode</code></td><td>String</td><td>'default'</td><td>弹窗布局：'default' 完整模式 / 'mini' 迷你模式（仅标准色+滑块+最近使用，图标化压缩）</td></tr>
+                        <tr><td><code>standardColors</code></td><td>Array</td><td>内置 32 色</td><td>自定义标准调色板（#rrggbb 数组，非法值会被过滤）</td></tr>
+                        <tr><td><code>storagePrefix</code></td><td>String</td><td>'ws-color-picker'</td><td>最近使用/收藏的 localStorage 命名空间（改前缀可隔离）</td></tr>
+                        <tr><td><code>maxRecent</code></td><td>Number</td><td>8</td><td>最近使用保留的最大条数</td></tr>
+                        <tr><td><code>resetOnCancel</code></td><td>Boolean</td><td>true</td><td>取消(未点确认)关闭时是否把颜色还原为打开时的初始色</td></tr>
+                        <tr><td><code>onCancel</code></td><td>Function</td><td>null</td><td>取消回调 <code>(color, originalColor, { changed, lastColor })</code>：仅取消(未确认)关闭时触发</td></tr>
+                        <tr><td><code>onClose</code></td><td>Function</td><td>null</td><td>关闭回调 <code>({ action, confirmed, originalColor, color, lastColor, changed })</code>：任何关闭都会触发，action 为 'confirm'/'cancel'，用于区分用户是确认还是取消</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <h5 class="mt-3">回调参数 color 对象返回结构（onColorChange / onColorSelect / onCancel 的参数）</h5>
+            <pre class="bg-body-secondary p-3 rounded"><code>{
+    hex: '#ff0000',           // HEX 颜色值
+    rgb: 'rgb(255, 0, 0)',   // RGB 颜色值
+    rgba: 'rgba(255,0,0,1)', // RGBA 颜色值（含透明度）
+    hsl: 'hsl(0, 100%, 50%)', // HSL 颜色值
+    hsla: 'hsla(0,100%,50%,1)', // HSLA 颜色值
+    h: 0, s: 100, l: 50, a: 1  // 各通道独立值
+}</code></pre>
+            <h5 class="mt-3">API 方法</h5>
+            <ul>
+                <li><code>open()</code> - 打开颜色选择器</li>
+                <li><code>close()</code> - 关闭颜色选择器（等价于取消，触发 <code>onClose</code> action='cancel'）</li>
+                <li><code>setColor('#ff0000')</code> - 设置当前颜色</li>
+                <li><code>getCurrentColor()</code> - 获取当前颜色对象</li>
+                <li><code>destroy()</code> - 销毁实例</li>
+            </ul>
+        </section>
+    </div>
+
+    <script src="/statics/js/jquery/jquery.min.js"></script>
+    <script src="/statics/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- 组件为原生 ESM，可直接加载源码：改完组件刷新即可，无需任何构建。
+         样式必须单独 link —— 组件刻意不 import CSS，否则浏览器会因 MIME 类型
+         是 text/css 而拒绝加载整个模块。 -->
+    <link rel="stylesheet" href="ws-color-picker.css">
+    <script type="module" src="ws-color-picker.js"></script>
+    <script src="/statics/js/theme.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // ========== 1. 基本用法 ==========
+            var picker1 = new WsColorPicker({
+                initialColor: '#007bff',
+                onColorChange: function(color) {
+                    addLog('eventLog1', 'onColorChange: ' + color.hex);
+                },
+                onColorSelect: function(color) {
+                    $('#preview1').css('background-color', color.rgba);
+                    $('#colorValue1').text(color.hex);
+                    addLog('eventLog1', 'onColorSelect(确认): ' + color.hex + ' | ' + color.rgba);
+                }
+            });
+            $('#openPicker1').on('click', function() { picker1.open(); });
+
+            // ========== 2. 多实例 ==========
+            var pickerA = new WsColorPicker({
+                initialColor: '#ff0000',
+                onColorSelect: function(color) {
+                    $('#previewA').css('background-color', color.rgba);
+                    $('#colorValueA').text(color.hex);
+                }
+            });
+            var pickerB = new WsColorPicker({
+                initialColor: '#00ff00',
+                onColorSelect: function(color) {
+                    $('#previewB').css('background-color', color.rgba);
+                    $('#colorValueB').text(color.hex);
+                }
+            });
+            $('#openPickerA').on('click', function() { pickerA.open(); });
+            $('#openPickerB').on('click', function() { pickerB.open(); });
+
+            // ========== 3. API 方法演示 ==========
+            var picker2 = new WsColorPicker({
+                initialColor: '#007bff',
+                onColorSelect: function(color) {
+                    $('#preview2').css('background-color', color.rgba);
+                    $('#colorValue2').text(color.hex);
+                    addLog('eventLog2', '确认选择: ' + color.hex + ' | rgba: ' + color.rgba);
+                }
+            });
+            $('#openPicker2').on('click', function() { picker2.open(); });
+            $('#btnSetPurple').on('click', function() {
+                picker2.setColor('#6f42c1');
+                $('#preview2').css('background-color', '#6f42c1');
+                $('#colorValue2').text('#6f42c1');
+                addLog('eventLog2', 'setColor("#6f42c1")');
+            });
+            $('#btnSetOrange').on('click', function() {
+                picker2.setColor('#fd7e14');
+                $('#preview2').css('background-color', '#fd7e14');
+                $('#colorValue2').text('#fd7e14');
+                addLog('eventLog2', 'setColor("#fd7e14")');
+            });
+            $('#btnSetTeal').on('click', function() {
+                picker2.setColor('#20c997');
+                $('#preview2').css('background-color', '#20c997');
+                $('#colorValue2').text('#20c997');
+                addLog('eventLog2', 'setColor("#20c997")');
+            });
+            $('#btnGetColor').on('click', function() {
+                var c = picker2.getCurrentColor();
+                var info = 'hex:' + c.hex + ' rgb:' + c.rgb + ' rgba:' + c.rgba + ' hsl:' + c.hsl + ' h:' + c.h + ' s:' + c.s + ' l:' + c.l + ' a:' + c.a;
+                $('#preview2').css('background-color', c.rgba);
+                $('#colorValue2').text(c.hex + ' (已同步)');
+                addLog('eventLog2', 'getCurrentColor(): ' + info);
+            });
+            $('#btnClose').on('click', function() {
+                picker2.close();
+                addLog('eventLog2', 'close() - 选择器已关闭');
+            });
+
+            // ========== 4. 实时颜色变化监听 ==========
+            // 计数：演示色相条(ribbonSlider)/亮度/透明度滑块使用 input 事件，
+            // 拖动过程中会连续触发 onColorChange（而非松手才触发一次）
+            var changeHits = 0;
+            var picker3 = new WsColorPicker({
+                initialColor: '#0d6efd',
+                onColorChange: function(color) {
+                    // 实时更新背景色
+                    $('#fullPageBg').css('background-color', color.rgba);
+                    // 根据亮度调整文字颜色
+                    var textColor = color.l > 50 ? '#000' : '#fff';
+                    $('#fullPageBg p').css('color', textColor);
+                    $('#preview3').css('background-color', color.rgba);
+                    $('#colorValue3').text(color.hex + ' | L:' + color.l + '%');
+                    // 记录实时触发次数（拖动滑块的连续触发可见）
+                    changeHits++;
+                    $('#changeHits').text(changeHits);
+                },
+                onColorSelect: function(color) {
+                    $('#preview3').css('background-color', color.rgba);
+                    $('#colorValue3').text(color.hex + ' (已确认)');
+                },
+                // 关闭事件：区分「确认」与「取消」，携带原始色/结束色/是否变化
+                onClose: function(info) {
+                    var label = info.action === 'confirm'
+                        ? '<span class="text-success">已确认</span>'
+                        : '<span class="text-danger">已取消</span>';
+                    $('#lastSession').html(
+                        label + ' · 原始色 <code>' + info.originalColor.hex +
+                        '</code> → 结束色 <code>' + info.lastColor.hex + '</code>' +
+                        (info.changed ? '（有调整）' : '（无调整）') +
+                        (info.confirmed ? '' : '，已自动还原为原始色')
+                    );
+                }
+            });
+            $('#openPicker3').on('click', function() { picker3.open(); });
+
+            // ========== 5. 快速预设颜色 ==========
+            var picker4 = new WsColorPicker({
+                initialColor: '#007bff',
+                onColorSelect: function(color) {
+                    $('#preview4').css('background-color', color.rgba);
+                    $('#colorValue4').text(color.hex);
+                }
+            });
+            $('#openPicker4').on('click', function() { picker4.open(); });
+            $('.color-swatch-item').on('click', function() {
+                var color = $(this).data('color');
+                picker4.setColor(color);
+                $('#preview4').css('background-color', color);
+                $('#colorValue4').text(color + ' (已预选)');
+            });
+
+            // ========== 6. 迷你模式 / 自定义色板 / 颜色记忆 ==========
+            var pickerMini = new WsColorPicker({
+                mode: 'mini', // 迷你布局
+                initialColor: '#0ea5e9',
+                onColorChange: function(color) {
+                    $('#previewMini').css('background-color', color.rgba);
+                    $('#colorValueMini').text(color.hex);
+                },
+                onColorSelect: function(color) {
+                    $('#previewMini').css('background-color', color.rgba);
+                    $('#colorValueMini').text(color.hex + ' (已确认)');
+                }
+            });
+            $('#openPickerMini').on('click', function() { pickerMini.open(); });
+
+            // 自定义标准色板：传入企业品牌色/常用色，覆盖内置 32 色
+            var pickerCustom = new WsColorPicker({
+                initialColor: '#059669',
+                standardColors: [
+                    '#0f172a', '#1e293b', '#334155', '#475569', '#64748b', '#94a3b8', '#cbd5e1', '#e2e8f0', '#f1f5f9', '#f8fafc',
+                    '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', '#22c55e', '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9',
+                    '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef', '#ec4899', '#f43f5e', '#7c3aed'
+                ],
+                onColorChange: function(color) {
+                    $('#previewCustom').css('background-color', color.rgba);
+                    $('#colorValueCustom').text(color.hex);
+                },
+                onColorSelect: function(color) {
+                    $('#previewCustom').css('background-color', color.rgba);
+                    $('#colorValueCustom').text(color.hex + ' (已确认)');
+                }
+            });
+            $('#openPickerCustom').on('click', function() { pickerCustom.open(); });
+
+            // 日志工具
+            function addLog(containerId, msg) {
+                var time = new Date().toLocaleTimeString();
+                var $log = $('#' + containerId);
+                $log.prepend('<div>[' + time + '] ' + msg + '</div>');
+                // 限制日志行数
+                if ($log.children().length > 20) {
+                    $log.children().last().remove();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

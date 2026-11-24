@@ -1,0 +1,47 @@
+/**
+ * ws-hint-input.css
+ * WiseAdmin 提示输入组件样式（从 ws-hint-input.js 提取）
+ */
+
+.ws-hintinput-container {
+    position: relative;
+}
+
+.ws-hintinput-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+    border-top: none;
+    border-radius: 0 0 var(--bs-border-radius) var(--bs-border-radius);
+    box-shadow: var(--bs-box-shadow);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 2001;
+    display: none;
+}
+
+.ws-hintinput-suggestion {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid var(--bs-border-color);
+    transition: background-color 0.15s ease-in-out;
+}
+
+.ws-hintinput-suggestion:hover,
+.ws-hintinput-suggestion.ws-active {
+    background-color: var(--bs-secondary-bg);
+}
+
+.ws-hintinput-suggestion:last-child {
+    border-bottom: none;
+}
+
+.ws-hintinput-highlight {
+    background-color: rgba(var(--bs-warning-rgb), 0.3);
+    font-weight: 600;
+    padding: 0.1rem 0.2rem;
+    border-radius: 0.25rem;
+}

@@ -1,0 +1,29 @@
+{extend name="public/base" /}
+
+{block name="title"}回收站{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="public/page_header" icon="bi bi-recycle" title="回收站" desc="统一查看与恢复各模块已删除的记录；彻底删除与清空需二次确认" actions="" /}
+
+    <form id="ws-filter" class="ws-filter-bar ws-filter-form row g-2 align-items-end mb-3">
+        <div class="col-auto">
+            <label class="form-label" for="filter-model">模块</label>
+            <select class="form-select form-select-sm" id="filter-model" name="model">
+                <option value="">加载中…</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <label class="form-label" for="filter-keyword">关键词</label>
+            <input type="text" class="form-control form-control-sm" id="filter-keyword" name="keyword" placeholder="标题关键词">
+        </div>
+        <div class="col-auto">
+            <button type="button" class="btn btn-sm btn-primary ws-filter-submit">查询</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary ws-filter-reset">重置</button>
+        </div>
+    </form>
+
+    <div id="toolbar" class="ws-toolbar"></div>
+    <table id="table"></table>
+</div>
+{/block}

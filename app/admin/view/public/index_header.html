@@ -1,0 +1,7 @@
+{/* 兼容片段（UIS v1）：保留 app 侧 18 个老页面原有的 include 调用不变。
+   新页面请直接用 public/page_header（同一视图根），可额外带 desc 与 actions。
+
+   说明：本片段只做参数转交 —— 外层未传参时，[icon]/[caption] 占位会原样透传，
+   仍由 wise-framework.js 按 iframe tab 回填；desc/actions 传空串，不留占位文本。
+   注意：注释里不能写带花括号的 include 语法（标签解析先于注释剥离，会被真实执行）。 */}
+{include file="public/page_header" icon="[icon]" title="[caption]" desc="" actions="" /}

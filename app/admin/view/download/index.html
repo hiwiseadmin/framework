@@ -1,0 +1,50 @@
+{extend name="public/base" /}
+
+{block name="title"}下载中心{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="public/page_header" icon="bi bi-download" title="下载中心" desc="仅显示本人提交的导出任务；文件默认保留 7 天" actions="" /}
+
+    <form id="ws-filter" class="ws-filter-bar ws-filter-form row g-2 align-items-end mb-3">
+        <div class="col-auto">
+            <label class="form-label" for="filter-status">状态</label>
+            <select class="form-select form-select-sm" id="filter-status" name="status">
+                <option value="">全部</option>
+                <option value="pending">等待中</option>
+                <option value="running">执行中</option>
+                <option value="success">已完成</option>
+                <option value="failed">失败</option>
+                <option value="canceled">已取消</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="button" class="btn btn-sm btn-primary ws-filter-submit">查询</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary ws-filter-reset">重置</button>
+        </div>
+    </form>
+
+    <div id="toolbar" class="ws-toolbar"></div>
+    <table id="table"></table>
+</div>
+{/block}
+
+{block name="js"}
+<script nonce="{$csp_nonce|default=''}">
+    // 导出任务状态轮询：存在「等待中/执行中」的任务时自动刷新列表
+    (function () {
+        var timer = null;
+        function poll(table) {
+            var $t = window.jQuery('#table');
+            if (!$t.length) return;
+            var rows = $t.bootstrapTable('getData') || [];
+            var active = rows.some(function (r) { return r.status === 'pending' || r.status === 'running'; });
+            clearTimeout(timer);
+            if (active) {
+                timer = setTimeout(function () { window.Wise.table.refresh(table); }, 3000);
+            }
+        }
+        window.__wsDownloadPoll = poll;
+    })();
+</script>
+{/block}
