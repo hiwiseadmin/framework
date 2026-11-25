@@ -1,0 +1,91 @@
+/**
+ * {$controller_url}.js — {$title} 列表页与表单页控制器
+ *
+ * 由 `php think wise:crud` 于 {$create_time} 生成。
+ *
+ * 加载约定（两种模式都无需额外接线）：
+ *   - 框架级：由 AdminTrait 按「控制器名」自动 import
+ *   - 插件级：plugin\BaseController::setupJsPath() 把 wsconfig.js 指向
+ *             ../plugins/{ident}/js/{controller} —— 故本文件需位于
+ *             plugins/{ident}/statics/js/，由 AssetManager 发布到 /statics/plugins/{ident}/js/
+ *
+ * ⚠️ 列表列配置在**生成期固化**。增删字段后需重新生成，或改为运行时拉取：
+ *     fetch('{$api_base}/schema')  → 用 fields 构建 columns
+ *   后者是后续版本的规划（见 docs/wise-form-schema-分析报告.md 第九节）。
+ *
+ * 表单页无需在此构建控件：HTML 由服务端 HtmlRenderer 运行时渲染，
+ * 这里只负责挂上校验器（autoSubmit 会读取 form 的 action 提交）。
+ */
+const $ = window.jQuery;
+const Table = window.EnhancedTable;
+const FormValidator = window.WsFormValidator;
+const Layer = window.parent.Layer || window.Layer;
+
+const OK_CODE = 0;
+
+/** 接口基址（框架级 /admin/{controller}，插件级 /plugin/{ident}/{controller}） */
+const API_BASE = '{$api_base}';
+
+/** 表单校验配置（与后台其它模块保持一致） */
+const VALIDATOR_OPTIONS = {
+    liveValidation: true,
+    showIcons: true,
+    autoSubmit: true
+};
+
+const Controller = {
+    index() {
+        return new Table({
+            idTable: 'table',
+            url: API_BASE + '/getList',
+            showColumns: true,
+            pagination: true,
+            dataDataField: 'data.list',
+            extend: {
+                index_url: API_BASE + '/index',
+                add_url: API_BASE + '/add',
+                del_url: API_BASE + '/delete'
+            },
+            toolbarBtn: ['add', 'refresh', 'export',
+                {
+                    id: 'delete',
+                    name: 'delete',
+                    title: '批量删除',
+                    icon: 'bi bi-trash',
+                    disabled: true,
+                    class: 'btn btn-sm btn-danger mx-1 btn-disabled',
+                    click() {
+                        const rows = $('#table').bootstrapTable('getSelections');
+
+                        if (!rows || rows.length === 0) {
+                            Layer.msg('请选择需要删除的记录', {icon: 0});
+                            return;
+                        }
+
+                        Layer.confirm('确定删除选中的 ' + rows.length + ' 条记录？', function () {
+                            const ids = rows.map(function (r) { return r.id; });
+
+                            $.post(API_BASE + '/delete', {ids: ids.join(',')}, function (res) {
+                                Layer.msg(res.msg, {icon: res.code === OK_CODE ? 1 : 2});
+                                $('#table').bootstrapTable('refresh');
+                            }, 'json');
+                        });
+                    }
+                }
+            ],
+            columns: [
+{$columns}
+            ]
+        });
+    },
+
+    add() {
+        return new FormValidator('wsForm', VALIDATOR_OPTIONS);
+    },
+
+    edit() {
+        return new FormValidator('wsForm', VALIDATOR_OPTIONS);
+    }
+};
+
+export default Controller;

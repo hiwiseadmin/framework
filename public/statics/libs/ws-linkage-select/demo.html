@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkageSelect 联动选择器演示</title>
+    <link href="/statics/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/statics/libs/bootstrap-icons/bootstrap-icons.min.css">
+    <style>
+        .demo-section {
+            background: var(--bs-body-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid var(--bs-border-color);
+        }
+        .linked-select-container { margin-bottom: 1rem; }
+        .linked-select-label { display: block; margin-bottom: 0.25rem; font-weight: 500; }
+        .event-log {
+            background: var(--bs-secondary-bg);
+            border-radius: 6px;
+            padding: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+        .selected-display {
+            background: var(--bs-info-bg-subtle);
+            border-radius: 6px;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            min-height: 50px;
+        }
+    </style>
+</head>
+<body>
+<a href="/statics/demo/ws-form.html" style="position:fixed;right:18px;bottom:18px;z-index:2050;display:inline-flex;align-items:center;gap:.35rem;padding:.5rem .875rem;font-size:.8125rem;font-weight:500;color:#fff;background:#0d6efd;border-radius:999px;box-shadow:0 4px 14px rgba(13,110,253,.35);text-decoration:none;">声明式表单接入示例 &rarr;</a>
+    <div class="container my-5">
+        <h1 class="text-center mb-1">LinkageSelect 联动选择器</h1>
+        <p class="text-center text-muted mb-4">基于 ES6 的纯 JavaScript 联动选择组件</p>
+
+        <!-- 本地三级联动 -->
+        <section class="demo-section">
+            <h3><i class="bi bi-geo-alt me-2"></i>1. 本地数据三级联动</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="linked-select-container">
+                        <label for="province" class="linked-select-label">省份</label>
+                        <select id="province" class="form-select">
+                            <option value="">请选择省份</option>
+                        </select>
+                    </div>
+                    <div class="linked-select-container">
+                        <label for="city" class="linked-select-label">城市</label>
+                        <select id="city" class="form-select" disabled>
+                            <option value="">请先选择省份</option>
+                        </select>
+                    </div>
+                    <div class="linked-select-container">
+                        <label for="district" class="linked-select-label">区县</label>
+                        <select id="district" class="form-select" disabled>
+                            <option value="">请先选择城市</option>
+                        </select>
+                    </div>
+                    <div class="mt-2" style="display:flex;gap:8px;">
+                        <button id="btnReset" class="btn btn-sm btn-outline-secondary">重置</button>
+                        <button id="btnGetValues" class="btn btn-sm btn-outline-primary">获取选中值</button>
+                        <button id="btnDestroy" class="btn btn-sm btn-outline-danger">销毁</button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6>当前选中值</h6>
+                    <div class="selected-display" id="localDisplay">请选择省份...</div>
+                    <h6 class="mt-3">事件日志</h6>
+                    <div class="event-log" id="localLog"><div class="text-muted">等待选择...</div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 远程数据联动 -->
+        <section class="demo-section">
+            <h3><i class="bi bi-cloud-download me-2"></i>2. 远程数据联动</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="linked-select-container">
+                        <label for="category" class="linked-select-label">分类</label>
+                        <select id="category" class="form-select">
+                            <option value="">请选择分类</option>
+                        </select>
+                    </div>
+                    <div class="linked-select-container">
+                        <label for="subcategory" class="linked-select-label">子分类</label>
+                        <select id="subcategory" class="form-select" disabled>
+                            <option value="">请先选择分类</option>
+                        </select>
+                    </div>
+                    <div class="mt-2" style="display:flex;gap:8px;">
+                        <button id="btnRemoteReset" class="btn btn-sm btn-outline-secondary">重置</button>
+                        <button id="btnRemoteGetValues" class="btn btn-sm btn-outline-primary">获取选中值</button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6>选中值</h6>
+                    <div class="selected-display" id="remoteDisplay">请选择分类...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 自定义字段映射 -->
+        <section class="demo-section">
+            <h3><i class="bi bi-gear me-2"></i>3. 自定义字段映射</h3>
+            <p class="text-muted">使用自定义 valueField/labelField/parentField 映射非标准数据</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="linked-select-container">
+                        <label for="dept" class="linked-select-label">部门</label>
+                        <select id="dept" class="form-select">
+                            <option value="">请选择部门</option>
+                        </select>
+                    </div>
+                    <div class="linked-select-container">
+                        <label for="team" class="linked-select-label">团队</label>
+                        <select id="team" class="form-select" disabled>
+                            <option value="">请先选择部门</option>
+                        </select>
+                    </div>
+                    <div class="mt-2">
+                        <button id="btnCustomGetValues" class="btn btn-sm btn-outline-primary">获取选中值</button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6>选中值</h6>
+                    <div class="selected-display" id="customDisplay">请选择...</div>
+                    <h6 class="mt-3">数据格式</h6>
+                    <div class="event-log" style="max-height:80px;">
+                        <pre class="mb-0"><code>// 自定义字段名
+{ code: 'D001', title: '技术部', pid: null }
+{ code: 'T001', title: '前端组', pid: 'D001' }</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- API 参考 -->
+        <section class="demo-section">
+            <h3><i class="bi bi-book me-2"></i>API 参考</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>配置选项</h6>
+                    <table class="table table-sm">
+                        <tr><th>参数</th><th>说明</th></tr>
+                        <tr><td><code>selects</code></td><td>select 元素 ID 数组，至少两个</td></tr>
+                        <tr><td><code>dataSource</code></td><td>数据源：数组/函数/URL字符串</td></tr>
+                        <tr><td><code>options.placeholder</code></td><td>占位提示文本</td></tr>
+                        <tr><td><code>options.parentField</code></td><td>父级字段名，默认 "parent_id"</td></tr>
+                        <tr><td><code>options.valueField</code></td><td>值字段名，默认 "id"</td></tr>
+                        <tr><td><code>options.labelField</code></td><td>显示字段名，默认 "name"</td></tr>
+                        <tr><td><code>options.loadingText</code></td><td>加载中文本</td></tr>
+                        <tr><td><code>options.errorText</code></td><td>加载失败文本</td></tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h6>实例方法</h6>
+                    <ul>
+                        <li><code>getValues()</code> - 获取所有级别选中值</li>
+                        <li><code>reset()</code> - 重置所有选择</li>
+                        <li><code>destroy()</code> - 销毁实例</li>
+                    </ul>
+                    <h6 class="mt-3">自定义事件</h6>
+                    <ul>
+                        <li><code>linkageSelectChange</code> - 选择变化事件（在第一个 select 上触发）</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="/statics/js/jquery/jquery.min.js"></script>
+    <script src="/statics/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- 组件为原生 ESM，可直接加载源码：改完组件刷新即可，无需任何构建。
+         样式必须单独 link —— 组件刻意不 import CSS，否则浏览器会因 MIME 类型
+         是 text/css 而拒绝加载整个模块。 -->
+    <link rel="stylesheet" href="ws-linkage-select.css">
+    <script type="module" src="ws-linkage-select.js"></script>
+    <script src="/statics/js/theme.js"></script>
+
+    <script>
+        // 本地数据 - 三级联动
+        var localData = [
+            { id: '1', name: '北京市', parent_id: null },
+            { id: '2', name: '上海市', parent_id: null },
+            { id: '3', name: '广东省', parent_id: null },
+            { id: '4', name: '江苏省', parent_id: null },
+            { id: '11', name: '北京市', parent_id: '1' },
+            { id: '21', name: '上海市', parent_id: '2' },
+            { id: '31', name: '广州市', parent_id: '3' },
+            { id: '32', name: '深圳市', parent_id: '3' },
+            { id: '41', name: '南京市', parent_id: '4' },
+            { id: '42', name: '苏州市', parent_id: '4' },
+            { id: '111', name: '东城区', parent_id: '11' },
+            { id: '112', name: '西城区', parent_id: '11' },
+            { id: '211', name: '黄浦区', parent_id: '21' },
+            { id: '212', name: '徐汇区', parent_id: '21' },
+            { id: '311', name: '天河区', parent_id: '31' },
+            { id: '312', name: '越秀区', parent_id: '31' },
+            { id: '321', name: '福田区', parent_id: '32' },
+            { id: '322', name: '南山区', parent_id: '32' },
+            { id: '411', name: '玄武区', parent_id: '41' },
+            { id: '412', name: '秦淮区', parent_id: '41' },
+            { id: '421', name: '姑苏区', parent_id: '42' },
+            { id: '422', name: '吴中区', parent_id: '42' }
+        ];
+
+        // 远程模拟 API
+        function mockRemoteAPI(parent) {
+            return new Promise(function(resolve) {
+                setTimeout(function() {
+                    var data = [];
+                    if (!parent) {
+                        data = [
+                            { id: 'cat1', name: '电子产品' },
+                            { id: 'cat2', name: '服装' },
+                            { id: 'cat3', name: '家居用品' }
+                        ];
+                    } else if (parent === 'cat1') {
+                        data = [
+                            { id: 'sub1', name: '手机' },
+                            { id: 'sub2', name: '电脑' },
+                            { id: 'sub3', name: '相机' }
+                        ];
+                    } else if (parent === 'cat2') {
+                        data = [
+                            { id: 'sub4', name: '男装' },
+                            { id: 'sub5', name: '女装' },
+                            { id: 'sub6', name: '童装' }
+                        ];
+                    } else if (parent === 'cat3') {
+                        data = [
+                            { id: 'sub7', name: '家具' },
+                            { id: 'sub8', name: '厨具' },
+                            { id: 'sub9', name: '装饰' }
+                        ];
+                    }
+                    resolve(data);
+                }, 500);
+            });
+        }
+
+        // 自定义字段映射数据
+        var customData = [
+            { code: 'D001', title: '技术部', pid: null },
+            { code: 'D002', title: '市场部', pid: null },
+            { code: 'D003', title: '运营部', pid: null },
+            { code: 'T001', title: '前端组', pid: 'D001' },
+            { code: 'T002', title: '后端组', pid: 'D001' },
+            { code: 'T003', title: '测试组', pid: 'D001' },
+            { code: 'M001', title: '品牌组', pid: 'D002' },
+            { code: 'M002', title: '渠道组', pid: 'D002' },
+            { code: 'O001', title: '用户运营', pid: 'D003' },
+            { code: 'O002', title: '内容运营', pid: 'D003' }
+        ];
+
+        function addLog(id, msg) {
+            var time = new Date().toLocaleTimeString();
+            $('#' + id).prepend('<div>[' + time + '] ' + msg + '</div>');
+            if ($('#' + id).children().length > 15) $('#' + id).children().last().remove();
+        }
+
+        function formatValues(v) {
+            var parts = [];
+            for (var i = 0; ; i++) {
+                if (!v['level' + i]) break;
+                var data = v['level' + i + 'Data'] || {};
+                parts.push((data.name || data.title || v['level' + i]) + ' (' + v['level' + i] + ')');
+            }
+            return parts.join(' → ');
+        }
+
+        $(document).ready(function() {
+            // ========== 1. 本地三级联动 ==========
+            var localExample = new LinkageSelect({
+                selects: ['province', 'city', 'district'],
+                dataSource: localData,
+                options: {
+                    placeholder: '请选择省份',
+                    parentField: 'parent_id',
+                    valueField: 'id',
+                    labelField: 'name'
+                }
+            });
+
+            document.getElementById('province').addEventListener('linkageSelectChange', function(e) {
+                var v = localExample.getValues();
+                if (v.level0) {
+                    $('#localDisplay').text(formatValues(v));
+                    addLog('localLog', '选择变化: ' + formatValues(v));
+                }
+            });
+
+            $('#btnReset').on('click', async function() {
+                await localExample.reset();
+                $('#localDisplay').text('请选择省份...');
+                addLog('localLog', 'reset() 已重置');
+            });
+            $('#btnGetValues').on('click', function() {
+                var v = localExample.getValues();
+                $('#localDisplay').html('<pre class="mb-0">' + JSON.stringify(v, null, 2) + '</pre>');
+                addLog('localLog', 'getValues()');
+            });
+            $('#btnDestroy').on('click', function() {
+                localExample.destroy();
+                $('#localDisplay').text('实例已销毁');
+                addLog('localLog', 'destroy() 已销毁');
+            });
+
+            // ========== 2. 远程数据联动 ==========
+            var remoteExample = new LinkageSelect({
+                selects: ['category', 'subcategory'],
+                dataSource: function(level, parentValue) {
+                    return mockRemoteAPI(parentValue);
+                },
+                options: { placeholder: '请选择分类' }
+            });
+
+            document.getElementById('category').addEventListener('linkageSelectChange', function(e) {
+                var v = remoteExample.getValues();
+                var parts = [];
+                if (v.level0) parts.push(v.level0Data.name + ' (' + v.level0 + ')');
+                if (v.level1) parts.push(v.level1Data.name + ' (' + v.level1 + ')');
+                $('#remoteDisplay').text(parts.length > 0 ? parts.join(' → ') : '请选择分类...');
+            });
+
+            $('#btnRemoteReset').on('click', async function() {
+                await remoteExample.reset();
+                $('#remoteDisplay').text('请选择分类...');
+            });
+            $('#btnRemoteGetValues').on('click', function() {
+                var v = remoteExample.getValues();
+                $('#remoteDisplay').html('<pre class="mb-0">' + JSON.stringify(v, null, 2) + '</pre>');
+            });
+
+            // ========== 3. 自定义字段映射 ==========
+            var customExample = new LinkageSelect({
+                selects: ['dept', 'team'],
+                dataSource: customData,
+                options: {
+                    placeholder: '请选择部门',
+                    parentField: 'pid',
+                    valueField: 'code',
+                    labelField: 'title'
+                }
+            });
+
+            document.getElementById('dept').addEventListener('linkageSelectChange', function(e) {
+                var v = customExample.getValues();
+                var parts = [];
+                if (v.level0) parts.push(v.level0Data.title + ' (' + v.level0 + ')');
+                if (v.level1) parts.push(v.level1Data.title + ' (' + v.level1 + ')');
+                $('#customDisplay').text(parts.length > 0 ? parts.join(' → ') : '请选择...');
+            });
+
+            $('#btnCustomGetValues').on('click', function() {
+                var v = customExample.getValues();
+                $('#customDisplay').html('<pre class="mb-0">' + JSON.stringify(v, null, 2) + '</pre>');
+            });
+        });
+    </script>
+</body>
+</html>

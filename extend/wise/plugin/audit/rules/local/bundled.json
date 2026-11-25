@@ -1,0 +1,273 @@
+{
+    "version": "bundled-2026.11.1",
+    "description": "WiseAdmin 本地预检规则库（随框架包分发）。structure.* / manifest.* 为确定性规则，可阻断；code.regex.* 一律 warn。AST 深度扫描与人工审核在服务端（wise-market）。",
+    "generated_at": "2026-11-18",
+    "rules": [
+        {
+            "id": "structure.manifest_missing",
+            "level": "error",
+            "title": "缺少 manifest.json",
+            "why": "manifest.json 是插件发现、结构判定与元数据的唯一依据。"
+        },
+        {
+            "id": "structure.manifest_invalid",
+            "level": "error",
+            "title": "manifest.json 无法解析",
+            "why": "JSON 语法错误会让插件扫描直接失败，且不会给出字段级提示。"
+        },
+        {
+            "id": "structure.multiple_roots",
+            "level": "error",
+            "title": "包根目录结构不合法",
+            "why": "只允许「manifest.json 在根」或「唯一顶层目录内含 manifest.json」两种结构。"
+        },
+        {
+            "id": "structure.unsafe_path",
+            "level": "error",
+            "title": "存在不安全路径",
+            "why": "路径穿越或绝对路径会在解压时写到预期目录之外。"
+        },
+        {
+            "id": "structure.forbidden_extension",
+            "level": "error",
+            "title": "存在禁止分发的文件类型",
+            "why": "可执行/脚本类文件不应随插件分发，服务端会直接拒绝。"
+        },
+        {
+            "id": "structure.package_too_large",
+            "level": "error",
+            "title": "包体积超限",
+            "why": "服务端上传有体积上限，超限会在提交后才失败。"
+        },
+        {
+            "id": "structure.vendor_dir",
+            "level": "warn",
+            "title": "包含 vendor / node_modules",
+            "why": "依赖目录不应随包分发；本地已跳过这些目录的扫描。"
+        },
+        {
+            "id": "structure.dir_name_mismatch",
+            "level": "warn",
+            "title": "目录名与插件标识不一致",
+            "why": "插件目录名应与 manifest.name 一致，否则安装/排查时容易混淆。"
+        },
+        {
+            "id": "manifest.required_field",
+            "level": "error",
+            "title": "缺少必需字段",
+            "why": "缺少 name / version / author 会导致插件信息不完整，服务端拒收。"
+        },
+        {
+            "id": "manifest.name_format",
+            "level": "error",
+            "title": "插件标识格式不合法",
+            "why": "name 会作为 PHP 命名空间片段（plugin\\{name}），必须是小写字母开头的标识符。"
+        },
+        {
+            "id": "manifest.ident_mismatch",
+            "level": "error",
+            "title": "ident 与 name 不一致",
+            "why": "两套标识并存时，市场按 ident、框架按 name，必然错位。"
+        },
+        {
+            "id": "manifest.version_format",
+            "level": "warn",
+            "title": "版本号格式不规范",
+            "why": "非语义化版本会影响升级比较与市场展示。"
+        },
+        {
+            "id": "manifest.title_missing",
+            "level": "warn",
+            "title": "缺少显示名称",
+            "why": "title 缺失时后台会退化为目录名，市场展示也不完整。"
+        },
+        {
+            "id": "manifest.description_missing",
+            "level": "warn",
+            "title": "缺少插件描述",
+            "why": "描述是市场详情页与审核判断的第一手信息。"
+        },
+        {
+            "id": "manifest.type_invalid",
+            "level": "error",
+            "title": "字段类型不合法",
+            "why": "框架按固定类型读取，类型错误会在运行期静默失效。"
+        },
+        {
+            "id": "manifest.unknown_field",
+            "level": "warn",
+            "title": "存在未知字段",
+            "why": "多为拼写错误（如 menu / menus），不会报错但也不会生效。"
+        },
+        {
+            "id": "manifest.develop_flag",
+            "level": "warn",
+            "title": "开发模式标记",
+            "why": "develop=true 通常只用于开发期，上架包建议移除。"
+        },
+        {
+            "id": "manifest.service_provider_missing",
+            "level": "error",
+            "title": "服务提供者文件不存在",
+            "why": "BootServiceProvider 缺失会导致插件启用后不启动。"
+        },
+        {
+            "id": "manifest.service_provider_mismatch",
+            "level": "warn",
+            "title": "服务提供者类名与文件不匹配",
+            "why": "声明的类与文件内的类名不一致时，插件会静默不启动。"
+        },
+        {
+            "id": "manifest.dependency_invalid",
+            "level": "error",
+            "title": "插件依赖声明不合法",
+            "why": "dependencies 必须是 {插件标识: 版本约束} 的映射。"
+        },
+        {
+            "id": "manifest.dependency_self",
+            "level": "error",
+            "title": "依赖自身",
+            "why": "自依赖会形成无法满足的检查条件。"
+        },
+        {
+            "id": "manifest.package_invalid",
+            "level": "error",
+            "title": "库包依赖声明不合法",
+            "why": "packages 只接受「版本约束字符串」或「constraint + required」对象。"
+        },
+        {
+            "id": "manifest.menu_invalid",
+            "level": "error",
+            "title": "菜单声明不合法",
+            "why": "菜单节点缺少 name/path 或 children 非数组，会导致后台菜单注册失败。"
+        },
+        {
+            "id": "manifest.menu_duplicate_path",
+            "level": "warn",
+            "title": "菜单路径重复",
+            "why": "同一路径注册多次会出现重复菜单或权限点冲突。"
+        },
+        {
+            "id": "manifest.menu_type_unknown",
+            "level": "warn",
+            "title": "菜单类型不是常见值",
+            "why": "框架按 dir / menu / button 渲染，未知类型可能不展示。"
+        },
+        {
+            "id": "manifest.permission_invalid",
+            "level": "error",
+            "title": "权限点声明不合法",
+            "why": "权限点缺少 name/ident 时无法写入权限表。"
+        },
+        {
+            "id": "manifest.permission_duplicate",
+            "level": "warn",
+            "title": "权限点标识重复",
+            "why": "重复 ident 会在权限表中互相覆盖。"
+        },
+        {
+            "id": "manifest.config_invalid",
+            "level": "error",
+            "title": "配置声明不合法",
+            "why": "非数组定义或缺少键名会被框架静默跳过，表现为「配置项消失」。"
+        },
+        {
+            "id": "manifest.config_type_unknown",
+            "level": "warn",
+            "title": "未知配置类型",
+            "why": "未知 type 会被降级为 string，渲染与校验都会变。"
+        },
+        {
+            "id": "manifest.config_options_missing",
+            "level": "warn",
+            "title": "选项类配置缺少 options",
+            "why": "select / radio / checkbox 没有 options 时渲染为空，无法选择。"
+        },
+        {
+            "id": "manifest.config_key_reserved",
+            "level": "warn",
+            "title": "使用了保留配置键",
+            "why": "以 `__` 开头的键属于框架状态（如 __state.enabled），不参与业务配置。"
+        },
+        {
+            "id": "manifest.publish_invalid",
+            "level": "error",
+            "title": "静态资源发布映射不合法",
+            "why": "publish 必须是 {源目录: 目标目录} 映射，目标不允许越出 public。"
+        },
+        {
+            "id": "manifest.publish_source_missing",
+            "level": "warn",
+            "title": "发布源目录不存在",
+            "why": "源目录缺失时 AssetManager 不会复制任何内容，页面会 404。"
+        },
+        {
+            "id": "manifest.capability_invalid",
+            "level": "error",
+            "title": "能力声明不合法",
+            "why": "capabilities.requires 必须是数组，否则能力协商会被跳过。"
+        },
+        {
+            "id": "code.regex.dangerous_function",
+            "level": "warn",
+            "title": "危险函数调用",
+            "why": "eval/exec/system 等会被服务端 AST 扫描阻断或人工重点审核。"
+        },
+        {
+            "id": "code.regex.eval_chain",
+            "level": "warn",
+            "title": "疑似混淆执行链",
+            "why": "eval + base64_decode/gzinflate 是后门的典型组合。"
+        },
+        {
+            "id": "code.regex.superglobal_include",
+            "level": "warn",
+            "title": "用户输入进入 include",
+            "why": "这是本地文件包含（LFI）的典型写法。"
+        },
+        {
+            "id": "code.regex.superglobal_extract",
+            "level": "warn",
+            "title": "extract 用户输入",
+            "why": "extract($_POST) 会覆盖局部变量，是常见提权手法。"
+        },
+        {
+            "id": "code.regex.superglobal_unserialize",
+            "level": "warn",
+            "title": "反序列化用户输入",
+            "why": "反序列化不可信数据可能导致对象注入。"
+        }
+    ],
+    "regex_rules": [
+        {
+            "id": "code.regex.dangerous_function",
+            "pattern": "~(?<![\\w>$:])(eval|exec|system|shell_exec|passthru|popen|proc_open|pcntl_exec|create_function)\\s*\\(~i",
+            "message": "检测到危险函数调用",
+            "hint": "服务端会阻断或重点审核；请改用框架提供的安全能力（队列、HTTP 客户端、文件系统等）"
+        },
+        {
+            "id": "code.regex.eval_chain",
+            "pattern": "~\\beval\\s*\\(\\s*(base64_decode|gzinflate|gzuncompress|str_rot13|strrev|hex2bin)\\s*\\(~i",
+            "message": "检测到「解码后执行」组合",
+            "hint": "这是后门常用写法，服务端会直接阻断；请删除"
+        },
+        {
+            "id": "code.regex.superglobal_include",
+            "pattern": "~\\b(include|include_once|require|require_once)\\s*\\(?\\s*\\$_(GET|POST|REQUEST|COOKIE|FILES|SERVER)\\b~i",
+            "message": "检测到用户输入进入 include/require",
+            "hint": "存在本地文件包含风险；请改为白名单映射"
+        },
+        {
+            "id": "code.regex.superglobal_extract",
+            "pattern": "~\\bextract\\s*\\(\\s*\\$_(GET|POST|REQUEST|COOKIE)\\b~i",
+            "message": "检测到 extract(用户输入)",
+            "hint": "会覆盖局部变量；请改为显式取值"
+        },
+        {
+            "id": "code.regex.superglobal_unserialize",
+            "pattern": "~\\bunserialize\\s*\\(\\s*\\$_(GET|POST|REQUEST|COOKIE)\\b~i",
+            "message": "检测到反序列化用户输入",
+            "hint": "请改用 json_decode，或对数据做签名校验"
+        }
+    ]
+}

@@ -1,0 +1,401 @@
+{extend name="public/base" /}
+
+{block name="title"}存储配置管理{/block}
+
+{block name="css"}
+<style>
+    .storage-card {
+        transition: transform 0.2s;
+    }
+    .storage-card:hover {
+        transform: translateY(-2px);
+    }
+    .storage-default {
+        border: 2px solid var(--bs-success);
+    }
+    .config-field {
+        display: none;
+    }
+</style>
+{/block}
+
+{block name="content"}
+    <div class="container-fluid py-4">
+        {include file="public/page_header" icon="bi bi-hdd-stack" title="存储配置管理" desc="管理本地与云存储驱动的接入配置" actions="" /}
+
+        <div id="toolbar" class="ws-toolbar">
+            <div class="ws-toolbar-actions">
+                <button type="button" class="btn btn-sm btn-primary" id="addStorageBtn">
+                    <i class="bi bi-plus-circle me-1"></i>添加配置
+                </button>
+            </div>
+        </div>
+
+        <div class="row" id="storageConfigs">
+            <!-- 存储配置卡片将通过JavaScript动态生成 -->
+        </div>
+    </div>
+
+    <!-- 存储配置编辑模态框 -->
+    <div class="modal fade" id="storageModal" tabindex="-1" aria-labelledby="storageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="storageModalLabel">添加存储配置</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="storageForm">
+                        <input type="hidden" id="storageId" name="id">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="storageName" class="form-label">配置名称</label>
+                                    <input type="text" class="form-control" id="storageName" name="name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="storageDriver" class="form-label">存储类型</label>
+                                    <select class="form-select" id="storageDriver" name="driver" required>
+                                        <option value="">请选择存储类型</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 本地存储配置 -->
+                        <div id="localConfig" class="config-field">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="localRoot" class="form-label">存储根目录</label>
+                                        <input type="text" class="form-control" name="config[root_path]" id="localRoot" placeholder="例如: D:/uploads 或 /var/www/uploads">
+                                        <div class="form-text">绝对路径或相对于项目根目录的路径</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="localUrl" class="form-label">访问URL</label>
+                                        <input type="text" class="form-control" name="config[base_url]" id="localUrl" placeholder="例如: /uploads">
+                                        <div class="form-text">文件访问的基础URL</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FTP 存储配置 -->
+                        <div id="ftpConfig" class="config-field">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="ftpHost" class="form-label">主机地址</label>
+                                        <input type="text" class="form-control" name="config[host]" id="ftpHost" placeholder="例如: 192.168.1.100">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="ftpPort" class="form-label">端口</label>
+                                        <input type="number" class="form-control" name="config[port]" id="ftpPort" value="21">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="ftpUsername" class="form-label">用户名</label>
+                                        <input type="text" class="form-control" name="config[username]" id="ftpUsername">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="ftpPassword" class="form-label">密码</label>
+                                        <input type="password" class="form-control" name="config[password]" id="ftpPassword">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="ftpRoot" class="form-label">根目录</label>
+                                        <input type="text" class="form-control" name="config[root]" id="ftpRoot" placeholder="例如: /">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="ftpBaseUrl" class="form-label">访问URL（可选）</label>
+                                        <input type="text" class="form-control" name="config[base_url]" id="ftpBaseUrl" placeholder="例如: https://files.example.com">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 七牛云存储配置 -->
+                        <div id="qiniuConfig" class="config-field">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="qiniuAccessKey" class="form-label">AccessKey</label>
+                                        <input type="text" class="form-control" name="config[access_key]" id="qiniuAccessKey">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="qiniuSecretKey" class="form-label">SecretKey</label>
+                                        <input type="password" class="form-control" name="config[secret_key]" id="qiniuSecretKey">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="qiniuBucket" class="form-label">Bucket名称</label>
+                                        <input type="text" class="form-control" name="config[bucket]" id="qiniuBucket">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="qiniuDomain" class="form-label">访问域名</label>
+                                        <input type="text" class="form-control" name="config[domain]" id="qiniuDomain" placeholder="例如: https://xxx.clouddn.com">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 阿里云OSS配置 -->
+                        <div id="aliossConfig" class="config-field">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="aliossAccessKey" class="form-label">AccessKey</label>
+                                        <input type="text" class="form-control" name="config[access_key]" id="aliossAccessKey">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="aliossSecretKey" class="form-label">SecretKey</label>
+                                        <input type="password" class="form-control" name="config[secret_key]" id="aliossSecretKey">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="aliossBucket" class="form-label">Bucket名称</label>
+                                        <input type="text" class="form-control" name="config[bucket]" id="aliossBucket">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="aliossEndpoint" class="form-label">Endpoint</label>
+                                        <input type="text" class="form-control" name="config[endpoint]" id="aliossEndpoint" placeholder="例如: oss-cn-hangzhou.aliyuncs.com">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="aliossDomain" class="form-label">自定义域名（可选）</label>
+                                        <input type="text" class="form-control" name="config[domain]" id="aliossDomain" placeholder="例如: https://cdn.example.com">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 腾讯云COS配置 -->
+                        <div id="cosConfig" class="config-field">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="cosAccessKey" class="form-label">SecretId</label>
+                                        <input type="text" class="form-control" name="config[access_key]" id="cosAccessKey">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="cosSecretKey" class="form-label">SecretKey</label>
+                                        <input type="password" class="form-control" name="config[secret_key]" id="cosSecretKey">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="cosBucket" class="form-label">Bucket名称</label>
+                                        <input type="text" class="form-control" name="config[bucket]" id="cosBucket">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="cosRegion" class="form-label">地域</label>
+                                        <input type="text" class="form-control" name="config[region]" id="cosRegion" placeholder="例如: ap-guangzhou">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="cosDomain" class="form-label">自定义域名（可选）</label>
+                                        <input type="text" class="form-control" name="config[domain]" id="cosDomain" placeholder="例如: https://cdn.example.com">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="storageStatus" class="form-label">状态</label>
+                                    <select class="form-select" id="storageStatus" name="status">
+                                        <option value="1">启用</option>
+                                        <option value="0">禁用</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="storageDefault" class="form-label">默认配置</label>
+                                    <select class="form-select" id="storageDefault" name="is_default">
+                                        <option value="0">否</option>
+                                        <option value="1">是</option>
+                                    </select>
+                                    <div class="form-text">设置为默认配置后，新上传的文件将使用此配置</div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="saveStorageBtn">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 图片处理设置（只读展示） ==================== -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-image me-2"></i>图片处理配置</h5>
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>当前配置来自 <code>config/wise-attachment.php</code>
+                    </small>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <!-- 质量 + 预览 -->
+                        <div class="col-lg-4">
+                            <div class="card border h-100">
+                                <div class="card-body">
+                                    <label class="form-label fw-semibold">🎨 默认图片质量</label>
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <input type="range" class="form-range flex-grow-1" id="imageQuality" min="10" max="100" value="85"
+                                            oninput="$('#imageQualityVal').text(this.value+'%');$('#qualityPreviewBar').css('width',this.value+'%')">
+                                        <span class="badge bg-primary fs-6" id="imageQualityVal" style="min-width:48px;">85%</span>
+                                    </div>
+                                    <div class="progress mb-1" style="height:6px;">
+                                        <div id="qualityPreviewBar" class="progress-bar bg-gradient" style="width:85%;"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <small class="text-muted">更小体积</small>
+                                        <small class="text-muted">更高质量</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 水印状态 + 类型 -->
+                        <div class="col-lg-4">
+                            <div class="card border h-100">
+                                <div class="card-body">
+                                    <label class="form-label fw-semibold">💧 水印设置</label>
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="watermarkEnabled">
+                                            <label class="form-check-label" for="watermarkEnabled">启用水印</label>
+                                        </div>
+                                    </div>
+                                    <div id="watermarkDetails">
+                                        <div class="mb-2">
+                                            <label class="form-label small text-muted">类型</label>
+                                            <div class="btn-group btn-group-sm w-100" role="group">
+                                                <input type="radio" class="btn-check" name="watermarkType" id="wmText" value="text" checked>
+                                                <label class="btn btn-outline-secondary" for="wmText"><i class="bi bi-fonts me-1"></i>文字</label>
+                                                <input type="radio" class="btn-check" name="watermarkType" id="wmImage" value="image">
+                                                <label class="btn btn-outline-secondary" for="wmImage"><i class="bi bi-file-image me-1"></i>图片</label>
+                                            </div>
+                                        </div>
+                                        <div class="mb-2" id="watermarkTextGroup">
+                                            <input type="text" class="form-control form-control-sm" id="watermarkText" placeholder="水印文字内容">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 水印位置 + 透明度 -->
+                        <div class="col-lg-4">
+                            <div class="card border h-100">
+                                <div class="card-body">
+                                    <label class="form-label fw-semibold">📍 水印位置 & 透明度</label>
+                                    <!-- 九宫格位置选择器 -->
+                                    <div class="watermark-position-grid mb-3" id="watermarkPositionGrid">
+                                        <div class="wp-cell" data-pos="top-left" title="左上"><span class="wp-dot"></span></div>
+                                        <div class="wp-cell" data-pos="top" title="上中"><span class="wp-dot"></span></div>
+                                        <div class="wp-cell" data-pos="top-right" title="右上"><span class="wp-dot"></span></div>
+                                        <div class="wp-cell" data-pos="left" title="左中"><span class="wp-dot"></span></div>
+                                        <div class="wp-cell" data-pos="center" title="居中"><span class="wp-dot"></span></div>
+                                        <div class="wp-cell" data-pos="right" title="右中"><span class="wp-dot"></span></div>
+                                        <div class="wp-cell" data-pos="bottom-left" title="左下"><span class="wp-dot"></span></div>
+                                        <div class="wp-cell" data-pos="bottom" title="下中"><span class="wp-dot"></span></div>
+                                        <div class="wp-cell" data-pos="bottom-right" title="右下" selected><span class="wp-dot"></span></div>
+                                    </div>
+                                    <input type="hidden" id="watermarkPosition" value="bottom-right">
+                                    <div>
+                                        <label class="form-label small text-muted">透明度</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="number" class="form-control" id="watermarkOpacity" min="0" max="100" value="30">
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 缩略图预设尺寸 -->
+                        <div class="col-12">
+                            <div class="card border">
+                                <div class="card-body">
+                                    <label class="form-label fw-semibold">📐 缩略图预设尺寸</label>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-borderless align-middle mb-0">
+                                            <thead class="table-light"><tr><th>名称</th><th>尺寸</th><th>模式</th><th>预览</th></tr></thead>
+                                            <tbody id="thumbnailSizesBody"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 底部操作 -->
+                        <div class="col-12">
+                            <div class="alert alert-light border mb-0 d-flex align-items-center gap-3">
+                                <i class="bi bi-file-earmark-code fs-4 text-primary"></i>
+                                <div class="flex-grow-1">
+                                    <strong>配置修改方式</strong><br>
+                                    <small class="text-muted">图片处理参数通过 <code>config/wise-attachment.php</code> 中的 <code>image</code> 节点控制。</small>
+                                </div>
+                                <a href="#" class="btn btn-sm btn-outline-primary" id="openConfigHint">
+                                    <i class="bi bi-pencil-square me-1"></i>查看配置项说明
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

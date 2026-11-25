@@ -1,0 +1,253 @@
+{extend name="public/base" /}
+
+{block name="title"}图标管理{/block}
+
+{block name="css"}
+<style>
+:root {--sidebar-width:280px;}
+.app-content-header {padding:1rem 0.5rem;background:var(--bs-body-bg);}
+.sidebar {width:var(--sidebar-width);height:calc(100vh - 65px);position:fixed;left:0;top:65px;overflow-y:auto;background-color:var(--bs-body-bg);border-right:1px solid var(--bs-border-color);z-index:1000;transition:transform 0.3s ease;}
+.main-content {margin-left:var(--sidebar-width);padding:0 20px 20px;transition:margin-left 0.3s ease;}
+@media (max-width:768px) {
+.sidebar {transform:translateX(-100%);}
+.sidebar.show {transform:translateX(0);}
+.main-content {margin-left:0;}
+.sidebar-overlay {display:none;position:fixed;top:0;left:0;right:0;bottom:0;background-color:rgba(0,0,0,0.5);z-index:999;}.sidebar-overlay.show {display:block;}}
+.category-header {padding:0.5rem 1rem;font-weight:600;color:var(--bs-secondary-color);font-size:0.9rem;text-transform:uppercase;letter-spacing:0.5px;}
+.category-item {padding:0.5rem 1rem;border-radius:0.375rem;margin:0 0.5rem 0.25rem;cursor:pointer;transition:all 0.2s;}
+.category-item:hover{background-color:var(--bs-gray-600);color:var(--bs-white);}
+.category-item.active {background-color:var(--bs-gray-100);color:var(--bs-primary);}
+.icon-card {border:1px solid var(--bs-border-color);border-radius:0.5rem;padding:0.75rem;text-align:center;cursor:pointer;transition:all 0.2s;height:100%;}
+.icon-card:hover {transform:translateY(-2px);box-shadow:0 10px 20px 1px solid var(--bs-border-color);border-color:var(--bs-primary);}
+.icon-card.active {box-shadow:0 10px 20px 1px solid var(--bs-border-color);border-color:var(--bs-primary);}
+.icon-preview {font-size:2rem;margin-bottom:0.5rem;color:var(--bs-body-color);}
+.icon-name {font-size:0.8rem;color:var(--bs-body-color);word-break:break-word;}
+.search-box {position:sticky;top:0;background:var(--bs-secondary-bg);z-index:100;padding:1rem 0;border:0px solid var(--bs-secondary-border-subtle);border-bottom-left-radius:6px;border-bottom-right-radius:6px;margin-left:6px;}
+.toolbar {background:var(--bs-secondary-bg);padding:1rem;border-radius:0.5rem;box-shadow:0 2px 10px rgba(0,0,0,0.05);margin-bottom:1.5rem;}
+.code-example {background:var(--bs-secondary-bg);border-radius:0.375rem;padding:1rem;margin-bottom:1rem;position:relative;}
+.copy-btn {position:absolute;top:0.5rem;right:0.5rem;}
+.copy-btn .bi-check-lg, .copy-btn .bi-x-lg{display:none;}
+.copy-btn.copied {background-color:var(--bs-success);color:#fff;}
+.copy-btn.copied .bi-check-lg{display:block;}
+.copy-btn.copied .bi-clipboard, .copy-btn.copied .bi-x-lg{display:none;}
+.copy-btn.failed {background-color:var(--bs-danger);color:#fff;}
+.copy-btn.failed .bi-x-lg{display:block;}
+.copy-btn.failed .bi-clipboard, .copy-btn.failed .bi-check-lg{display:none;}
+.color-picker {width:30px;height:30px;border:none;border-radius:50%;cursor:pointer;padding:0;overflow:hidden;}
+.favorite-btn.active {color:var(--bs-primary);}
+#iconModal .modal-body {max-height:70vh;overflow-y:auto;}
+#svgCode,#imgCode,#cssCode {display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis;}
+.hotkey-tips {display: block;padding: var(--bs-pagination-padding-y) var(--bs-pagination-padding-x);}
+</style>
+{/block}
+
+{block name="content"}
+    {include file="public/page_header" icon="bi bi-bounding-box" title="图标管理" desc="浏览与复制可用的图标类名" actions="" /}
+    <!-- 主内容区 -->
+    <div class="main-content">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="search-box px-3">
+                <h4 class="mb-3">Bootstrap Icons</h4>
+                <div class="input-group mb-3">
+                    <input type="text" id="searchInput" class="form-control" placeholder="搜索图标...">
+                    <button class="btn btn-outline-secondary" type="button" id="clearSearch">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="category-list">
+                <div class="category-header mt-4">收藏夹</div>
+                <div class="category-item" data-category="favorites">我的收藏</div>
+    
+                <div class="category-header">分类</div>
+                <div class="category-item" data-category="all" tabindex="-1">所有分类</div>
+                <div class="category-item" data-category="shapes" tabindex="-1">形状</div>
+                <div class="category-item" data-category="typography" tabindex="-1">排版</div>
+                <div class="category-item" data-category="data" tabindex="-1">数据</div>
+                <div class="category-item" data-category="transportation" tabindex="-1">运输</div>
+                <div class="category-item" data-category="devices" tabindex="-1">设备</div>
+                <div class="category-item" data-category="brand" tabindex="-1">品牌</div>
+                <div class="category-item" data-category="graphics" tabindex="-1">图形</div>
+                <div class="category-item" data-category="ui and keyboard" tabindex="-1">用户界面和键盘</div>
+                <div class="category-item" data-category="apps" tabindex="-1">应用</div>
+                <div class="category-item" data-category="files and folders" tabindex="-1">文件和文件夹</div>
+                <div class="category-item" data-category="arrows" tabindex="-1">箭</div>
+                <div class="category-item" data-category="shape arrows" tabindex="-1">形状箭头</div>
+                <div class="category-item" data-category="arrows love" tabindex="-1">箭爱</div>
+                <div class="category-item" data-category="media" tabindex="-1">多媒体</div>
+                <div class="category-item" data-category="communications" tabindex="-1">通信</div>
+                <div class="category-item" data-category="real world" tabindex="-1">现实世界</div>
+                <div class="category-item" data-category="travel" tabindex="-1">旅行</div>
+                <div class="category-item" data-category="badges" tabindex="-1">徽章</div>
+                <div class="category-item" data-category="commerce" tabindex="-1">商业</div>
+                <div class="category-item" data-category="real world love" tabindex="-1">现实世界的爱</div>
+                <div class="category-item" data-category="miscellaneous" tabindex="-1">杂项</div>
+                <div class="category-item" data-category="bootstrap" tabindex="-1">独自创立</div>
+                <div class="category-item" data-category="box arrows" tabindex="-1">方框箭头</div>
+                <div class="category-item" data-category="tools" tabindex="-1">工具</div>
+                <div class="category-item" data-category="buildings" tabindex="-1">建筑物</div>
+                <div class="category-item" data-category="geo" tabindex="-1">地理</div>
+                <div class="category-item" data-category="date and time" tabindex="-1">日期与时间</div>
+                <div class="category-item" data-category="date and time love" tabindex="-1">日期和时间的爱</div>
+                <div class="category-item" data-category="medical" tabindex="-1">医学的</div>
+                <div class="category-item" data-category="carets" tabindex="-1">插入符号</div>
+                <div class="category-item" data-category="communications love" tabindex="-1">沟通之爱</div>
+                <div class="category-item" data-category="alerts, warnings, and signs" tabindex="-1">警报、警告和标志</div>
+                <div class="category-item" data-category="chevrons" tabindex="-1">V形标志</div>
+                <div class="category-item" data-category="real world medical" tabindex="-1">现实世界医学</div>
+                <div class="category-item" data-category="weather" tabindex="-1">天气</div>
+                <div class="category-item" data-category="layout" tabindex="-1">布局</div>
+                <div class="category-item" data-category="entertainment" tabindex="-1">娱乐</div>
+                <div class="category-item" data-category="emoji" tabindex="-1">表情符号</div>
+                <div class="category-item" data-category="sort and filter" tabindex="-1">排序和筛选</div>
+                <div class="category-item" data-category="security" tabindex="-1">安全</div>
+                <div class="category-item" data-category="people" tabindex="-1">人们</div>
+                <div class="category-item" data-category="hands" tabindex="-1">手</div>
+                <div class="category-item" data-category="love" tabindex="-1">爱</div>
+                <div class="category-item" data-category="controls" tabindex="-1">控制</div>
+            </div>
+        </div>
+        
+        <!-- 移动端侧边栏遮罩 -->
+        <div class="sidebar-overlay"></div>
+    
+        <!-- 工具栏 -->
+        <div class="toolbar">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <button class="btn btn-outline-primary d-md-none" id="sidebarToggle">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <h5 class="d-none d-md-inline mb-0" id="currentCategory">全部图标</h5>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div class="d-flex me-3">
+                        <label class="form-label text-nowrap me-2 mb-0">颜色:</label>
+                        <input type="color" class="color-picker" id="iconColor" value="#495057">
+                    </div>
+                    <div class="d-flex me-3">
+                        <label class="form-label text-nowrap me-2 mb-0">大小:</label>
+                        <select class="form-select form-select-sm" id="iconSize">
+                            <option value="1">小</option>
+                            <option value="2" selected>中</option>
+                            <option value="3">大</option>
+                            <option value="4">超大</option>
+                        </select>
+                    </div>
+                    <!-- 切换列表和网格视图 -->
+                    <!-- <div class="btn-group" role="group">
+                        <input type="radio" class="btn-check" name="viewMode" id="gridView" autocomplete="off" checked>
+                        <label class="btn btn-outline-primary" for="gridView"><i class="bi bi-grid-3x3-gap"></i></label>
+                        
+                        <input type="radio" class="btn-check" name="viewMode" id="listView" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="listView"><i class="bi bi-list-task"></i></label>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- 图标网格 -->
+        <div class="container-fluid">
+            <div class="row" id="iconsContainer">
+                <!-- 图标将通过JavaScript动态加载 -->
+            </div>
+        </div>
+        
+        <!-- 空状态 -->
+        <div id="emptyState" class="text-center py-5 d-none">
+            <i class="bi bi-search display-1 text-muted"></i>
+            <h4 class="mt-3 text-muted">未找到匹配的图标</h4>
+            <p class="text-muted">尝试调整搜索条件或浏览其他分类</p>
+        </div>
+        
+        <!-- 分页 -->
+        <nav aria-label="图标分页" class="mt-4">
+            <ul class="pagination justify-content-center" id="pagination">
+                <!-- 分页将通过JavaScript动态生成 -->
+            </ul>
+        </nav>
+    </div>
+    
+    <!-- 图标详情模态框 -->
+    <div class="modal fade" id="iconModal" tabindex="-1" aria-labelledby="iconModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="iconModalLabel">图标详情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <div class="icon-preview-large mb-3">
+                                <i id="modalIconPreview" class="bi" style="font-size: 5rem;"></i>
+                            </div>
+                            <h5 id="modalIconName" class="mb-3">icon-name</h5>
+                            <div class="d-flex justify-content-center mb-3">
+                                <button class="btn btn-outline-primary me-2" id="favoriteBtn">
+                                    <i class="bi bi-star"></i> 收藏
+                                </button>
+                                <button class="btn btn-primary" id="downloadSvgBtn">
+                                    <i class="bi bi-download"></i> 下载SVG
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <h6>使用方式</h6>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">图标字体</label>
+                                <div class="code-example">
+                                    <code id="fontCode">&lt;i class="bi bi-icon-name"&gt;&lt;/i&gt;</code>
+                                    <button type="button" class="btn btn-secondary btn-sm copy-btn" data-clipboard-target="#fontCode">
+                                        <i class="bi bi-clipboard"></i>
+                                        <i class="bi bi-check-lg"></i>
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">SVG嵌入</label>
+                                <div class="code-example">
+                                    <code id="svgCode">&lt;svg ... &gt;</code>
+                                    <button type="button" class="btn btn-secondary btn-sm copy-btn" data-clipboard-target="#svgCode">
+                                        <i class="bi bi-clipboard"></i>
+                                        <i class="bi bi-check-lg"></i>
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">雪碧图引用</label>
+                                <div class="code-example">
+                                    <code id="imgCode">&lt;svg width="16" height="16" fill="currentColor"&gt;&lt;use href="/statics/libs/bootstrap-icons/bootstrap-icons.svg#icon-name"&gt;&lt;/use&gt;&lt;/svg&gt;</code>
+                                    <button type="button" class="btn btn-secondary btn-sm copy-btn" data-clipboard-target="#imgCode">
+                                        <i class="bi bi-clipboard"></i>
+                                        <i class="bi bi-check-lg"></i>
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">CSS背景</label>
+                                <div class="code-example">
+                                    <code id="cssCode">background-image: url(...);</code>
+                                    <button type="button" class="btn btn-secondary btn-sm copy-btn" data-clipboard-target="#cssCode">
+                                        <i class="bi bi-clipboard"></i>
+                                        <i class="bi bi-check-lg"></i>
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}

@@ -1,0 +1,702 @@
+/**
+ * WiseAdmin 主题系统
+ *
+ * 三层变量体系：
+ *   Layer 0  --ws-*   语义令牌（框架无关，业务样式只引用这一层）
+ *   Layer 1  --bs-*   Bootstrap 变量，全部指向 --ws-*
+ *   Layer 2  --lte-*  AdminLTE 变量，全部指向 --ws-*
+ *
+ * 主题三维度（由 <html> 上的属性驱动）：
+ *   data-bs-theme     = light | dark         明暗模式（auto 已被 JS 解析为具体值）
+ *   data-color-scheme = blue|green|red|purple 颜色主题
+ *   data-ws-sidebar   = light | dark         侧边栏模式（独立于主区域）
+ *
+ * ⚠️ 优先级陷阱（已规避）：
+ *   Bootstrap 5.3 的 [data-bs-theme=dark] 在 :root 上定义了整套 --bs-* 变量，
+ *   其选择器优先级 (0,1,0) 高于 :root (0,0,1)，导致「写在 :root 上的 --bs-* 映射
+ *   在暗色下被 Bootstrap 覆盖」。因此 Layer 1 映射必须挂在
+ *   html[data-bs-theme="dark"], html[data-bs-theme="light"] (0,1,1) 上，
+ *   才能稳定覆盖 Bootstrap 的暗色变量。
+ */
+
+/* ============================================================
+   Layer 0 · 语义令牌 —— 默认值（暗色 + 蓝色）
+   具体取值由下方各维度块覆写，这里只保证变量一定存在
+   ============================================================ */
+:root {
+    --ws-bg-canvas: #1a2332;
+    --ws-bg-canvas-rgb: 26, 35, 50;
+    --ws-bg-surface: #212c3d;
+    --ws-bg-surface-rgb: 33, 44, 61;
+    --ws-bg-elevated: #253144;
+    --ws-bg-elevated-rgb: 37, 49, 68;
+    --ws-bg-hover: #2b3849;
+    --ws-bg-active: #33415a;
+
+    --ws-fg-default: #e2e6ea;
+    --ws-fg-default-rgb: 226, 230, 234;
+    --ws-fg-muted: #a8b2bd;
+    --ws-fg-muted-rgb: 168, 178, 189;
+    --ws-fg-subtle: #8794a3;
+    --ws-fg-subtle-rgb: 135, 148, 163;
+    --ws-fg-inverted: #0f172a;
+
+    --ws-border-default: #3a4558;
+    --ws-border-strong: #4a5670;
+
+    --ws-brand: #64b4ff;
+    --ws-brand-rgb: 100, 180, 255;
+    --ws-brand-hover: #85c5ff;
+    --ws-brand-active: #a6d6ff;
+    --ws-on-brand: #0b1a2e;
+    --ws-brand-bg-subtle: rgba(100, 180, 255, 0.14);
+    --ws-brand-border-subtle: rgba(100, 180, 255, 0.35);
+    --ws-brand-text-emphasis: #a6d6ff;
+
+    --ws-success: #4ade80;
+    --ws-success-rgb: 74, 222, 128;
+    --ws-success-bg: rgba(74, 222, 128, 0.12);
+    --ws-success-border: rgba(74, 222, 128, 0.35);
+    --ws-success-text: #86efac;
+
+    --ws-warning: #fbbf24;
+    --ws-warning-rgb: 251, 191, 36;
+    --ws-warning-bg: rgba(251, 191, 36, 0.12);
+    --ws-warning-border: rgba(251, 191, 36, 0.35);
+    --ws-warning-text: #fcd34d;
+
+    --ws-danger: #f87171;
+    --ws-danger-rgb: 248, 113, 113;
+    --ws-danger-bg: rgba(248, 113, 113, 0.12);
+    --ws-danger-border: rgba(248, 113, 113, 0.35);
+    --ws-danger-text: #fca5a5;
+
+    --ws-info: #60a5fa;
+    --ws-info-rgb: 96, 165, 250;
+    --ws-info-bg: rgba(96, 165, 250, 0.12);
+    --ws-info-border: rgba(96, 165, 250, 0.35);
+    --ws-info-text: #93c5fd;
+}
+
+/* ============================================================
+   维度一：明暗模式 —— 中性色阶（与品牌色无关）
+   ============================================================ */
+
+/* 暗色 */
+[data-bs-theme="dark"] {
+    --ws-bg-canvas: #1a2332;
+    --ws-bg-canvas-rgb: 26, 35, 50;
+    --ws-bg-surface: #212c3d;
+    --ws-bg-surface-rgb: 33, 44, 61;
+    --ws-bg-elevated: #253144;
+    --ws-bg-elevated-rgb: 37, 49, 68;
+    --ws-bg-hover: #2b3849;
+    --ws-bg-active: #33415a;
+
+    --ws-fg-default: #e2e6ea;
+    --ws-fg-default-rgb: 226, 230, 234;
+    --ws-fg-muted: #a8b2bd;
+    --ws-fg-muted-rgb: 168, 178, 189;
+    --ws-fg-subtle: #8794a3;
+    --ws-fg-subtle-rgb: 135, 148, 163;
+    --ws-fg-inverted: #0f172a;
+
+    --ws-border-default: #3a4558;
+    --ws-border-strong: #4a5670;
+}
+
+/* 亮色
+   对比度按 WCAG AA（正文 4.5:1）选取：
+     #0f172a / #f5f7fa ≈ 15.3:1
+     #475569 / #f5f7fa ≈  7.4:1
+     #64748b / #f5f7fa ≈  4.8:1（次要文字下限，不可再浅） */
+[data-bs-theme="light"] {
+    --ws-bg-canvas: #f5f7fa;
+    --ws-bg-canvas-rgb: 245, 247, 250;
+    --ws-bg-surface: #ffffff;
+    --ws-bg-surface-rgb: 255, 255, 255;
+    --ws-bg-elevated: #ffffff;
+    --ws-bg-elevated-rgb: 255, 255, 255;
+    --ws-bg-hover: #e9eef4;
+    --ws-bg-active: #dfe6ee;
+
+    --ws-fg-default: #0f172a;
+    --ws-fg-default-rgb: 15, 23, 42;
+    --ws-fg-muted: #475569;
+    --ws-fg-muted-rgb: 71, 85, 105;
+    --ws-fg-subtle: #64748b;
+    --ws-fg-subtle-rgb: 100, 116, 139;
+    --ws-fg-inverted: #f8fafc;
+
+    --ws-border-default: #d5dee8;
+    --ws-border-strong: #b9c6d4;
+
+    --ws-success: #15803d;
+    --ws-success-rgb: 21, 128, 61;
+    --ws-success-bg: rgba(21, 128, 61, 0.10);
+    --ws-success-border: rgba(21, 128, 61, 0.30);
+    --ws-success-text: #14532d;
+
+    --ws-warning: #b45309;
+    --ws-warning-rgb: 180, 83, 9;
+    --ws-warning-bg: rgba(180, 83, 9, 0.10);
+    --ws-warning-border: rgba(180, 83, 9, 0.28);
+    --ws-warning-text: #7c2d12;
+
+    --ws-danger: #b91c1c;
+    --ws-danger-rgb: 185, 28, 28;
+    --ws-danger-bg: rgba(185, 28, 28, 0.08);
+    --ws-danger-border: rgba(185, 28, 28, 0.28);
+    --ws-danger-text: #7f1d1d;
+
+    --ws-info: #1d4ed8;
+    --ws-info-rgb: 29, 78, 216;
+    --ws-info-bg: rgba(29, 78, 216, 0.08);
+    --ws-info-border: rgba(29, 78, 216, 0.26);
+    --ws-info-text: #1e3a8a;
+}
+
+/* ============================================================
+   维度二：品牌配色
+   ------------------------------------------------------------
+   暗色用高亮度品牌色（深底上够醒目）；
+   亮色用加深版本（白底上对比度 ≥ 4.5:1），且白字压在其上仍达 AA。
+   ============================================================ */
+
+/* —— 蓝 —— */
+[data-color-scheme="blue"][data-bs-theme="dark"] {
+    --ws-brand: #64b4ff;
+    --ws-brand-rgb: 100, 180, 255;
+    --ws-brand-hover: #85c5ff;
+    --ws-brand-active: #a6d6ff;
+    --ws-on-brand: #0b1a2e;
+    --ws-brand-bg-subtle: rgba(100, 180, 255, 0.14);
+    --ws-brand-border-subtle: rgba(100, 180, 255, 0.35);
+    --ws-brand-text-emphasis: #a6d6ff;
+}
+
+[data-color-scheme="blue"][data-bs-theme="light"] {
+    --ws-brand: #0b5ed7;
+    --ws-brand-rgb: 11, 94, 215;
+    --ws-brand-hover: #0a53be;
+    --ws-brand-active: #094293;
+    --ws-on-brand: #ffffff;
+    --ws-brand-bg-subtle: rgba(11, 94, 215, 0.08);
+    --ws-brand-border-subtle: rgba(11, 94, 215, 0.28);
+    --ws-brand-text-emphasis: #084298;
+}
+
+/* —— 绿 —— */
+[data-color-scheme="green"][data-bs-theme="dark"] {
+    --ws-brand: #64dca0;
+    --ws-brand-rgb: 100, 220, 160;
+    --ws-brand-hover: #85e6b6;
+    --ws-brand-active: #a6f0cc;
+    --ws-on-brand: #08281c;
+    --ws-brand-bg-subtle: rgba(100, 220, 160, 0.14);
+    --ws-brand-border-subtle: rgba(100, 220, 160, 0.35);
+    --ws-brand-text-emphasis: #a6f0cc;
+}
+
+[data-color-scheme="green"][data-bs-theme="light"] {
+    --ws-brand: #0e7c5a;
+    --ws-brand-rgb: 14, 124, 90;
+    --ws-brand-hover: #0c6a4d;
+    --ws-brand-active: #0a583f;
+    --ws-on-brand: #ffffff;
+    --ws-brand-bg-subtle: rgba(14, 124, 90, 0.08);
+    --ws-brand-border-subtle: rgba(14, 124, 90, 0.28);
+    --ws-brand-text-emphasis: #0a583f;
+}
+
+/* —— 红 —— */
+[data-color-scheme="red"][data-bs-theme="dark"] {
+    --ws-brand: #ff7878;
+    --ws-brand-rgb: 255, 120, 120;
+    --ws-brand-hover: #ff9494;
+    --ws-brand-active: #ffb0b0;
+    --ws-on-brand: #2e0d12;
+    --ws-brand-bg-subtle: rgba(255, 120, 120, 0.14);
+    --ws-brand-border-subtle: rgba(255, 120, 120, 0.35);
+    --ws-brand-text-emphasis: #ffb0b0;
+}
+
+[data-color-scheme="red"][data-bs-theme="light"] {
+    --ws-brand: #c2334d;
+    --ws-brand-rgb: 194, 51, 77;
+    --ws-brand-hover: #ab2b42;
+    --ws-brand-active: #942438;
+    --ws-on-brand: #ffffff;
+    --ws-brand-bg-subtle: rgba(194, 51, 77, 0.08);
+    --ws-brand-border-subtle: rgba(194, 51, 77, 0.28);
+    --ws-brand-text-emphasis: #942438;
+}
+
+/* —— 紫 —— */
+[data-color-scheme="purple"][data-bs-theme="dark"] {
+    --ws-brand: #b48cff;
+    --ws-brand-rgb: 180, 140, 255;
+    --ws-brand-hover: #c6a7ff;
+    --ws-brand-active: #d8c2ff;
+    --ws-on-brand: #1a0d2e;
+    --ws-brand-bg-subtle: rgba(180, 140, 255, 0.14);
+    --ws-brand-border-subtle: rgba(180, 140, 255, 0.35);
+    --ws-brand-text-emphasis: #d8c2ff;
+}
+
+[data-color-scheme="purple"][data-bs-theme="light"] {
+    --ws-brand: #6f42c1;
+    --ws-brand-rgb: 111, 66, 193;
+    --ws-brand-hover: #5e37a6;
+    --ws-brand-active: #4e2d8a;
+    --ws-on-brand: #ffffff;
+    --ws-brand-bg-subtle: rgba(111, 66, 193, 0.08);
+    --ws-brand-border-subtle: rgba(111, 66, 193, 0.28);
+    --ws-brand-text-emphasis: #4e2d8a;
+}
+
+/* ============================================================
+   背景色调：随品牌色轻微偏移
+   ------------------------------------------------------------
+   纯中性灰会显得呆板，给画布/卡片底色掺入极淡的品牌色相，
+   与原有的 skin_*.css 观感保持一致。每个覆盖块同步给出 rgb 三元组。
+   ============================================================ */
+[data-color-scheme="green"][data-bs-theme="dark"] {
+    --ws-bg-canvas: #1a2a24;
+    --ws-bg-canvas-rgb: 26, 42, 36;
+    --ws-bg-surface: #213229;
+    --ws-bg-surface-rgb: 33, 50, 41;
+    --ws-bg-elevated: #25392f;
+    --ws-bg-elevated-rgb: 37, 57, 47;
+    --ws-bg-hover: #2b3a33;
+    --ws-bg-active: #334539;
+    --ws-border-default: #3a4a44;
+    --ws-border-strong: #4a5c54;
+}
+
+[data-color-scheme="green"][data-bs-theme="light"] {
+    --ws-bg-canvas: #f5faf7;
+    --ws-bg-canvas-rgb: 245, 250, 247;
+    --ws-bg-hover: #e8f1ec;
+    --ws-bg-active: #ddeae3;
+    --ws-border-default: #d3e3da;
+    --ws-border-strong: #b7cdc1;
+}
+
+[data-color-scheme="red"][data-bs-theme="dark"] {
+    --ws-bg-canvas: #2a1a1a;
+    --ws-bg-canvas-rgb: 42, 26, 26;
+    --ws-bg-surface: #322122;
+    --ws-bg-surface-rgb: 50, 33, 34;
+    --ws-bg-elevated: #392828;
+    --ws-bg-elevated-rgb: 57, 40, 40;
+    --ws-bg-hover: #3d2b2b;
+    --ws-bg-active: #4a3333;
+    --ws-border-default: #4a3a3a;
+    --ws-border-strong: #5c4a4a;
+}
+
+[data-color-scheme="red"][data-bs-theme="light"] {
+    --ws-bg-canvas: #faf6f6;
+    --ws-bg-canvas-rgb: 250, 246, 246;
+    --ws-bg-hover: #f3e8e8;
+    --ws-bg-active: #ebdcdc;
+    --ws-border-default: #e6d5d5;
+    --ws-border-strong: #cfb6b6;
+}
+
+[data-color-scheme="purple"][data-bs-theme="dark"] {
+    --ws-bg-canvas: #2a1a3a;
+    --ws-bg-canvas-rgb: 42, 26, 58;
+    --ws-bg-surface: #322142;
+    --ws-bg-surface-rgb: 50, 33, 66;
+    --ws-bg-elevated: #39294a;
+    --ws-bg-elevated-rgb: 57, 41, 74;
+    --ws-bg-hover: #3d2b4e;
+    --ws-bg-active: #4a3358;
+    --ws-border-default: #4a3a5a;
+    --ws-border-strong: #5c4a6e;
+}
+
+[data-color-scheme="purple"][data-bs-theme="light"] {
+    --ws-bg-canvas: #f8f6fb;
+    --ws-bg-canvas-rgb: 248, 246, 251;
+    --ws-bg-hover: #eee9f6;
+    --ws-bg-active: #e3dcf0;
+    --ws-border-default: #ddd4ea;
+    --ws-border-strong: #c3b5da;
+}
+
+/* 蓝色系的画布色调（与中性的暗色默认值一致，此处仅覆盖亮色） */
+[data-color-scheme="blue"][data-bs-theme="light"] {
+    --ws-bg-canvas: #f5f8fc;
+    --ws-bg-canvas-rgb: 245, 248, 252;
+    --ws-bg-hover: #e9eff7;
+    --ws-bg-active: #dfe7f1;
+    --ws-border-default: #d5dfe9;
+    --ws-border-strong: #b9c6d6;
+}
+
+/* ============================================================
+   维度三：侧边栏模式（独立于主区域）
+   ------------------------------------------------------------
+   侧边栏元素由 JS 同步 data-bs-theme 与 data-color-scheme
+   （见 wise-theme.js 的 [data-ws-theme-scope="sidebar"]），
+   因此其内部的 --bs-* / --ws-* 都是独立的明暗上下文，
+   这里只需补 AdminLTE 私有的 --lte-sidebar-* 变量。
+
+   ⚠️ 变量必须声明在侧边栏元素自身，不能挂在 <html> 的
+   [data-ws-sidebar] 上：CSS 自定义属性在「声明所在元素」完成 var() 替换。
+   若写成 [data-ws-sidebar="dark"] { --ws-sb-bg: var(--ws-bg-surface); }，
+   var() 会在 <html> 上求值 —— 亮色主题时取到 #ffffff，
+   随后以字面量继承给侧边栏，导致「亮色主题 + 深色侧边栏」背景仍是白的。
+   ============================================================ */
+
+[data-ws-theme-scope="sidebar"][data-bs-theme="dark"] {
+    --ws-sb-bg: var(--ws-bg-surface);
+    --ws-sb-bg-secondary: var(--ws-bg-surface);
+    --ws-sb-color: #b8c2cc;
+    --ws-sb-hover-color: #ffffff;
+    --ws-sb-hover-bg: rgba(255, 255, 255, 0.08);
+    --ws-sb-active-color: var(--ws-brand);
+    --ws-sb-active-bg: rgba(var(--ws-brand-rgb), 0.18);
+    --ws-sb-submenu-color: #98a4b0;
+    --ws-sb-submenu-bg: rgba(255, 255, 255, 0.02);
+    --ws-sb-submenu-hover-color: #ffffff;
+    --ws-sb-submenu-hover-bg: rgba(var(--ws-brand-rgb), 0.10);
+    --ws-sb-submenu-active-color: var(--ws-brand);
+    --ws-sb-submenu-active-bg: rgba(var(--ws-brand-rgb), 0.14);
+    --ws-sb-header-color: #8b98a5;
+}
+
+[data-ws-theme-scope="sidebar"][data-bs-theme="light"] {
+    --ws-sb-bg: var(--ws-bg-surface);
+    --ws-sb-bg-secondary: var(--ws-bg-surface);
+    --ws-sb-color: #475569;
+    --ws-sb-hover-color: #0f172a;
+    --ws-sb-hover-bg: rgba(15, 23, 42, 0.06);
+    --ws-sb-active-color: var(--ws-brand);
+    --ws-sb-active-bg: rgba(var(--ws-brand-rgb), 0.12);
+    --ws-sb-submenu-color: #64748b;
+    --ws-sb-submenu-bg: rgba(15, 23, 42, 0.02);
+    --ws-sb-submenu-hover-color: #0f172a;
+    --ws-sb-submenu-hover-bg: rgba(var(--ws-brand-rgb), 0.08);
+    --ws-sb-submenu-active-color: var(--ws-brand);
+    --ws-sb-submenu-active-bg: rgba(var(--ws-brand-rgb), 0.10);
+    --ws-sb-header-color: #8896a6;
+}
+
+/* ============================================================
+   Layer 1 · Bootstrap 变量映射
+   ------------------------------------------------------------
+   ⚠️ 必须挂在 html[data-bs-theme="dark"], html[data-bs-theme="light"]
+   （优先级 0,1,1），否则暗色模式下 Bootstrap 的
+   [data-bs-theme=dark] (0,1,0) 会覆盖这里的 --bs-* 定义。
+
+   侧边栏是独立的明暗上下文（如「亮色主题 + 深色侧边栏」），
+   其上同样带着 data-bs-theme，但上面的 html[...] 选择器命中不到它，
+   只能吃到 Bootstrap 原生暗色（#212529），与主区域的 --ws-* 色阶不一致。
+   这里用 (0,2,0) 的后代写法补一份，优先级仍高于 Bootstrap 的 (0,1,0)。
+
+   同时补齐 -rgb 变体：Bootstrap 的 .bg-body/.bg-body-secondary 等
+   工具类用的是 rgba(var(--bs-xxx-rgb))，只映射 hex 变体不会生效。
+   ============================================================ */
+html[data-bs-theme="dark"],
+html[data-bs-theme="light"],
+[data-ws-theme-scope="sidebar"][data-bs-theme="dark"],
+[data-ws-theme-scope="sidebar"][data-bs-theme="light"] {
+    --bs-body-bg: var(--ws-bg-canvas);
+    --bs-body-bg-rgb: var(--ws-bg-canvas-rgb);
+    --bs-body-color: var(--ws-fg-default);
+    --bs-body-color-rgb: var(--ws-fg-default-rgb);
+
+    --bs-emphasis-color: var(--ws-fg-default);
+    --bs-emphasis-color-rgb: var(--ws-fg-default-rgb);
+    --bs-secondary-color: var(--ws-fg-muted);
+    --bs-secondary-color-rgb: var(--ws-fg-muted-rgb);
+    --bs-secondary-bg: var(--ws-bg-surface);
+    --bs-secondary-bg-rgb: var(--ws-bg-surface-rgb);
+    --bs-tertiary-color: var(--ws-fg-subtle);
+    --bs-tertiary-color-rgb: var(--ws-fg-subtle-rgb);
+    --bs-tertiary-bg: var(--ws-bg-elevated);
+    --bs-tertiary-bg-rgb: var(--ws-bg-elevated-rgb);
+
+    --bs-primary: var(--ws-brand);
+    --bs-primary-rgb: var(--ws-brand-rgb);
+    --bs-primary-text-emphasis: var(--ws-brand-text-emphasis);
+    --bs-primary-bg-subtle: var(--ws-brand-bg-subtle);
+    --bs-primary-border-subtle: var(--ws-brand-border-subtle);
+
+    --bs-success: var(--ws-success);
+    --bs-success-rgb: var(--ws-success-rgb);
+    --bs-success-text-emphasis: var(--ws-success-text);
+    --bs-success-bg-subtle: var(--ws-success-bg);
+    --bs-success-border-subtle: var(--ws-success-border);
+
+    --bs-warning: var(--ws-warning);
+    --bs-warning-rgb: var(--ws-warning-rgb);
+    --bs-warning-text-emphasis: var(--ws-warning-text);
+    --bs-warning-bg-subtle: var(--ws-warning-bg);
+    --bs-warning-border-subtle: var(--ws-warning-border);
+
+    --bs-danger: var(--ws-danger);
+    --bs-danger-rgb: var(--ws-danger-rgb);
+    --bs-danger-text-emphasis: var(--ws-danger-text);
+    --bs-danger-bg-subtle: var(--ws-danger-bg);
+    --bs-danger-border-subtle: var(--ws-danger-border);
+
+    --bs-info: var(--ws-info);
+    --bs-info-rgb: var(--ws-info-rgb);
+    --bs-info-text-emphasis: var(--ws-info-text);
+    --bs-info-bg-subtle: var(--ws-info-bg);
+    --bs-info-border-subtle: var(--ws-info-border);
+
+    --bs-heading-color: var(--ws-fg-default);
+    --bs-link-color: var(--ws-brand);
+    --bs-link-hover-color: var(--ws-brand-hover);
+    --bs-link-color-rgb: var(--ws-brand-rgb);
+    --bs-link-hover-color-rgb: var(--ws-brand-rgb);
+
+    --bs-border-color: var(--ws-border-default);
+    --bs-border-color-translucent: rgba(var(--ws-fg-default-rgb), 0.15);
+
+    --bs-form-valid-color: var(--ws-success);
+    --bs-form-valid-border-color: var(--ws-success-border);
+    --bs-form-invalid-color: var(--ws-danger);
+    --bs-form-invalid-border-color: var(--ws-danger-border);
+
+    --bs-highlight-bg: rgba(var(--ws-warning-rgb), 0.22);
+}
+
+/* ============================================================
+   组件级语义修正
+   ------------------------------------------------------------
+   Bootstrap 默认 .card 背景 = --bs-body-bg（页面同色）。
+   本主题分层约定：
+     canvas    页面最底背景（body、顶部导航栏 bg-body）
+     surface   卡片 / 面板（bg-body-secondary）
+     elevated  浮动层（下拉菜单、模态框）
+   导航栏使用 bg-body，会自然解析为 canvas，与页面同色（Bootstrap
+   navbar 默认风格，仅靠 border-bottom 分隔）。
+   ============================================================ */
+
+/* 卡片浮于 canvas 之上 */
+html[data-bs-theme="dark"] .card,
+html[data-bs-theme="light"] .card {
+    --bs-card-bg: var(--ws-bg-surface);
+    background-color: var(--ws-bg-surface);
+}
+
+/* body 背景使用 canvas（页面最底），而非 Bootstrap tertiary 的 elevated */
+html[data-bs-theme="dark"] body.bg-body-tertiary,
+html[data-bs-theme="light"] body.bg-body-tertiary {
+    background-color: var(--ws-bg-canvas) !important;
+}
+
+/* 下拉菜单浮动层 */
+html[data-bs-theme="dark"] .dropdown-menu,
+html[data-bs-theme="light"] .dropdown-menu {
+    --bs-dropdown-bg: var(--ws-bg-elevated);
+    --bs-dropdown-border-color: var(--ws-border-default);
+    --bs-dropdown-color: var(--ws-fg-default);
+    --bs-dropdown-link-color: var(--ws-fg-default);
+    --bs-dropdown-link-hover-bg: var(--ws-bg-hover);
+    --bs-dropdown-link-hover-color: var(--ws-fg-default);
+    --bs-dropdown-link-active-bg: var(--ws-brand);
+    --bs-dropdown-link-active-color: var(--ws-on-brand);
+    --bs-dropdown-header-color: var(--ws-fg-muted);
+}
+
+/* 模态框浮动层 */
+html[data-bs-theme="dark"] .modal-content,
+html[data-bs-theme="light"] .modal-content {
+    --bs-modal-bg: var(--ws-bg-elevated);
+    --bs-modal-border-color: var(--ws-border-default);
+    --bs-modal-color: var(--ws-fg-default);
+    --bs-modal-header-border-color: var(--ws-border-default);
+    --bs-modal-footer-border-color: var(--ws-border-default);
+}
+
+/* ============================================================
+   Layer 2 · AdminLTE 变量映射（侧边栏）
+   ------------------------------------------------------------
+   aside-wrapper 在模板里用了 bg-body-secondary，这里必须用
+   !important 覆盖，否则侧边栏背景会停在 Bootstrap 默认灰色，
+   不随皮肤色变化。
+
+   ⚠️ 选择器必须达到 (0,2,1) 以上：AdminLTE 自带
+   [data-bs-theme=dark].app-sidebar / [data-bs-theme=dark] .app-sidebar
+   （0,2,0）会用它的硬编码值覆盖这里的映射 —— 后果是「暗色主题 + 亮色
+   侧边栏」时菜单文字仍是浅灰（#c2c7d0 压在白底上几乎不可见）。
+   故加 html 前缀 + [data-bs-theme] 凑到 (0,2,1)。
+   ============================================================ */
+html .app-sidebar[data-bs-theme],
+html .control-sidebar[data-bs-theme],
+html [data-ws-theme-scope="sidebar"][data-bs-theme] {
+    --lte-sidebar-color: var(--ws-sb-color);
+    --lte-sidebar-hover-color: var(--ws-sb-hover-color);
+    --lte-sidebar-hover-bg: var(--ws-sb-hover-bg);
+    --lte-sidebar-active-color: var(--ws-sb-active-color);
+    --lte-sidebar-menu-active-color: var(--ws-sb-active-color);
+    --lte-sidebar-menu-active-bg: var(--ws-sb-active-bg);
+    --lte-sidebar-submenu-color: var(--ws-sb-submenu-color);
+    --lte-sidebar-submenu-bg: var(--ws-sb-submenu-bg);
+    --lte-sidebar-submenu-hover-color: var(--ws-sb-submenu-hover-color);
+    --lte-sidebar-submenu-hover-bg: var(--ws-sb-submenu-hover-bg);
+    --lte-sidebar-submenu-active-color: var(--ws-sb-submenu-active-color);
+    --lte-sidebar-submenu-active-bg: var(--ws-sb-submenu-active-bg);
+    --lte-sidebar-header-color: var(--ws-sb-header-color);
+}
+
+/* 侧边栏面板背景（覆盖 aside-wrapper 上的 bg-body-secondary） */
+[data-ws-theme-scope="sidebar"] .aside-wrapper {
+    background-color: var(--ws-sb-bg) !important;
+}
+
+[data-ws-theme-scope="sidebar"] .sidebar-brand,
+[data-ws-theme-scope="sidebar"] .sidebar-wrapper,
+[data-ws-theme-scope="sidebar"] .form-inline {
+    background-color: transparent;
+}
+
+/* ============================================================
+   主题切换过渡
+   ------------------------------------------------------------
+   仅在切换瞬间由 wise-theme.js 挂到 <html> 上（220ms 后自动移除），
+   避免常驻 transition 拖慢页面交互。只过渡颜色，不动布局属性。
+   ============================================================ */
+.ws-theme-transition,
+.ws-theme-transition *,
+.ws-theme-transition *::before,
+.ws-theme-transition *::after {
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        fill 0.2s ease,
+        stroke 0.2s ease,
+        box-shadow 0.2s ease !important;
+    transition-delay: 0s !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ws-theme-transition,
+    .ws-theme-transition *,
+    .ws-theme-transition *::before,
+    .ws-theme-transition *::after {
+        transition: none !important;
+    }
+}
+
+/* ============================================================
+   主题切换器 UI
+   ============================================================ */
+
+.ws-theme-modes {
+    display: inline-flex;
+    gap: 2px;
+    padding: 2px;
+    border-radius: 0.5rem;
+    background-color: var(--ws-bg-active);
+}
+
+.ws-theme-modes .btn {
+    width: 5rem;
+    border: 0;
+    background: transparent;
+    color: var(--ws-fg-muted);
+    border-radius: 0.375rem;
+    padding: 0.25rem 0.625rem;
+    line-height: 1.2;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.ws-theme-modes .btn:hover {
+    color: var(--ws-fg-default);
+    background-color: var(--ws-bg-hover);
+}
+
+.ws-theme-modes .btn.active {
+    background-color: var(--ws-bg-surface);
+    color: var(--ws-fg-default);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+    font-weight: 500;
+}
+
+.ws-theme-modes .btn:focus-visible,
+.ws-theme-schemes .ws-scheme-swatch:focus-visible,
+.ws-theme-sidebars .btn:focus-visible {
+    outline: 2px solid var(--ws-brand);
+    outline-offset: 2px;
+}
+
+.ws-theme-schemes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.ws-theme-schemes .ws-scheme-swatch {
+    position: relative;
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    /* 用 box-shadow / border 做选中反馈，不用 transform —— 避免布局跳动 */
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.ws-theme-schemes .ws-scheme-swatch:hover {
+    box-shadow: 0 0 0 3px rgba(128, 128, 128, 0.35);
+}
+
+.ws-theme-schemes .ws-scheme-swatch.active {
+    border-color: var(--ws-bg-surface);
+    box-shadow: 0 0 0 2px currentColor;
+}
+
+.ws-theme-schemes .ws-scheme-swatch .ws-scheme-check {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.ws-theme-schemes .ws-scheme-swatch.active .ws-scheme-check {
+    opacity: 1;
+}
+
+/* 色块基色：取明暗两态的中位值，保证在两种模式下都可辨识 */
+.ws-scheme-swatch[data-ws-scheme="blue"] {
+    color: #3b8ce8;
+    background-color: #1a6fd4;
+}
+
+.ws-scheme-swatch[data-ws-scheme="green"] {
+    color: #3aac7e;
+    background-color: #12805c;
+}
+
+.ws-scheme-swatch[data-ws-scheme="red"] {
+    color: #dd5665;
+    background-color: #c2334d;
+}
+
+.ws-scheme-swatch[data-ws-scheme="purple"] {
+    color: #9267de;
+    background-color: #6f42c1;
+}
+
+.ws-theme-sidebars {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}

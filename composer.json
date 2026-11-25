@@ -1,0 +1,132 @@
+{
+    "name": "wiseadmin/framework",
+    "description": "ThinkPHP 8 后台框架：一条命令把现有数据表变成增删改查后台；CRUD + RBAC2 + 可加装 AI Agent，Apache-2.0",
+    "type": "project",
+    "keywords": [
+        "wiseadmin",
+        "thinkphp",
+        "admin",
+        "backend",
+        "crud",
+        "rbac",
+        "framework"
+    ],
+    "homepage": "https://www.wiseadmin.top/",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "wiseadmin",
+            "email": "wiseadmin@126.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/hiwiseadmin/framework/issues",
+        "source": "https://github.com/hiwiseadmin/framework",
+        "docs": "https://www.wiseadmin.top/"
+    },
+    "require": {
+        "php": ">=8.1.0",
+        "topthink/framework": "^8.0",
+        "topthink/think-orm": "^3.0",
+        "topthink/think-filesystem": "^3.0",
+        "topthink/think-captcha": "^3.0",
+        "topthink/think-view": "^2.0",
+        "topthink/think-migration": "^3.0",
+        "topthink/think-multi-app": "^1.0",
+        "topthink/think-queue": "^3.0",
+        "phpmailer/phpmailer": "^6.11",
+        "zoujingli/ip2region": "^3.0",
+        "wiseadmin/wise-support": "1.0.*",
+        "wiseadmin/wise-auth": "1.0.*",
+        "wiseadmin/wise-operation-log": "1.0.*",
+        "wiseadmin/wise-config": "1.0.*",
+        "wiseadmin/wise-attachment": "1.0.*",
+        "wiseadmin/wise-api": "1.0.*",
+        "wiseadmin/wise-jwt": "1.0.*",
+        "wiseadmin/wise-notification": "1.0.*",
+        "wiseadmin/wise-health-check": "1.0.*",
+        "wiseadmin/wise-oauth": "1.0.*",
+        "wiseadmin/wise-webhook": "1.0.*",
+        "wiseadmin/wise-workflow": "1.0.*",
+        "wiseadmin/wise-backup": "1.0.*",
+        "wiseadmin/wise-form-schema": "1.0.*",
+        "wiseadmin/wise-url": "1.0.*"
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^4.2",
+        "topthink/think-trace": "^1.0",
+        "phpunit/phpunit": "10.5.62",
+        "mockery/mockery": "^1.6",
+        "phpstan/phpstan": "^2.0"
+    },
+    "suggest": {
+        "topthink/think-swoole": "可选运行时：Swoole 常驻模式（HTTP / WebSocket 高性能场景）。框架与 wise-* 包代码已按 FPM / Swoole 双环境兼容编写，但正式上线不将 Swoole 作为必要依赖；需要常驻模式时再安装并确保已装 ext-swoole 扩展。"
+    },
+    "autoload": {
+        "psr-4": {
+            "app\\": "app"
+        },
+        "psr-0": {
+            "": "extend/"
+        }
+    },
+    "config": {
+        "preferred-install": "dist",
+        "policy": {
+            "advisories": {
+                "block": true
+            }
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "scripts": {
+        "pre-package-uninstall": [
+            "wise\\composer\\PackageHook::onPackagePreUninstall"
+        ],
+        "post-package-uninstall": [
+            "wise\\composer\\PackageHook::onPackageUninstall"
+        ],
+        "post-autoload-dump": [
+            "@php think service:discover",
+            "@php think plugin:migrate:register",
+            "@php think vendor:publish",
+            "@php think wise:vendor:publish",
+            "@php think menu:sync --prune-orphans --silent",
+            "@php think wise:package:cleanup --reconcile --apply --silent"
+        ],
+        "test": [
+            "@test:packages"
+        ],
+        "test:packages": [
+            "@php ../scripts/run-package-tests.php"
+        ],
+        "analyse": [
+            "@php vendor/bin/phpstan analyse -c ../phpstan.neon --autoload-file=vendor/autoload.php --memory-limit=1G --no-progress"
+        ],
+        "analyse:plugins": [
+            "@php vendor/bin/phpstan analyse -c ../phpstan-plugins.neon --autoload-file=vendor/autoload.php --memory-limit=1G --no-progress"
+        ],
+        "verify": [
+            "npm run verify:all"
+        ],
+        "ci": [
+            "@test",
+            "@analyse",
+            "@verify"
+        ]
+    },
+    "archive": {
+        "exclude": [
+            "/tests",
+            "/docs",
+            "/.github",
+            "/phpunit.xml",
+            "/.gitattributes",
+            "/.gitignore",
+            "/*.md",
+            "!/README.md",
+            "/qa/"
+        ]
+    }
+}

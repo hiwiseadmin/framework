@@ -1,0 +1,111 @@
+{extend name="public/base" /}
+
+{block name="title"}分类管理{/block}
+
+{block name="css"}
+<style>
+.category-tree {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.tree-item {
+    padding: 8px 12px;
+    border: 1px solid var(--bs-border-color);
+    margin-bottom: 5px;
+    border-radius: var(--bs-border-radius);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tree-item:hover {
+    background-color: var(--bs-tertiary-bg);
+}
+
+.tree-item.selected {
+    border-color: var(--bs-primary);
+    background-color: var(--bs-primary-bg-subtle);
+}
+
+.tree-children {
+    margin-left: 30px;
+}
+
+.drag-over {
+    background-color: var(--bs-warning-bg-subtle);
+    border-color: var(--bs-warning-border-subtle);
+}
+</style>
+{/block}
+
+{block name="content"}
+    <div class="container-fluid py-4">
+        {include file="public/page_header" icon="bi bi-folder" title="分类管理" desc="维护附件分类与排序" actions="<a href='/admin/attachment/index' class='btn btn-sm btn-outline-secondary'><i class='bi bi-arrow-left me-1'></i>返回附件管理</a>" /}
+
+        <div id="toolbar" class="ws-toolbar">
+            <div class="ws-toolbar-actions">
+                {/* 弹窗由 attachment_category.js 调 Wise.ui.dialog.form 打开，模板不再保留 modal 骨架 */}
+                <button type="button" class="btn btn-sm btn-primary" id="addCategoryBtn">
+                    <i class="bi bi-plus-circle me-1"></i>添加分类
+                </button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">分类列表</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="categoryTree" class="category-tree">
+                            <!-- 分类树将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">分类信息</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="categoryInfo" style="display: none;">
+                            <h6 id="infoName" class="border-bottom pb-2"></h6>
+                            <div class="mb-2">
+                                <small class="text-muted">ID:</small>
+                                <span id="infoId" class="ms-2"></span>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted">父级分类:</small>
+                                <span id="infoParent" class="ms-2"></span>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted">排序:</small>
+                                <span id="infoSort" class="ms-2"></span>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted">创建时间:</small>
+                                <span id="infoCreateTime" class="ms-2"></span>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-primary btn-sm" id="editCategoryBtn">
+                                    <i class="bi bi-pencil me-1"></i>编辑
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm" id="deleteCategoryBtn">
+                                    <i class="bi bi-trash me-1"></i>删除
+                                </button>
+                            </div>
+                        </div>
+                        <div id="noCategoryInfo" class="text-center text-muted py-4">
+                            <i class="bi bi-info-circle display-6"></i>
+                            <p class="mt-2">请选择一个分类查看详情</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {/* 分类编辑已迁移到 Wise.ui.dialog.form（UIS v1 §4.2） */}
+{/block}

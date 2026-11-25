@@ -1,0 +1,83 @@
+{extend name="public/base" /}
+
+{block name="title"}预览 - {:basename($attachment->object_name)}{/block}
+
+{block name="css"}
+<style>
+.preview-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 160px);
+    background-color: #1a1a2e;
+    border-radius: var(--bs-border-radius);
+    overflow: hidden;
+}
+.preview-wrapper img {
+    max-width: 100%;
+    max-height: calc(100vh - 200px);
+    object-fit: contain;
+}
+.preview-wrapper video {
+    max-width: 100%;
+    max-height: calc(100vh - 200px);
+}
+.preview-wrapper iframe {
+    width: 100%;
+    height: calc(100vh - 200px);
+    border: none;
+    background: #fff;
+}
+.preview-wrapper .unsupported {
+    text-align: center;
+    color: #aaa;
+    padding: 4rem;
+}
+.preview-wrapper .unsupported i {
+    font-size: 5rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+</style>
+{/block}
+
+{block name="content"}
+<div class="container-fluid py-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <a href="/admin/attachment/info?id={$attachment->id}" class="btn btn-outline-secondary btn-sm me-2"><i class="bi bi-arrow-left me-1"></i>返回详情</a>
+            <span class="text-light">{:basename($attachment->object_name)}</span>
+            <span class="badge bg-secondary ms-2">{$attachment->getHumanSize()}</span>
+        </div>
+        <a href="/admin/attachment/download?id={$attachment->id}" class="btn btn-primary btn-sm"><i class="bi bi-download me-1"></i>下载</a>
+    </div>
+
+    <div class="preview-wrapper">
+        {if $attachment->isImage()}
+        <img src="{$attachment->url}" alt="">
+        {elseif $attachment->isVideo()}
+        <video controls autoplay>
+            <source src="{$attachment->url}" type="{$attachment->mime_type}">
+            您的浏览器不支持视频播放
+        </video>
+        {elseif $attachment->isAudio()}
+        <div class="text-center text-light p-5">
+            <i class="{$attachment->getIconClass()} display-1 mb-3 d-block"></i>
+            <h5>{:basename($attachment->object_name)}</h5>
+            <audio controls class="mt-3">
+                <source src="{$attachment->url}" type="{$attachment->mime_type}">
+            </audio>
+        </div>
+        {elseif $attachment->isPdf()}
+        <iframe src="{$attachment->url}"></iframe>
+        {else /}
+        <div class="unsupported">
+            <i class="{$attachment->getIconClass()}"></i>
+            <h5>无法预览此文件类型</h5>
+            <p class="text-muted">{$attachment->mime_type}</p>
+            <a href="/admin/attachment/download?id={$attachment->id}" class="btn btn-primary"><i class="bi bi-download me-1"></i>下载文件</a>
+        </div>
+        {/if}
+    </div>
+</div>
+{/block}

@@ -1,0 +1,394 @@
+{extend name="public/base" /}
+
+{block name="title"}{if $isEdit}编辑角色{else}添加角色{/if}{/block}
+
+{block name="css"}
+<style>
+/* 权限树面板 */
+.perm-tree-panel {
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.375rem;
+    overflow: hidden;
+    max-height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.perm-tree-header {
+    padding: 8px 12px;
+    background: var(--bs-tertiary-bg);
+    border-bottom: 1px solid var(--bs-border-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.perm-tree-header .input-group {
+    flex: 1;
+}
+
+.perm-tree-body {
+    overflow-y: auto;
+    flex: 1;
+    padding: 4px 0;
+}
+
+.perm-tree-item {
+    display: flex;
+    align-items: center;
+    padding: 3px 12px;
+    cursor: pointer;
+    transition: background 0.1s;
+    user-select: none;
+}
+
+.perm-tree-item:hover {
+    background: rgba(var(--bs-primary-rgb), 0.04);
+}
+
+.perm-tree-item .form-check-input {
+    margin-right: 8px;
+}
+
+.perm-tree-item .tree-toggle {
+    width: 16px;
+    font-size: 10px;
+    cursor: pointer;
+    color: var(--bs-secondary-color);
+    flex-shrink: 0;
+    text-align: center;
+}
+
+.perm-tree-item .perm-label {
+    flex: 1;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.perm-tree-item .perm-badge {
+    font-size: 10px;
+    padding: 0 4px;
+    border-radius: 3px;
+    opacity: 0.6;
+}
+
+.perm-tree-children {
+    display: none;
+}
+
+.perm-tree-children.show {
+    display: block;
+}
+
+.perm-tree-item.has-children > .perm-label {
+    font-weight: 600;
+}
+
+/* 虚拟分组：来自菜单目录（dir），仅还原层级，不可勾选 */
+.perm-tree-item.perm-virtual {
+    cursor: default;
+    background: rgba(var(--bs-secondary-rgb), 0.05);
+}
+
+.perm-tree-item.perm-virtual .perm-group-label {
+    font-size: 12px;
+    color: var(--bs-secondary-color);
+    letter-spacing: 0.02em;
+}
+
+.perm-stats-bar {
+    padding: 6px 12px;
+    background: rgba(var(--bs-primary-rgb), 0.05);
+    border-bottom: 1px solid var(--bs-border-color);
+    display: flex;
+    gap: 16px;
+    font-size: 12px;
+    flex-wrap: wrap;
+}
+
+.perm-stats-bar .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.perm-stats-bar .stat-item .stat-num {
+    font-weight: 700;
+    font-size: 13px;
+}
+
+/* RBAC2 约束区 */
+.constraint-section {
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.375rem;
+    padding: 12px;
+    background: var(--bs-tertiary-bg);
+}
+
+.constraint-section .constraint-group {
+    margin-bottom: 8px;
+}
+
+.constraint-section .constraint-group:last-child {
+    margin-bottom: 0;
+}
+
+.constraint-mutex-badge {
+    cursor: pointer;
+}
+
+.constraint-mutex-badge .bi-x {
+    font-size: 10px;
+    margin-left: 4px;
+    cursor: pointer;
+}
+</style>
+{/block}
+
+{block name="content"}
+<div class="container">
+    <form id="wsForm" class="ws-form needs-validation" novalidate method="post" action="{$formAction}">
+        {if $isEdit}<input type="hidden" name="id" value="{$row.id}">{/if}
+
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-info-circle"></i> 基本信息</h6>
+            </div>
+            <div class="card-body">
+                <!-- 角色名称 -->
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto label">
+                        <label for="name" class="col-form-label">角色名称</label>
+                    </div>
+                    <div class="col">
+                        <input type="text" class="form-control" id="name" name="name" value="{$row.name|default=''}" placeholder="请输入角色名称"
+                            data-validation="required|minLength:2|maxLength:30"
+                            data-validation-message-required="请输入角色名称"
+                            data-validation-message-minLength="角色名称至少需要2个字符"
+                            data-validation-message-maxLength="角色名称不能超过30个字符">
+                    </div>
+                    <div class="col-auto tips">
+                        <div class="invalid-feedback">
+                            <i class="bi bi-exclamation-circle validation-icon"></i>
+                            <span class="validation-text"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 角色标识 -->
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto label">
+                        <label for="ident" class="col-form-label">角色标识</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="text" class="form-control" id="ident" name="ident" value="{$row.ident|default=''}"
+                            placeholder="如：editor"
+                            {if $isEdit && ($row.ident == 'super_admin' || $row.ident == 'admin')}readonly{/if}
+                            data-validation="required|minLength:2|maxLength:50"
+                            data-validation-message-required="请输入角色标识">
+                    </div>
+                    <div class="col-auto tips">
+                        <div class="invalid-feedback">
+                            <i class="bi bi-exclamation-circle validation-icon"></i>
+                            <span class="validation-text"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 上级角色 -->
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto label">
+                        <label for="parentId" class="col-form-label">上级角色</label>
+                    </div>
+                    <div class="col">
+                        <select class="form-select" id="parentId" name="parent_id"
+                            data-validation="required"
+                            data-validation-message-required="请选择上级角色">
+                            <option value="0" {if !$isEdit && $parent_id == 0}selected{/if}>顶级角色</option>
+                            {volist name="parentRoles" id="v"}
+                                <option value="{$v.id}" {if ($isEdit && $row && $row.parent_id == $v.id) || (!$isEdit && $parent_id == $v.id)}selected{/if}>{:$v.name}</option>
+                            {/volist}
+                        </select>
+                    </div>
+                    <div class="col-auto tips">
+                        <div class="invalid-feedback">
+                            <i class="bi bi-exclamation-circle validation-icon"></i>
+                            <span class="validation-text"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 属性配置行 -->
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto label">
+                        <label class="col-form-label">属性配置</label>
+                    </div>
+                    <div class="col">
+                        <div class="d-flex gap-3 flex-wrap">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="is_inherit" value="1" {if !$isEdit || $row.is_inherit == 1}checked{/if}>
+                                <label class="form-check-label">继承父角色权限</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="is_inherit" value="0" {if $isEdit && $row.is_inherit == 0}checked{/if}>
+                                <label class="form-check-label">不继承</label>
+                            </div>
+                            <span class="mx-2 text-secondary">|</span>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="status" value="1" {if !$isEdit || $row.status == 1}checked{/if}>
+                                <label class="form-check-label text-success">启用</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="status" value="0" {if $isEdit && $row.status == 0}checked{/if}>
+                                <label class="form-check-label text-secondary">禁用</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 排序号 -->
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto label">
+                        <label for="sort" class="col-form-label">排序号</label>
+                    </div>
+                    <div class="col">
+                        <input type="number" class="form-control" id="sort" name="sort" value="{$row.sort|default=50}" min="0" max="99999"
+                            style="max-width:120px"
+                            data-validation="min:0|max:99999"
+                            data-validation-message-min="排序号不能小于0">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 权限配置区 -->
+        <div class="card mb-3">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h6 class="mb-0"><i class="bi bi-shield-check"></i> 权限配置</h6>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-xs btn-outline-success" id="btn-select-all">
+                        <i class="bi bi-check-all"></i> 全选
+                    </button>
+                    <button type="button" class="btn btn-xs btn-outline-danger" id="btn-deselect-all">
+                        <i class="bi bi-x-circle"></i> 清空
+                    </button>
+                    <button type="button" class="btn btn-xs btn-outline-secondary" id="btn-expand-tree">
+                        <i class="bi bi-arrows-expand"></i> 展开
+                    </button>
+                    <button type="button" class="btn btn-xs btn-outline-secondary" id="btn-collapse-tree">
+                        <i class="bi bi-arrows-collapse"></i> 折叠
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="perm-tree-panel">
+                    <div class="perm-tree-header">
+                        <div class="input-group input-group-sm" style="max-width: 240px;">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="perm-tree-search" placeholder="搜索权限...">
+                        </div>
+                        <span class="ms-2 text-secondary" style="font-size:12px;">
+                            总计 <strong id="perm-total">0</strong> 项 | 已选 <strong id="perm-selected">0</strong> 项
+                        </span>
+                        <div class="ms-auto">
+                            <button type="button" class="btn btn-xs btn-outline-info" id="btn-copy-perms" title="从其他角色复制权限">
+                                <i class="bi bi-clipboard"></i> 从角色复制
+                            </button>
+                        </div>
+                    </div>
+                    <div class="perm-stats-bar" id="perm-stats">
+                        <span class="stat-item"><i class="bi bi-square-fill text-success" style="font-size:8px;"></i> 直接: <span class="stat-num text-success" id="s-direct">0</span></span>
+                        <span class="stat-item"><i class="bi bi-square-fill text-warning" style="font-size:8px;"></i> 继承: <span class="stat-num text-warning" id="s-inherited">0</span></span>
+                        <span class="stat-item"><i class="bi bi-square text-secondary" style="font-size:8px;"></i> 未选: <span class="stat-num text-secondary" id="s-unselected">0</span></span>
+                    </div>
+                    <div class="perm-tree-body" id="perm-tree-container">
+                        <div class="text-center py-3 text-secondary">
+                            <i class="bi bi-hourglass-split"></i> 加载中...
+                        </div>
+                    </div>
+                </div>
+                <!-- 隐藏的权限ID输入 -->
+                <input type="hidden" name="permission_ids" id="perm-ids-input" value="{if isset($row.permission_ids)}{:implode(',', $row.permission_ids)}{/if}">
+            </div>
+        </div>
+
+        {if $isEdit}
+        <!-- RBAC2 约束区 -->
+        <div class="card mb-3" id="rbac2-card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h6 class="mb-0"><i class="bi bi-shield-exclamation"></i> RBAC2 高级约束</h6>
+                <button type="button" class="btn btn-xs btn-link text-secondary" id="btn-toggle-constraints">
+                    <i class="bi bi-chevron-down"></i> 展开
+                </button>
+            </div>
+            <div class="card-body" id="rbac2-body" style="display:none;">
+                <div class="constraint-section">
+                    <!-- 互斥角色 -->
+                    <div class="constraint-group">
+                        <label class="form-label small mb-1">
+                            <i class="bi bi-x-octagon text-danger"></i> 互斥角色
+                            <small class="text-secondary">（与此角色互斥的角色，不能同时分配给同一用户）</small>
+                        </label>
+                        <div class="d-flex gap-2 align-items-center">
+                            <select class="form-select form-select-sm" id="mutex-role-select" style="max-width:200px;">
+                                <option value="">选择互斥角色...</option>
+                            </select>
+                            <button type="button" class="btn btn-sm btn-outline-danger" id="btn-add-mutex">
+                                <i class="bi bi-plus"></i> 添加
+                            </button>
+                        </div>
+                        <div class="mt-2 d-flex gap-1 flex-wrap" id="mutex-role-list"></div>
+                        <input type="hidden" name="mutex" id="mutex-role-ids" value="{$row.mutex_slugs|default=''}">
+                    </div>
+
+                    <!-- 基数限制 -->
+                    <div class="constraint-group mt-3">
+                        <label class="form-label small mb-1">
+                            <i class="bi bi-123 text-warning"></i> 最大成员数
+                            <small class="text-secondary">（0 = 不限制）</small>
+                        </label>
+                        <input type="number" class="form-control form-control-sm" name="max_members" value="{$row.max_members|default=0}"
+                            min="0" max="99999" style="max-width:120px">
+                    </div>
+                </div>
+            </div>
+        </div>
+        {/if}
+
+        <!-- 备注 -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-pencil"></i> 备注</h6>
+            </div>
+            <div class="card-body">
+                <textarea class="form-control" id="description" name="description" rows="2" placeholder="角色描述">{$row.description|default=''}</textarea>
+            </div>
+        </div>
+
+        {include file="public/submit" /}
+    </form>
+
+    <!-- 复制权限模态框 -->
+    <div class="modal fade" id="copyPermsModal" tabindex="-1">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title">从角色复制权限</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <select class="form-select" id="copy-from-role">
+                        <option value="">选择源角色...</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-sm btn-primary" id="btn-confirm-copy">复制并覆盖</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

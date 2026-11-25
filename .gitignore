@@ -1,0 +1,168 @@
+# ========================
+# IDE / Editor
+# ========================
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# ========================
+# OS generated files
+# ========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+# 注：`.htaccess` 曾在此被忽略，但 src/.htaccess 与 src/public/.htaccess 都是部署
+# 必需且已入库；目录级规则只会让新目录下的 .htaccess 被静默忽略，故删除该规则。
+# `.user.ini` / `.travis.yml` 改为不入库（见文件末尾的锚定规则）。
+
+# ========================
+# Composer Dependencies
+# ---------------------------------------------------------------
+# 必须锚定成 `/vendor/`：无锚定写法会匹配任意层级的 vendor 目录，误伤插件里的
+# ========================
+/vendor/
+
+# ========================
+# Local Packages / Plugins（禁止在此忽略！）
+# ---------------------------------------------------------------
+# 1) src/packages/ 是 36 个 wise-* 子包的唯一真源，src/plugins/ 是内置插件真源，
+#    整仓开发时必须能被 git 跟踪；
+# 2) 一旦写成 `plugins/` / `Packages/`，在 core.ignorecase=true 的机器（Windows/macOS）
+#    上会按大小写不敏感命中 src/plugins/ 与 src/packages/，导致新建的包、迁移、
+#    插件文件被 git status 静默忽略（Linux 上却正常）—— 曾实际发生；
+# 3) 「框架分发包里不含 packages/ 与 plugins/」由 src/.gitattributes 的
+#    export-ignore + release/release.php::buildMainTree() 负责，与 .gitignore 无关。
+# ========================
+
+# ========================
+# wise-* 子包配置文件（开发期本地覆盖副本，不入库）
+# ---------------------------------------------------------------
+# 配置的唯一真源在各子包内：packages/wiseadmin/<pkg>/config/<pkg>.php。
+# 运行时由 ServiceTrait::mergeConfig() 把「包默认值 + 应用覆盖」合并进全局配置域
+# （见 packages/wiseadmin/wise-support/src/traits/ServiceTrait.php），
+# 各包 ServiceProvider 会自动合并，无需把配置文件复制到应用 config/ 目录。
+# 因此 src/config/wise-*.php 只是整仓开发期的本地副本：不入库，也就不会被
+# release/release.php::buildMainTree() 打进框架分发包，避免发布包里塞进
+# 「未安装子包」的配置。本机已有的副本继续留在工作区，git 只是不再跟踪。
+#
+# 白名单（下方 ! 规则，顺序有意义：必须写在忽略规则之后）＝
+#   src/composer.json 的 require 中「未被 release/composer.overlay.json 移除」的
+#   wise-* 子包（即发布版主包仍会安装的必备依赖），外加 wise-editor（无对应子包，
+#   src/app/common/library/EditorManager.php 直接读取，框架自身唯一真源）。
+#   新增/调整必备子包时，两处要同步维护。
+# ========================
+config/wise-*.php
+!config/wise-api.php
+!config/wise-attachment.php
+!config/wise-auth.php
+!config/wise-backup.php
+!config/wise-config.php
+!config/wise-editor.php
+!config/wise-health-check.php
+!config/wise-image.php
+!config/wise-jwt.php
+!config/wise-llm-wiki.php
+!config/wise-login-security.php
+!config/wise-notification.php
+!config/wise-oauth.php
+!config/wise-operation-log.php
+!config/wise-webhook.php
+!config/wise-workflow.php
+
+# ========================
+# Runtime & Temp
+# ---------------------------------------------------------------
+# 必须锚定到 src 根（`/xxx/`）：无锚定的 `runtime/` 会匹配任意层级的 runtime 目录，
+# 误伤包内同名源码目录 —— wise-support 的 src/runtime/Runtime.php（命名空间
+# wise\support\runtime）曾因此长期未入库，Package 打包后会直接缺类。
+# ========================
+/runtime/
+/backup/
+.playwright-cli/
+*.log
+*.tmp
+*.cache
+
+# ========================
+# Environment
+# ========================
+.env
+.env.cli-backup
+.env.local
+.env.*.local
+
+# 安装锁：由安装流程（CLI / Web）在安装成功后生成，绝不能入库。
+# 一旦随发布包分发，使用者 composer create-project 后会被判成“已安装”：
+# php think install 直接拒绝、网页安装向导只剩“已安装”提示。
+/app/install/install.lock
+
+# ========================
+# Build / Dist
+# ========================
+/public/build/
+/public/dist/
+/node_modules/
+# 编辑器闭环验证（npm run verify:editor）产出的截图与 Chrome 临时 profile
+/.verify-out/
+
+# ========================
+# Static / Third-party
+# ========================
+# 插件资产发布目录（AssetManager 复制）
+/public/statics/plugins/
+# 会员主题资产发布目录（member 插件 manifest.publish 声明）
+/public/statics/member/
+
+# ========================
+# 运行期用户上传（不入库，保留目录）
+# ---------------------------------------------------------------
+# uploads 下是使用方运行期产生的文件，属于部署环境数据，不能进仓库：
+# 会随框架 dist 分发、被误当成示例资源，且体积无上限增长。
+# ========================
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+# ========================
+# 本地环境文件（不随仓库分发）
+# ---------------------------------------------------------------
+# 锚定到 src 根：`.user.ini` 是 PHP per-directory 配置（部署方按需创建），
+# `.travis.yml` 为历史 CI 残留。
+# ========================
+/.user.ini
+/.travis.yml
+
+# ========================
+# SSL / ACME
+# ========================
+.well-known/
+
+# ========================
+# Test & Dev Tools
+# ========================
+phpunit.phar
+*.phar
+
+# ========================
+# CodeBuddy / WorkBuddy
+# ========================
+.codebuddy/
+.workbuddy/
+
+# ========================
+# 历史 IP 库（qqwry.dat 等）
+# ---------------------------------------------------------------
+# 归属地已改用 ip2region（数据随 zoujingli/ip2region 包分发，见 IPLocation）。
+# 保留忽略规则：避免老部署残留的 10MB+ dat 被误提交，每提交一次就多一份 git 历史。
+# ========================
+/app/common/library/ipdata/*.[dD]at
+# Sitemap 是派生数据，由 php think wisecms:sitemap:regenerate 生成
+/public/sitemap*.xml

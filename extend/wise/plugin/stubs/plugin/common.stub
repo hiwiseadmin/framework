@@ -1,0 +1,15 @@
+<?php
+// {$name} 插件 — 公共函数（boot 链 Step 3：文件存在即 include）
+//
+// 约定：
+//   1. 函数名以 {$name}_ 为前缀；
+//   2. 必须用 function_exists() 包裹 —— 避免多次 boot（含 Swoole 常驻）导致重复定义。
+//
+// 示例：
+// if (!function_exists('{$name}_config')) {
+//     function {$name}_config(?string $key = null, $default = null)
+//     {
+//         $config = config('{$name}');
+//         return $key === null ? $config : ($config[$key] ?? $default);
+//     }
+// }

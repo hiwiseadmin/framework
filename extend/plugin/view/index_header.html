@@ -1,0 +1,17 @@
+{/* 兼容片段（UIS v1）：保留插件页原有的 index_header include 调用（icon / caption / buttongroup）不变。
+
+   为什么这里不 include page_header：`__PLUGIN_VIEW__` 这类占位符只在**顶层模板**被
+   tpl_replace_string 替换，嵌套 include 里会残留字面量 → 模板找不到（曾导致 500）。
+   所以这里自带结构（与 page_header.html 同构），保证零解析风险。
+
+   注意：注释里不能出现花括号；buttongroup 只放"与表格无关"的页面级操作。 */}
+<div class="ws-page-header">
+    <div class="ws-page-heading">
+        <i class="ws-page-icon [icon]" id="index_header_icon"></i>
+        <div class="ws-page-text">
+            <h1 class="ws-page-title" id="index_header_title">[caption]</h1>
+            <p class="ws-page-desc"></p>
+        </div>
+    </div>
+    <div class="ws-page-actions">[buttongroup]</div>
+</div>

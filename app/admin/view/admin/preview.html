@@ -1,0 +1,51 @@
+{extend name="public/base" /}
+
+{block name="title"}用户预览{/block}
+
+{block name="content"}
+    <div class="container p-4">
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">用户名</div>
+            <div class="col p-2">{$admin.username}</div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">昵称</div>
+            <div class="col p-2">{$admin.nickname|default=''}</div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">角色</div>
+            <div class="col p-2">
+                {volist name="admin.roles" id="role"}
+                <span class="badge bg-primary mr-2">{$role.name}</span>
+                {/volist}
+            </div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">邮箱</div>
+            <div class="col p-2">{$admin.email|default=''}</div>
+        </div>
+            
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">手机号</div>
+            <div class="col p-2">{$admin.mobile|default=''}</div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">状态</div>
+            <div class="col p-2">
+                {if $admin.status == 1}
+                    <span class="badge bg-success">启用</span>
+                {else}
+                    <span class="badge bg-danger">禁用</span>
+                {/if}
+            </div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">备注</div>
+            <div class="col p-2">{$admin.description|default=''}</div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">创建时间</div>
+            <div class="col p-2">{$admin.create_time|default=''}</div>
+        </div>
+    </div>
+{/block}

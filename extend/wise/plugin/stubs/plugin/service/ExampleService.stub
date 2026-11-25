@@ -1,0 +1,22 @@
+<?php
+declare(strict_types=1);
+
+namespace plugin\{$name}\service;
+
+/**
+ * {$name} 示例服务
+ */
+class ExampleService
+{
+    /**
+     * 获取插件信息。
+     */
+    public function getInfo(): array
+    {
+        return [
+            'name'    => '{$name}',
+            'version' => '{$version}',
+            'author'  => '{$author}',
+        ];
+    }
+}

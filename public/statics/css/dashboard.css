@@ -1,0 +1,462 @@
+/**
+ * dashboard.css — 后台数据面板编排器样式
+ *
+ * 颜色一律消费主题语义令牌（--ws-*），随 data-bs-theme / data-color-scheme 自适应；
+ * 面板 accent 通过 --panel-accent 局部变量映射品牌/状态色。
+ */
+
+#dashboard-app {
+    padding-bottom: 36px;
+}
+
+.dashboard-toolbar {
+    margin-bottom: 14px;
+}
+
+/* ===== GridStack 容器 ===== */
+#panel-grid {
+    min-height: 120px;
+}
+
+/* content 是 GridStack 的定位盒：不得改 height / 加 padding，否则破坏库生成的四边 inset。
+   库默认给它填充了 --bs-secondary-bg，这里置透明，让 margin 留白处干净显示页面背景。 */
+.grid-stack-item-content {
+    background: transparent;
+}
+
+/* 拖动占位 */
+.grid-stack-placeholder > .placeholder-content {
+    border: 1px dashed var(--ws-border-strong);
+    background: var(--ws-brand-bg-subtle);
+    border-radius: 10px;
+}
+
+/* ===== 面板壳 ===== */
+.panel-shell {
+    --panel-accent: transparent;
+    /* 注意：不能设 height:100% —— .panel-shell 与 .grid-stack-item-content 是同一元素，
+       库以绝对定位 inset(top/right/bottom/left: margin) 决定其盒子；
+       设 height:100% 会使元素从 top 向下溢出整格，导致相邻两排 content 紧贴、纵向无间隙。 */
+    display: flex;
+    flex-direction: column;
+    background: var(--ws-bg-surface);
+    border: 1px solid var(--ws-border-default);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* accent 变量：仅作用于图标与 header 底色，不再使用左侧彩色边框 */
+.panel-shell[data-accent="brand"]   { --panel-accent: var(--ws-brand); }
+.panel-shell[data-accent="success"] { --panel-accent: var(--ws-success); }
+.panel-shell[data-accent="warning"] { --panel-accent: var(--ws-warning); }
+.panel-shell[data-accent="danger"]  { --panel-accent: var(--ws-danger); }
+.panel-shell[data-accent="info"]    { --panel-accent: var(--ws-info); }
+
+.panel-header {
+    cursor: move;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 10px 6px 12px;
+    background: var(--ws-bg-elevated);
+    border-bottom: 1px solid var(--ws-border-default);
+}
+
+/* header 颜色主题：整条头部使用对应语义色的浅底色 */
+.panel-shell[data-accent="brand"]   .panel-header { background: var(--ws-brand-bg-subtle); }
+.panel-shell[data-accent="success"] .panel-header { background: var(--ws-success-bg); }
+.panel-shell[data-accent="warning"] .panel-header { background: var(--ws-warning-bg); }
+.panel-shell[data-accent="danger"]  .panel-header { background: var(--ws-danger-bg); }
+.panel-shell[data-accent="info"]    .panel-header { background: var(--ws-info-bg); }
+
+.panel-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ws-fg-default);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.panel-title i.bi,
+.panel-title .panel-emoji {
+    color: var(--panel-accent);
+    font-style: normal;
+}
+
+.panel-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.panel-actions button {
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--ws-fg-muted);
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+}
+
+.panel-actions button:hover {
+    background: var(--ws-bg-hover);
+    color: var(--ws-fg-default);
+}
+
+.panel-body {
+    flex: 1;
+    overflow: auto;
+    padding: 12px;
+    background: var(--ws-bg-canvas);
+}
+
+.panel-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 60px;
+    color: var(--ws-fg-subtle);
+}
+
+.panel-error {
+    color: var(--ws-danger-text);
+    font-size: 12px;
+    text-align: center;
+    padding: 12px;
+}
+
+.panel-empty {
+    color: var(--ws-fg-subtle);
+    font-size: 12px;
+    text-align: center;
+    padding: 16px 8px;
+}
+
+/* ===== 渲染器：welcome / html ===== */
+.dash-welcome .dash-welcome-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--ws-fg-default);
+}
+
+.dash-welcome .dash-welcome-time {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--ws-brand-text-emphasis);
+    margin-top: 2px;
+}
+
+.dash-welcome .dash-welcome-meta {
+    color: var(--ws-fg-muted);
+    font-size: 12px;
+}
+
+/* ===== 渲染器：stat（指标） ===== */
+.dash-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+    gap: 10px;
+    height: 100%;
+}
+
+.dash-stat {
+    background: var(--ws-bg-elevated);
+    border: 1px solid var(--ws-border-default);
+    border-radius: 8px;
+    padding: 10px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    text-align: center;
+}
+
+.dash-stat-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ws-brand-text-emphasis);
+}
+
+.dash-stat-value .unit {
+    font-size: 11px;
+    color: var(--ws-fg-subtle);
+    margin-left: 1px;
+}
+
+.dash-stat-label {
+    font-size: 11px;
+    color: var(--ws-fg-muted);
+}
+
+/* ===== 渲染器：entries（图标快捷入口） ===== */
+.entry-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.entry-group-label {
+    font-size: 12px;
+    color: var(--ws-fg-subtle);
+    margin-bottom: 6px;
+    letter-spacing: 0.4px;
+}
+
+.entry-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+    gap: 10px 8px;
+}
+
+.entry-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    padding: 8px 4px 6px;
+    text-decoration: none;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.entry-item:hover {
+    background: var(--ws-bg-hover);
+    border-color: var(--ws-border-default);
+}
+
+.entry-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 20px;
+    background-color: var(--ws-brand);
+    overflow: hidden;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    flex-shrink: 0;
+}
+
+.entry-icon .entry-emoji {
+    font-size: 20px;
+    line-height: 1;
+}
+
+.entry-name {
+    font-size: 11px;
+    color: var(--ws-fg-muted);
+    text-align: center;
+    line-height: 1.25;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.entry-item:hover .entry-name {
+    color: var(--ws-fg-default);
+}
+
+/* ===== 渲染器：list ===== */
+.dash-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dash-list-head {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--ws-fg-subtle);
+    padding-bottom: 2px;
+}
+
+.dash-list-head .badge {
+    font-weight: 600;
+}
+
+.dash-list-item {
+    background: var(--ws-bg-elevated);
+    border: 1px solid var(--ws-border-default);
+    border-radius: 8px;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.dash-list-item-title {
+    font-size: 13px;
+    color: var(--ws-fg-default);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dash-list-item-title .dot-unread {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--ws-danger);
+    flex-shrink: 0;
+}
+
+.dash-list-item-meta {
+    font-size: 11px;
+    color: var(--ws-fg-subtle);
+}
+
+/* ===== 添加面板 catalog ===== */
+.dashboard-catalog .catalog-group {
+    margin-bottom: 14px;
+}
+
+.catalog-group-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ws-fg-muted);
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--ws-border-default);
+}
+
+.catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+}
+
+.catalog-item {
+    border: 1px solid var(--ws-border-default);
+    background: var(--ws-bg-elevated);
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.catalog-item:hover {
+    border-color: var(--ws-brand-border-subtle);
+    background: var(--ws-bg-hover);
+}
+
+.catalog-item-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: var(--ws-on-brand);
+    background: var(--ws-brand-bg-subtle);
+    flex-shrink: 0;
+}
+
+.catalog-item-body {
+    min-width: 0;
+}
+
+.catalog-item-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ws-fg-default);
+}
+
+.catalog-item-desc {
+    font-size: 11px;
+    color: var(--ws-fg-subtle);
+    margin-top: 2px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.catalog-item-size {
+    font-size: 10px;
+    color: var(--ws-fg-subtle);
+    margin-top: 3px;
+}
+
+.catalog-empty {
+    color: var(--ws-fg-subtle);
+    font-size: 12px;
+    text-align: center;
+    padding: 24px 0;
+}
+
+/* ===== 空态 ===== */
+.dashboard-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 48px 0;
+    color: var(--ws-fg-subtle);
+    border: 1px dashed var(--ws-border-strong);
+    border-radius: 12px;
+    margin-top: 12px;
+}
+
+.dashboard-empty i {
+    font-size: 40px;
+    color: var(--ws-border-strong);
+}
+
+/* ===== accent 选择色点 ===== */
+.accent-dots {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.accent-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    padding: 0;
+}
+
+.accent-dot.active {
+    border-color: var(--ws-fg-default);
+    box-shadow: 0 0 0 2px var(--ws-bg-surface);
+}
+
+/* 响应式：小屏收起面板标题区部分文案 */
+@media (max-width: 576px) {
+    .dash-stat-value {
+        font-size: 16px;
+    }
+    .catalog-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>config['site.name']|default='首页'</title>
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <style> 
+    body{
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-size: 18px;
+        background: linear-gradient(45deg, black, transparent);
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        overflow: hidden;
+        background: linear-gradient(300deg, #d9afd9 0%, #97d9e1 50%, #93aff2 100%);
+        padding: 20px 50px;
+    }
+    code{
+        background-color: #d9d9d9;
+        padding:2px 8px;
+        font-size:18px;
+        font-weight: 700;
+        font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        border-radius: 5px;
+    }
+    </style>
+</head>
+<body>
+    <div style="margin-bottom: 40px;">
+        <h1>{{ config['site.name']|default='首页' }}</h1>
+        <div style="margin-top:50px;">
+            <p><b>默认首页：</b>当前网站没有配置默认首页，您可以在后台进行配置。</p>
+        </div>
+    </div>
+</body>
+</html>

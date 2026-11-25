@@ -1,0 +1,13 @@
+{extend name="public/base" /}
+
+{block name="title"}用户管理{/block}
+
+{block name="content"}
+<div class="app-main container-fluid">
+    {include file="public/page_header" icon="bi bi-people" title="用户管理" desc="维护后台管理员账号、状态与所属角色" actions="" /}
+    {/* 搜索区：控制器 defineSearch() 声明 → 运行时渲染；无声明时 filterHtml === '' 不渲染 */}
+    {notempty name="filterHtml"}{$filterHtml|raw}{/notempty}
+    <div id="toolbar" class="ws-toolbar"></div>
+    <table id="table"></table>
+</div>
+{/block}

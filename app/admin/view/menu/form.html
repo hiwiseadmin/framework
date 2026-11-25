@@ -1,0 +1,197 @@
+{extend name="public/base" /}
+
+{block name="title"}{if $isEdit}编辑菜单{else}添加菜单{/if}{/block}
+
+{block name="content"}
+<div class="container">
+    <form id="wsForm" class="ws-form needs-validation" novalidate method="post" action="{$formAction}">
+        {if $isEdit}<input type="hidden" name="id" value="{$row.id}">{/if}
+        <div class="row">
+            <!-- 上级菜单 -->
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label for="parentId" class="col-form-label">上级菜单</label>
+                </div>
+                <div class="col">
+                    <select class="form-select" id="parentId" name="parent_id" 
+                        data-validation="required" 
+                        data-validation-message-required="请选择上级菜单">
+                        <option value="0">顶级菜单</option>
+                        {volist name="parentMenus" id="menu"}
+                            <option value="{$menu.id}" {if ($isEdit && $row.parent_id == $menu.id) || (!$isEdit && isset($parent_id) && $parent_id == $menu.id)}selected{/if}>{:$menu.name}</option>
+                        {/volist}
+                    </select>
+                </div>
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text"></span>
+                    </div>
+                </div> 
+            </div>
+            
+            <!-- 菜单名称 -->
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label for="name" class="col-form-label">菜单名称</label>
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" id="name" name="name" value="{$row.name|default=''}" placeholder="请输入菜单名称" 
+                        data-validation="required" 
+                        data-validation-message-required="请输入菜单名称">
+                </div>
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text"></span>
+                    </div>
+                </div> 
+            </div>
+
+            <!-- 菜单类型 -->
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label for="type" class="col-form-label">菜单类型</label>
+                </div>
+                <div class="col">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="type" id="directory" value="dir"
+                            {if !$isEdit || $row.type == 'dir'}checked{/if}
+                            data-validation="required" 
+                            data-validation-message-required="请选择菜单类型">
+                        <label class="form-check-label" for="directory">目录</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="type" id="menu" value="menu"
+                            {if $isEdit && $row.type == 'menu'}checked{/if}>
+                        <label class="form-check-label" for="menu">菜单</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="type" id="button" value="button"
+                            {if $isEdit && $row.type == 'button'}checked{/if}>
+                        <label class="form-check-label" for="button">按钮</label>
+                    </div>
+                </div>
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text"></span>
+                    </div>
+                </div> 
+            </div>
+
+            <!-- 菜单图标 -->
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label for="icon" class="col-form-label">菜单图标</label>
+                </div>
+                <div class="col">
+                    <div class="input-group">
+                        <span class="border border-secondary-subtle ws-bg-tertiary rounded fs-5 py-1 px-3 me-2" id="iconPreview"><i class="{$row.icon|default='bi bi-circle'}"></i></span>
+                        <input type="text" class="form-control" id="icon" name="icon" placeholder="如：bi bi-circle" value="{$row.icon|default='bi bi-circle'}">
+                        <button type="button" class="btn btn-outline-secondary" id="selectIcon" data-ws-icon="#icon" data-ws-icon-preview="#iconPreview">选择图标</button>
+                    </div>
+                </div>
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text"></span>
+                    </div>
+                </div> 
+            </div>
+                        
+            <!-- 路由地址 -->
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label for="path" class="col-form-label">路由地址</label>
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" id="path" name="path" value="{$row.path|default=''}" placeholder="如：/admin/menu/index （子菜单必填，顶级菜单可留空）" 
+                        data-validation="match:/^\/[a-z]+[a-zA-Z0-9\/_]+$/"  
+                        data-validation-message-match="请输入正确的路由地址">
+                </div>
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text"></span>
+                    </div>
+                </div> 
+            </div>
+            
+            <!-- 前端组件路径 -->
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label for="component" class="col-form-label">前端组件路径</label>
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" id="component" name="component" value="{$row.component|default=''}" placeholder="默认为 /public/static/admin" 
+                        data-validation="match:/^[a-z]+[a-zA-Z0-9\/_]+$/"  
+                        data-validation-message-match="请输入正确的前端组件路径">
+                </div>
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text"></span>
+                    </div>
+                </div> 
+            </div>
+            
+            <!-- 菜单状态 -->
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label class="col-form-label">菜单状态</label>
+                </div>
+                <div class="col">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="status" id="status-normal" value="1"
+                            {if !$isEdit || $row.status == 1}checked{/if}
+                            data-validation="required" 
+                            data-validation-message-required="请选择菜单状态">
+                        <label class="form-check-label" for="status-normal">启用</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="status" id="status-disabled" value="0"
+                            {if $isEdit && $row.status == 0}checked{/if}>
+                        <label class="form-check-label" for="status-disabled">禁用</label>
+                    </div>
+                </div>
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text"></span>
+                    </div>
+                </div> 
+            </div>
+
+            <!-- 排序号 -->
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label for="sort" class="col-form-label">排序号</label>
+                </div>
+                <div class="col">
+                    <input type="number" class="form-control" id="sort" name="sort" value="{$row.sort|default=0}" min="0" 
+                        data-validation="number|min:0|max:9999" 
+                        data-validation-message-number="请输入数字">
+                </div>
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text"></span>
+                    </div>
+                </div> 
+            </div>
+            
+            <!-- 备注 -->
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label for="description" class="col-form-label">备注</label>
+                </div>
+                <div class="col">
+                    <textarea class="form-control" id="description" name="description" rows="3" placeholder="请输入菜单备注信息">{$row.description|default=''}</textarea>
+                </div>
+            </div>
+        </div>
+        {include file="public/submit" /}
+    </form>
+</div>
+{/block}

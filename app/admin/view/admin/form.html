@@ -1,0 +1,249 @@
+{extend name="public/base" /}
+
+{block name="title"}{if $isEdit}编辑用户{else}添加用户{/if}{/block}
+
+{block name="css"}
+{include file="profile/avatar_upload_style" /}
+{/block}
+
+{block name="content"}
+<div class="container">
+    <form id="wsForm" class="ws-form needs-validation" novalidate method="post" action="{$formAction}">
+        {if $isEdit}<input type="hidden" name="id" value="{$row.id}">{/if}
+        <div class="row">
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label for="username" class="col-form-label">用户名</label>
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" id="username" name="username" value="{$row.username|default=''}" placeholder="请输入用户名，包含大小写字母和数字和下划线，且不能以数字开头"
+                        {if !$isEdit}
+                        data-validation="required|minLength:2|maxLength:30" 
+                        data-validation-message-required="请输入用户名"
+                        data-validation-message-minLength="姓名至少需要2个字符"
+                        data-validation-message-maxLength="姓名不能超过30个字符"
+                        {/if}
+                        {if $isEdit}disabled{/if}>
+                </div>
+                {if $isEdit}
+                <div class="col-auto tips">
+                    <small class="form-text text-muted">用户名不可修改</small>
+                </div>
+                {else}
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text"></span>
+                    </div>
+                </div>
+                {/if}
+            </div>
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label for="nickname" class="col-form-label">昵称</label>
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" id="nickname" name="nickname" value="{$row.nickname|default=''}" placeholder="请输入用户昵称"
+                        data-validation="required|minLength:2|maxLength:30" 
+                        data-validation-message-required="请输入用户昵称"
+                        data-validation-message-minLength="昵称至少需要2个字符"
+                        data-validation-message-maxLength="昵称不能超过30个字符">
+                </div>
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text"></span>
+                    </div>
+                </div> 
+            </div>
+            {if !$isEdit}
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label for="password" class="col-form-label">密码</label>
+                </div>
+                <div class="col">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="请输入密码"
+                        data-validation="required|passwordStrength:8,letter,digit" 
+                        data-validation-message-required="请输入用户密码">
+                                    <div id="passwordStrength" class="password-strength"></div>
+
+                </div>
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text"></span>
+                    </div>
+                </div> 
+            </div>
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label for="password_confirm" class="col-form-label">确认密码</label>
+                </div>
+                <div class="col">
+                    <input type="password" class="form-control" id="password_confirm" name="password_confirm" placeholder="请再次输入密码"
+                        data-validation="required|confirmPassword:password" 
+                        data-validation-message-required="请确认密码"
+                        data-validation-message-confirmPassword="两次输入的密码不一致">
+                </div>
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text">两次输入密码保持一致</span>
+                    </div>
+                </div> 
+            </div>
+            {/if}
+            {if $isEdit}
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label for="resetPwdBtn" class="col-form-label">密码</label>
+                </div>
+                <div class="col">
+                    <button type="button" id="resetPwdBtn" data-id="{$row.id}" class="btn btn-primary">重置密码</button>
+                </div>
+                <div class="col-auto tips"></div> 
+            </div>
+            {/if}
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label for="email" class="col-form-label">邮箱</label>
+                </div>
+                <div class="col">
+                    <input type="email" class="form-control" id="email" name="email" value="{$row.email|default=''}" placeholder="请输入邮箱"
+                        data-validation="email" 
+                        data-validation-message-email="请输入有效的邮箱">
+                </div>
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text">请输入有效的邮箱</span>
+                    </div>
+                </div> 
+            </div>
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label for="mobile" class="col-form-label">手机号</label>
+                </div>
+                <div class="col">
+                    <input type="tel" class="form-control" id="mobile" name="mobile" value="{$row.mobile|default=''}" placeholder="请输入手机号"
+                        data-validation="mobile" 
+                        data-validation-message-mobile="请输入有效的手机号">
+                </div>
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text">请输入有效的手机号</span>
+                    </div>
+                </div> 
+            </div>
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label class="col-form-label">状态</label>
+                </div>
+                <div class="col">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="status" id="status1" value="1" {if !$isEdit || $row.status == 1}checked{/if} 
+                            data-validation="required" 
+                            data-validation-message-required="请选择用户状态">
+                        <label class="form-check-label" for="status1">启用</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="status" id="status0" value="0" {if $isEdit && $row.status == 0}checked{/if}>
+                        <label class="form-check-label" for="status0">禁用</label>
+                    </div>
+                </div>
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text"></span>
+                    </div>
+                </div> 
+            </div>
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label class="col-form-label">角色</label>
+                </div>
+                <div class="col row">
+                    {volist name="roles" id="role"}
+                    <div class="form-check col-md-6">
+                        <input class="form-check-input" type="checkbox" name="role_ids[]" id="role_{$role.id}" value="{$role.id}" {if $isEdit && in_array($role.id, $row.role_ids)}checked{/if} 
+                            data-validation="required" 
+                            data-validation-message-required="请至少选择一个角色">
+                        <label class="form-check-label" for="role_{$role.id}">{$role.name}</label>
+                    </div>
+                    {/volist}
+                </div> 
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text"></span>
+                    </div>
+                </div> 
+            </div>
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label class="col-form-label">头像</label>
+                </div>
+                <div class="col">
+                    <input type="hidden" class="form-control" id="avatar" name="avatar" value="{$row.avatar|default=''}" >
+                    <img id="avatar-preview" src="{$row.avatar|default='/statics/images/avatar/default_avatar.jpg'}" alt="头像预览" class="img-thumbnail" style="max-width: 100px;">
+                    <button type="button" class="btn btn-secondary" id="upload-avatar">选择头像</button>
+                </div>
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text"></span>
+                    </div>
+                </div> 
+            </div>
+            <div class="row g-3 align-items-center">
+                <div class="col-auto label">
+                    <label for="description" class="col-form-label">备注</label>
+                </div>
+                <div class="col">
+                    <textarea class="form-control" id="description" name="description" rows="2" placeholder="请输入备注信息" data-validation="maxLength:255" data-validation-message-maxLength="备注不能超过255个字符">{$row.description|default=''}</textarea>
+                </div>
+                <div class="col-auto tips">
+                    <div class="invalid-feedback">
+                        <i class="bi bi-exclamation-circle validation-icon"></i>
+                        <span class="validation-text"></span>
+                    </div>
+                </div> 
+            </div>
+        {include file="public/submit" /}
+    </form>
+</div>
+{if $isEdit}
+{/* 重置密码表单片段：由 Wise.ui.dialog.form() 在父窗口打开。
+    本页本身是被 iframe 弹层打开的，这里再手写 modal 会形成「弹层里套弹层」，
+    因此只保留字段片段，骨架/提交/校验交给统一入口（UIS v1.1 §4.5）。 */}
+<template id="resetPwdTpl">
+    <input type="hidden" name="id" value="{$row.id}">
+    <div class="row g-3">
+        <div class="col-12">
+            <label for="password" class="form-label">密码 <span class="text-danger">*</span></label>
+            <input type="password" class="form-control" id="password" name="password" placeholder="请输入密码" tabindex="0"
+                data-validation="required|passwordStrength:8,letter,digit"
+                data-validation-message-required="请输入用户密码">
+            <div id="passwordStrength" class="password-strength"></div>
+            <div class="invalid-feedback">
+                <i class="bi bi-exclamation-circle validation-icon"></i>
+                <span class="validation-text"></span>
+            </div>
+        </div>
+        <div class="col-12">
+            <label for="password_confirm" class="form-label">确认密码 <span class="text-danger">*</span></label>
+            <input type="password" class="form-control" id="password_confirm" name="password_confirm" placeholder="请再次输入密码"
+                data-validation="required|confirmPassword:password"
+                data-validation-message-required="请确认密码"
+                data-validation-message-confirmPassword="两次输入的密码不一致">
+            <div class="invalid-feedback">
+                <i class="bi bi-exclamation-circle validation-icon"></i>
+                <span class="validation-text">两次输入密码保持一致</span>
+            </div>
+        </div>
+    </div>
+</template>
+{/if}
+{include file="profile/avatar_upload" /}
+{/block}

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-bs-theme="{$wssite['theme']|default='dark'}" data-color-scheme="{$wssite['scheme']|default=''}" data-ws-sidebar="{$wssite['sidebar']|default='dark'}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark" />
+    <meta name="site-subframe" content="{:session('isSubframe')=='1' ? 'true' : 'false'}" />
+    <meta name="theme-color" content="#007bff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
+    {:csrf_meta()}
+    {/* 主题防闪烁引导：必须在所有样式表之前同步执行，首帧即应用正确主题（详见 common.php:theme_bootstrap_script） */}
+    {:theme_bootstrap_script($csp_nonce??'')}
+    <title>{$wssite['name']|default=''} - {block name="title"}{/block}</title>
+    {if (config('app.debug'))}
+    <link rel="stylesheet" href="/statics/libs/adminlte4/css/adminelte.css">
+    <!-- <link rel="stylesheet" href="/statics/libs/bootstrap/css/bootstrap-ui.css"> -->
+    <link rel="stylesheet" href="/statics/libs/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="/statics/libs/bootstrap-table/bootstrap-table-bundle.min.css">
+    <link rel="stylesheet" href="/statics/css/base.css">
+    <link rel="stylesheet" href="/statics/css/theme/theme.css">
+    {else}
+    <link rel="stylesheet" href="/statics/libs/adminlte4/css/adminelte.min.css">
+    <!-- <link rel="stylesheet" href="/statics/libs/bootstrap/css/bootstrap-ui.css"> -->
+    <link rel="stylesheet" href="/statics/libs/bootstrap-icons/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/statics/libs/bootstrap-table/bootstrap-table-bundle.min.css">
+    <link rel="stylesheet" href="/statics/css/base.css">
+    <link rel="stylesheet" href="/statics/css/theme/theme.css">
+    {/if}
+
+<!-- ================================================================
+     WiseAdmin JS 基础库 v1.0 （插件模块）
+     defer 加载：并行下载，文档序执行（jQuery→Bootstrap→plugins→ws-*→ESM）
+     ================================================================ -->
+
+<!-- Layer 1: 第三方库 -->
+<script src="/statics/js/jquery/jquery.min.js"></script>
+<script defer src="/statics/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+{if (config('app.debug'))}
+<script defer src="/statics/libs/adminlte4/js/adminelte.js"></script>
+{else}
+<script defer src="/statics/libs/adminlte4/js/adminelte.min.js"></script>
+{/if}
+
+<!-- Layer 2: bootstrap-table 合集 -->
+<script defer src="/statics/libs/bootstrap-table/bootstrap-table-bundle.min.js"></script>
+<script defer src="/statics/js/jquery-treegrid/js/jquery.treegrid.min.js"></script>
+<script defer src="/statics/libs/sortablejs/sortable.js"></script>
+
+<!-- Layer 3: 已清空（原先的热键/剪贴板/广播/Cookie 全局脚本）
+     hotkey / clipboard / broadcast / cookie 全部 ESM 化，随下方 wise-bundle.js 统一加载
+     （源码 statics/libs/<name>/<name>.js）。本模板此前就漏引 clipboard.js（插件页
+     Wise.ui.clipboard 静默降级），这类「漏引即失效」的问题随之根除；
+     四者仍在模块求值末尾挂 window.HotKey / Clipboard / Broadcast / Cookie，存量插件零改动。
+     ws-* 组件同理，见 statics/modules/ws/index.js。 -->
+
+<!-- Layer 4: EnhancedTable -->
+<script defer src="/statics/modules/enhanced-table.js"></script>
+
+<!-- PHP 配置注入 -->
+<script nonce="{$csp_nonce|default=''}">var site = {:json_encode($wssite??[], JSON_UNESCAPED_UNICODE)}</script>
+<script nonce="{$csp_nonce|default=''}">window.__WS_CONFIG__ = {:json_encode($wsconfig??[], JSON_UNESCAPED_UNICODE)}</script>
+<script nonce="{$csp_nonce|default=''}">window.__WS_SLOTS__ = {:json_encode($wsslots ?? [], JSON_UNESCAPED_UNICODE)}</script>
+
+{if (config('app.debug'))}
+<link rel="stylesheet" href="/statics/css/wise-bundle.css">
+<script type="module" src="/statics/modules/wise-bundle.js"></script>
+{else}
+<link rel="stylesheet" href="/statics/css/wise-bundle.min.css">
+<script type="module" src="/statics/modules/wise-bundle.min.js"></script>
+{/if}
+
+{block name="head"}{/block}
+{block name="css"}{/block}
+{block name="style"}{/block}
+</head>
+<body class="{block name='bodyclass'}{/block}">
+{block name="content"}{/block}
+
+<div class="loading-overlay">
+<div class="loading-spinner"></div>
+</div>
+{block name="js"}{/block}
+</body>
+</html>

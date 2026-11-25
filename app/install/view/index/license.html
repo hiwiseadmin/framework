@@ -1,0 +1,48 @@
+{extend name="index/layout" /}
+
+{block name="script"}
+<script>
+$(document).ready(function() {
+    $('#agreeCheckbox').change(function() {
+        $('.btn-install').prop('disabled', !$(this).is(':checked'));
+    });
+    
+    $('.btn-install').click(function(e) {
+        e.preventDefault();
+        if ($('#agreeCheckbox').is(':checked')) {
+            window.location.href = "{:url('/install/index/check')}";
+        } else {
+            showAlert('请先阅读并同意安装协议', 'danger');
+        }
+    });
+});
+</script>
+{/block}
+
+{block name="content"}
+<div class="row">
+    <div class="col-12">
+        <h3 class="mb-4">安装协议</h3>
+        
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-0">
+                <div class="license-content p-4" style="max-height: 400px; overflow-y: auto;">
+                    <pre style="font-family: 'Consolas', 'Monaco', monospace; font-size: 0.9rem; line-height: 1.5;">{$license|htmlspecialchars}</pre>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-check mb-4">
+            <input class="form-check-input" type="checkbox" id="agreeCheckbox">
+            <label class="form-check-label" for="agreeCheckbox">
+                我已仔细阅读并同意上述协议的所有条款
+            </label>
+        </div>
+        
+        <div class="alert alert-info alert-custom">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>提示：</strong> 您必须同意此协议才能继续安装。本协议最终解释权归软件开发者所有。
+        </div>
+    </div>
+</div>
+{/block}

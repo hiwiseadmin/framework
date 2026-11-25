@@ -1,0 +1,278 @@
+{extend name="layout" /}
+
+{block name="script"}
+<script>
+$(document).ready(function() {
+    // 安装步骤
+    const installSteps = [
+        '准备安装环境',
+        '写入配置文件',
+        '创建数据库',
+        '执行数据迁移',
+        '初始化数据',
+        '完成安装'
+    ];
+    
+    let currentStep = 0;
+    let isInstalling = false;
+    
+    // 更新步骤状态
+    function updateStepStatus(stepIndex, status) {
+        const stepElement = $(`#step-${stepIndex}`);
+        const icon = stepElement.find('.step-icon');
+        const text = stepElement.find('.step-text');
+        
+        stepElement.removeClass('step-pending step-active step-success step-error');
+        
+        if (status === 'success') {
+            stepElement.addClass('step-success');
+            icon.html('<i class="bi bi-check-circle-fill"></i>');
+            text.addClass('text-success');
+        } else if (status === 'error') {
+            stepElement.addClass('step-error');
+            icon.html('<i class="bi bi-x-circle-fill"></i>');
+            text.addClass('text-danger');
+        } else if (status === 'active') {
+            stepElement.addClass('step-active');
+            icon.html('<span class="loading-spinner"></span>');
+            text.addClass('text-primary');
+        } else {
+            stepElement.addClass('step-pending');
+            icon.html('<i class="bi bi-circle"></i>');
+            text.addClass('text-muted');
+        }
+    }
+    
+    // 初始化步骤
+    installSteps.forEach((step, index) => {
+        $('#installSteps').append(`
+            <div class="step-item" id="step-${index}">
+                <div class="step-icon"></div>
+                <div class="step-text">${step}</div>
+                <div class="step-status"></div>
+            </div>
+        `);
+        updateStepStatus(index, 'pending');
+    });
+    
+    // 开始安装
+    function startInstallation() {
+        if (isInstalling) return;
+        
+        isInstalling = true;
+        currentStep = 0;
+        
+        // 禁用按钮
+        $('.btn-install').prop('disabled', true).html('安装中...');
+        
+        // 执行第一步
+        executeStep(0);
+    }
+    
+    // 执行具体步骤
+    function executeStep(stepIndex) {
+        currentStep = stepIndex;
+        
+        // 更新当前步骤状态
+        updateStepStatus(stepIndex, 'active');
+        
+        // 根据步骤执行不同操作
+        let action = '';
+        switch(stepIndex) {
+            case 0: action = 'prepare'; break;
+            case 1: action = 'config'; break;
+            case 2: action = 'database'; break;
+            case 3: action = 'migrate'; break;
+            case 4: action = 'seed'; break;
+            case 5: action = 'complete'; break;
+        }
+        
+        // 如果是最后一步，直接完成
+        if (stepIndex >= installSteps.length - 1) {
+            setTimeout(() => {
+                updateStepStatus(stepIndex, 'success');
+                completeInstallation();
+            }, 1000);
+            return;
+        }
+        
+        // 模拟安装过程（实际应该是Ajax请求）
+        setTimeout(() => {
+            updateStepStatus(stepIndex, 'success');
+            
+            // 执行下一步
+            executeStep(stepIndex + 1);
+        }, 1500);
+    }
+    
+    // 完成安装
+    function completeInstallation() {
+        // 实际应该发送Ajax请求
+        $.ajax({
+            url: "{:url('/install/index/install')}",
+            type: 'POST',
+            data: {},
+            success: function(response) {
+                isInstalling = false;
+                
+                if (response.code === 1) {
+                    // 安装成功，跳转到完成页面
+                    setTimeout(() => {
+                        window.location.href = response.redirect;
+                    }, 1500);
+                } else {
+                    // 安装失败
+                    updateStepStatus(currentStep, 'error');
+                    $('#installResult').html(`
+                        <div class="alert alert-danger alert-custom">
+                            <i class="bi bi-x-circle-fill me-2"></i>
+                            <strong>安装失败：</strong> ${response.msg}
+                        </div>
+                    `);
+                    $('.btn-install').prop('disabled', false).html('重新安装');
+                }
+            },
+            error: function(xhr) {
+                isInstalling = false;
+                updateStepStatus(currentStep, 'error');
+                $('#installResult').html(`
+                    <div class="alert alert-danger alert-custom">
+                        <i class="bi bi-x-circle-fill me-2"></i>
+                        <strong>请求失败：</strong> ${xhr.statusText}
+                    </div>
+                `);
+                $('.btn-install').prop('disabled', false).html('重新安装');
+            }
+        });
+    }
+    
+    // 绑定开始安装按钮
+    $('.btn-install').click(function(e) {
+        e.preventDefault();
+        startInstallation();
+    });
+    
+    // 自动开始安装（如果需要）
+    setTimeout(() => {
+        if (!isInstalling) {
+            startInstallation();
+        }
+    }, 1000);
+    
+    // 样式
+    $('<style>')
+        .html(`
+            .install-process {
+                max-width: 600px;
+                margin: 0 auto;
+            }
+            .step-item {
+                display: flex;
+                align-items: center;
+                padding: 15px 0;
+                border-bottom: 1px solid #e9ecef;
+            }
+            .step-item:last-child {
+                border-bottom: none;
+            }
+            .step-icon {
+                width: 40px;
+                text-align: center;
+                font-size: 1.2rem;
+                margin-right: 15px;
+            }
+            .step-text {
+                flex: 1;
+                font-weight: 500;
+            }
+            .step-status {
+                width: 100px;
+                text-align: right;
+                font-size: 0.9rem;
+            }
+            .step-pending .step-text {
+                color: #6c757d;
+            }
+            .step-active .step-text {
+                color: #3498db;
+                font-weight: 600;
+            }
+            .step-success .step-text {
+                color: #2ecc71;
+            }
+            .step-error .step-text {
+                color: #e74c3c;
+            }
+            .step-success .step-status:after {
+                content: '✓ 成功';
+                color: #2ecc71;
+            }
+            .step-error .step-status:after {
+                content: '✗ 失败';
+                color: #e74c3c;
+            }
+            .step-active .step-status:after {
+                content: '处理中...';
+                color: #3498db;
+            }
+            #installResult {
+                margin-top: 30px;
+            }
+        `)
+        .appendTo('head');
+});
+</script>
+{/block}
+
+{block name="content"}
+<div class="row">
+    <div class="col-12 text-center">
+        <h3 class="mb-4">正在安装系统</h3>
+        <p class="text-muted mb-5">请稍候，系统正在安装中...</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="install-process">
+            <div id="installSteps"></div>
+            
+            <div id="installResult"></div>
+            
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-info-circle me-2"></i>安装信息</h5>
+                    <table class="table table-sm">
+                        <tr>
+                            <td width="40%">数据库主机</td>
+                            <td>{$config.hostname|default='localhost'}</td>
+                        </tr>
+                        <tr>
+                            <td>数据库名称</td>
+                            <td>{$config.database|default='未设置'}</td>
+                        </tr>
+                        <tr>
+                            <td>数据表前缀</td>
+                            <td>{$config.prefix|default='ws_'}</td>
+                        </tr>
+                        <tr>
+                            <td>管理员账号</td>
+                            <td>{$config.admin_username|default='admin'}</td>
+                        </tr>
+                        <tr>
+                            <td>管理员密码</td>
+                            <td>{$hide_password|default='******'}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="alert alert-info alert-custom mt-4">
+                <i class="bi bi-hourglass-split me-2"></i>
+                <strong>安装过程中请不要关闭或刷新页面！</strong>
+                <p class="mb-0 mt-2">安装过程可能需要几分钟时间，具体取决于服务器性能和数据库大小。</p>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

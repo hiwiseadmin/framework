@@ -1,0 +1,79 @@
+{extend name="public/base" /}
+
+{block name="title"}登录日志详情{/block}
+
+{block name="content"}
+    <div class="container p-4">
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">ID</div>
+            <div class="col p-2">{$loginLog.id}</div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">用户ID</div>
+            <div class="col p-2">{$loginLog.admin_id}</div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">用户名</div>
+            <div class="col p-2">{$loginLog.username|default='未知'}</div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">登录IP</div>
+            <div class="col p-2">{$loginLog.login_ip|default=''}</div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">登录地点</div>
+            <div class="col p-2">{$loginLog.location|default='未知'}</div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">浏览器</div>
+            <div class="col p-2">{$loginLog.browser|default='未知'}</div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">操作系统</div>
+            <div class="col p-2">{$loginLog.os|default='未知'}</div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">登录状态</div>
+            <div class="col p-2">{$loginLog.status_text|default='未知'}</div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">登录时间</div>
+            <div class="col p-2">{$loginLog.login_time|default='未知'}</div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">登录消息</div>
+            <div class="col p-2">{$loginLog.message|default='未知'}</div> 
+        </div>
+        <!-- 用户信息 -->
+        {if $loginLog.admin}
+        <div class="row align-items-center">
+            <div class="col p-2 text-center text-success">———————— 用户信息 ————————</div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">昵称</div>
+            <div class="col p-2">{$loginLog.admin.nickname|default='未知'}</div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">邮箱</div>
+            <div class="col p-2">{$loginLog.admin.email|default='未知'}</div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">手机号</div>
+            <div class="col p-2">{$loginLog.admin.mobile|default='未知'}</div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">最后登录时间</div>
+            <div class="col p-2">{$loginLog.admin.last_login_time|default=''}</div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">最后登录IP</div>
+            <div class="col p-2">{$loginLog.admin.last_login_ip|default=''}</div>
+        </div>
+        <!-- 创建时间 -->
+        <div class="row align-items-center">
+            <div class="col-3 p-2 text-end">创建时间</div>
+            <div class="col p-2">{$loginLog.admin.create_time|default=''}</div>
+        </div>
+        {/if}
+    </div>
+{/block}
